@@ -7,33 +7,37 @@ const ListItem = styled('li')(({ theme }) => ({
   margin: theme.spacing(0.5),
 }));
 
-export default function ChipsArray({array, removeValue}) {
+export default function ChipsArray({ array, removeValue }) {
 
   const handleDelete = (index) => () => {
-        removeValue(index);
+    removeValue(index);
   };
 
   return (
-    <Paper
-      sx={{
-        flexWrap: 'wrap',
-        listStyle: 'none',
-        p: 0.5,
-        m: 0,
-      }}
-      component="ul"
-    >
-      {array.map((item, index) => {
+    <>
+      {array.length > 0 && (
+        <Paper
+          sx={{
+            flexWrap: 'wrap',
+            listStyle: 'none',
+            p: 0.5,
+            m: 0,
+          }}
+          component="ul"
+        >
+          {array.map((item, index) => {
 
-        return (
-          <ListItem key={index}>
-            <Chip
-              label={item}
-              onDelete={handleDelete(index)}
-            />
-          </ListItem>
-        );
-      })}
-    </Paper>
+            return (
+              <ListItem key={index}>
+                <Chip
+                  label={item}
+                  onDelete={handleDelete(index)}
+                />
+              </ListItem>
+            );
+          })}
+        </Paper>
+      )}
+    </>
   );
 }

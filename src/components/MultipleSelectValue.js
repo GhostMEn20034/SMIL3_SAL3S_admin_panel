@@ -7,6 +7,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Chip from '@mui/material/Chip';
 
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -19,7 +20,7 @@ const MenuProps = {
 };
 
 
-export default function MultipleSelect({ value, setValue, objectKey, objectValue, menuItems, label }) {
+export default function MultipleSelect({ value, setValue, objectKey, objectValue, menuItems, label}) {
 
     const handleChange = (event) => {
         const {

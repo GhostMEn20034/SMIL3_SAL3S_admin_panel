@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import useAxios from "../utils/useAxios";
-import { Box, Button, TextField, Alert } from "@mui/material";
+import { Box, Button, TextField } from "@mui/material";
 import SelectValue from "./SelectValue";
 import MultipleSelect from "./MultipleSelectValue";
 import ChipsArray from "./ChipsArray";
@@ -14,9 +14,9 @@ export default function FacetEdit({ facet, categories }) {
     const [optional, setOptional] = useState(facet.optional);
     const [values, setValues] = useState(facet.values);
     const [showInFilters, setShowInFilters] = useState(facet.show_in_filters);
-    const [choosenCategories, setChoosenCategories] = useState(facet.categories);
+    const [chosenCategories, setChosenCategories] = useState(facet.categories);
     const [newFacetValue, setNewFacetValue] = useState("");
-    const [error, setError] = useState("");
+    const [errors, setErrors] = useState({});
 
     const api = useAxios('products');
     const navigate = useNavigate();
@@ -41,18 +41,14 @@ export default function FacetEdit({ facet, categories }) {
                 name: name,
                 optional: optional,
                 show_in_filters: showInFilters,
-                categories: choosenCategories,
+                categories: chosenCategories.length > 0 ? chosenCategories : "*",
                 values: values
             });
             navigate(-1);
         } catch (error) {
-            if (error.response.status === 422) {
-                setError("Make sure that all fields are not empty");
-            } else {
-                setError(error.response.data.error);
-            }
+            setErrors(error.response.data.errors);
         }
-    }
+    };
 
     const removeValue = (index) => {
         setValues((prevValues) => {
@@ -68,10 +64,6 @@ export default function FacetEdit({ facet, categories }) {
         setNewFacetValue("");
     };
 
-    const isFormValid = () => {
-        return name.trim() && choosenCategories && values;
-    }
-
     return (
         <>
             <Box>
@@ -79,10 +71,10 @@ export default function FacetEdit({ facet, categories }) {
                     <TextField value={code} label="Code" size="small" disabled />
                 </Box>
                 <Box sx={{ mt: 2 }}>
-                    <TextField value={name} onChange={(e) => setName(e.target.value)} label="Name" size="small" />
+                    <TextField value={name} onChange={(e) => setName(e.target.value)} label="Name" size="small" error={errors.name !== undefined} helperText={errors.name ? errors.name : ""} />
                 </Box>
                 <Box sx={{ mt: 2 }}>
-                    <SelectValue value={type} setValue={setType} menuItems={facetTypes} label={"Type"} disabled={true}/>
+                    <SelectValue value={type} setValue={setType} menuItems={facetTypes} label={"Type"} disabled={true} />
                 </Box>
                 <Box sx={{ mt: 2 }}>
                     <SelectValue value={optional} setValue={setOptional} menuItems={[
@@ -97,7 +89,7 @@ export default function FacetEdit({ facet, categories }) {
                     ]} label={"Show in filters"} />
                 </Box>
                 <Box sx={{ mt: 2 }}>
-                    <MultipleSelect value={choosenCategories === "*" ? [] : choosenCategories} setValue={setChoosenCategories}
+                    <MultipleSelect value={chosenCategories === "*" ? [] : chosenCategories} setValue={setChosenCategories}
                         objectKey={"_id"} objectValue={"name"} menuItems={categories} label={"Categories"} />
                 </Box>
                 {["list_string", "list_integer"].includes(type) && (
@@ -107,9 +99,11 @@ export default function FacetEdit({ facet, categories }) {
                                 onChange={(e) => setNewFacetValue(e.target.value)}
                                 label="New facet value"
                                 size="small"
+                                error={errors.values !== undefined}
+                                helperText={errors.values ? errors.values : ""}
                                 sx={{ mr: 2 }}
                             />
-                            <Button size="small" color="primary" variant="contained"
+                            <Button size="small" color="primary" variant="contained" sx={{maxHeight: "40px"}}
                                 onClick={() => addValue(newFacetValue)}
                                 disabled={newFacetValue === ""}
                             >
@@ -121,22 +115,13 @@ export default function FacetEdit({ facet, categories }) {
                         </Box>
                     </Box>
                 )}
-                {error && (
-                <Box sx={{mt: 2}}>
-                    <Alert severity="error" onClose={() => setError("")}>
-                        {error}
-                    </Alert>
-                </Box>
-                )}
-                <Box sx={{mt: 2, mb: 2}}>
+                <Box sx={{ mt: 2, mb: 2 }}>
                     <Button variant="contained" size="large" color="primary"
-                        disabled={!isFormValid()}
                         onClick={updateFacet}
                     >
                         Submit
                     </Button>
                 </Box>
-
             </Box>
         </>
     )

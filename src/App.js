@@ -8,7 +8,7 @@ import Login from './pages/LoginPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import FacetPage from './pages/FacetPage';
 import FacetDetailPage from './pages/FacetDetailPage';
-
+import AddFacetPage from './pages/AddFacetPage';
 
 function App() {
 
@@ -37,6 +37,11 @@ function App() {
             <Route path='/facets/:id' element={
               <PrivateRoute>
                 <FacetDetailPage />
+              </PrivateRoute>
+            }/>
+            <Route path='/facets/add' element={
+              <PrivateRoute>
+                <AddFacetPage />
               </PrivateRoute>
             }/>
           </Routes>
