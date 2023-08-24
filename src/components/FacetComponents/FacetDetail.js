@@ -1,6 +1,6 @@
 import { Box, Typography, Divider } from "@mui/material";
-import findCategoryByID from "../utils/FacetServices";
-
+import findCategoryByID from "../../utils/FacetServices";
+import { Fragment } from "react";
 
 
 export default function FacetDetail({ facet, categories }) {
@@ -32,14 +32,14 @@ export default function FacetDetail({ facet, categories }) {
             width: "50%",
         }}>
             {fields.map((field, index) => (
-                <>
-                    <Box key={index}>
-                        <Typography variant="h6" key={index}>
+                <Fragment key={`${index}-box`}>
+                    <Box>
+                        <Typography variant="h6">
                             {field.fieldName}: {facet[field.fieldValue]}
                         </Typography>
                     </Box>
                     <Divider />
-                </>
+                </Fragment>
             ))}
             <Box>
                 <Typography variant="h6">
@@ -62,7 +62,7 @@ export default function FacetDetail({ facet, categories }) {
                     <Box sx={{ ml: 5 }}>
                         <ul style={{ marginBlockStart: 0 }}>
                             {facet["values"].map((value, index) => (
-                                <li key={index}>
+                                <li key={`${index}-text`}>
                                     <Typography variant="h6">
                                         {value}
                                     </Typography>
@@ -84,17 +84,19 @@ export default function FacetDetail({ facet, categories }) {
                                 {"All categories"}
                             </Typography>
                         ) : (
-                            <ul style={{ marginBlockStart: 0 }}>
-                                {facet["categories"].map((value, index) => (
-                                    <li key={index}>
-                                        <Typography variant="h6">
-                                            {findCategoryByID(value, categories)}
-                                        </Typography>
-                                    </li>
-                                ))}
-                            </ul>
+                            <>
+                                <ul style={{ marginBlockStart: 0 }}>
+                                    {facet["categories"].map((value, index) => (
+                                        <li key={`${index}-li`}>
+                                            <Typography variant="h6">
+                                                {findCategoryByID(value, categories)}
+                                            </Typography>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </>
                         )}
-
+                            
                     </Box>
                 </Box>
             )}

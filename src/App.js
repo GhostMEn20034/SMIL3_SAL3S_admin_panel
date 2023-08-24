@@ -9,6 +9,9 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import FacetPage from './pages/FacetPage';
 import FacetDetailPage from './pages/FacetDetailPage';
 import AddFacetPage from './pages/AddFacetPage';
+import VariationThemePage from './pages/VariationThemePage';
+import VariationThemeDetailPage from './pages/VariationThemeDetailPage';
+
 
 function App() {
 
@@ -42,6 +45,16 @@ function App() {
             <Route path='/facets/add' element={
               <PrivateRoute>
                 <AddFacetPage />
+              </PrivateRoute>
+            }/>
+            <Route path='/variation-themes' element={
+              <PrivateRoute>
+                <VariationThemePage />
+              </PrivateRoute>
+            } />
+            <Route path='/variation-themes/:id' element={
+              <PrivateRoute>
+                <VariationThemeDetailPage />
               </PrivateRoute>
             }/>
           </Routes>

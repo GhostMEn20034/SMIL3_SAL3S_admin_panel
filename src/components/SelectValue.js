@@ -22,8 +22,8 @@ export default function SelectValue({ value, setValue, menuItems, label, disable
         label={label}
         onChange={handleChange}
       >
-      {menuItems.map((menuItem) => (
-        <MenuItem value={menuItem.value}>{menuItem.name}</MenuItem>
+      {menuItems.map((menuItem, index) => (
+        <MenuItem key={index} value={menuItem.value}>{menuItem.name}</MenuItem>
       ))}
       </Select>
     </FormControl>

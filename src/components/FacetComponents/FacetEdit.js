@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import useAxios from "../utils/useAxios";
+import useAxios from "../../utils/useAxios";
 import { Box, Button, TextField } from "@mui/material";
-import SelectValue from "./SelectValue";
-import MultipleSelect from "./MultipleSelectValue";
-import ChipsArray from "./ChipsArray";
+import SelectValue from "../SelectValue";
+import MultipleSelect from "../MultipleSelectValue";
+import ChipsArray from "../ChipsArray";
 import { useNavigate } from "react-router-dom";
 
 export default function FacetEdit({ facet, categories }) {

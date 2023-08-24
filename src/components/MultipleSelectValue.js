@@ -20,13 +20,19 @@ const MenuProps = {
 };
 
 
-export default function MultipleSelect({ value, setValue, objectKey, objectValue, menuItems, label}) {
+export default function MultipleSelect({ value, setValue, objectKey, objectValue, menuItems, label, index }) {
 
     const handleChange = (event) => {
         const {
             target: { value },
         } = event;
-        setValue(value)
+        
+        if (index !== null && index !== undefined) {
+            setValue(value, index);
+        } else {
+            setValue(value);
+        }
+
     };
 
     return (
