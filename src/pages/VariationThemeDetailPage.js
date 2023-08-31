@@ -20,7 +20,7 @@ export default function VariationThemeDetailPage() {
 
     const getCategories = async () => {
         try {
-            let response = await api.get(`/categories/`);
+            let response = await api.get(`/categories/for-choices`);
             let data = await response.data;
             setCategories(data);
         } catch {
@@ -35,7 +35,7 @@ export default function VariationThemeDetailPage() {
             let data = await response.data;
             setVariationTheme(data);
         } catch (error) {
-            console.log(error);
+            console.log("Something went wrong");
         }
     };
 
@@ -47,6 +47,15 @@ export default function VariationThemeDetailPage() {
     useEffect(() => {
         getCategories();
     }, []);
+
+    const deleteVariationTheme = async () => {
+        try {
+            await api.delete(`/variation-themes/${params.id}`);
+            navigate(-1);
+        } catch {
+            console.log("Something went wrong");
+        }
+    }
 
     return (
         <>
@@ -60,7 +69,7 @@ export default function VariationThemeDetailPage() {
                             <Button variant="contained" size="small" onClick={() => setEditMode(!editMode)}>{editMode ? "Go to detail view" : "Edit"}</Button>
                         </Box>
                         <Box sx={{ mt: 2, ml: 5 }}>
-                            <Button variant="contained" color="error" size="small">Delete Facet</Button>
+                            <Button variant="contained" color="error" size="small" onClick={deleteVariationTheme}>Delete Variation Theme</Button>
                         </Box>
                     </Box>
 

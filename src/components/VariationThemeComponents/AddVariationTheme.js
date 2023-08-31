@@ -1,21 +1,34 @@
-import { Box, TextField, Divider, Typography, IconButton, Button, Alert } from "@mui/material";
-import MultipleSelect from "../MultipleSelectValue";
-import { Fragment, useEffect, useState } from "react";
+import { useState, useEffect, Fragment } from "react";
+import { Box, TextField, IconButton, Typography, Divider, Alert, Button } from "@mui/material";
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import MultipleSelect from "../MultipleSelectValue";
 import useAxios from "../../utils/useAxios";
 import { useNavigate } from "react-router-dom";
+import slugify from "voca/slugify";
 
 
-export default function VariationThemeEdit({ variationTheme, categories }) {
-    const [name, setName] = useState(variationTheme.name);
-    const [filters, setFilters] = useState(variationTheme.filters);
-    const [chosenCategories, setChosenCategories] = useState(variationTheme.categories);
+export default function AddVariationTheme() {
+    const [name, setName] = useState("");
+    const [filters, setFilters] = useState([{ name: "", field_codes: [] }]);
+    const [chosenCategories, setChosenCategories] = useState([]);
     const [facets, setFacets] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [errors, setErrors] = useState([]);
 
-    const api = useAxios("products");
+    const api = useAxios('products');
     const navigate = useNavigate();
+
+
+    const getCategories = async () => {
+        try {
+            let response = await api.get(`/categories/for-choices`);
+            let data = await response.data;
+            setCategories(data);
+        } catch {
+            console.log("Something went wrong");
+        }
+    };
 
     const getFacets = async () => {
         try {
@@ -29,7 +42,9 @@ export default function VariationThemeEdit({ variationTheme, categories }) {
 
     useEffect(() => {
         getFacets();
+        getCategories();
     }, []);
+
 
     const changeFieldCodes = (value, indexTarget) => {
         let newFilters = filters.map((filter, index) => {
@@ -81,6 +96,11 @@ export default function VariationThemeEdit({ variationTheme, categories }) {
         })
     };
 
+
+    const addFilter = () => {
+        setFilters([...filters, { name: "", field_codes: [] }]);
+    };
+
     const removeError = (indexTarget) => {
         setErrors(prevErrors => {
             // Make a copy of the previous array
@@ -94,13 +114,10 @@ export default function VariationThemeEdit({ variationTheme, categories }) {
         });
     };
 
-    const addFilter = () => {
-        setFilters([...filters, { name: "", field_codes: [] }]);
-    };
-
-    const updateVariationTheme = async () => {
+    const addVariationTheme = async () => {
         try {
-            await api.put(`/variation-themes/${variationTheme._id}`, {
+            await api.post("/variation-themes/", {
+                name: name,
                 filters: filters,
                 categories: chosenCategories
             });
@@ -118,6 +135,7 @@ export default function VariationThemeEdit({ variationTheme, categories }) {
         }
     };
 
+
     return (
         <Box>
             {errors.length > 0 && (
@@ -133,7 +151,7 @@ export default function VariationThemeEdit({ variationTheme, categories }) {
                 Variation theme name:
             </Typography>
             <Box>
-                <TextField label="Name" disabled value={name} />
+                <TextField label="Name" value={name} onChange={(e) => setName(slugify(e.target.value))} />
             </Box>
             <Box>
                 <Divider sx={{ mt: 2, backgroundColor: "black" }} />
@@ -195,7 +213,7 @@ export default function VariationThemeEdit({ variationTheme, categories }) {
             </Box>
             <Box sx={{ mb: 2 }}>
                 <Button variant="contained" size="large" color="primary"
-                    onClick={updateVariationTheme}
+                    onClick={addVariationTheme}
                 >
                     Submit
                 </Button>

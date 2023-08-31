@@ -11,6 +11,7 @@ import FacetDetailPage from './pages/FacetDetailPage';
 import AddFacetPage from './pages/AddFacetPage';
 import VariationThemePage from './pages/VariationThemePage';
 import VariationThemeDetailPage from './pages/VariationThemeDetailPage';
+import AddVariationThemePage from './pages/AddVariationThemePage';
 
 
 function App() {
@@ -55,6 +56,11 @@ function App() {
             <Route path='/variation-themes/:id' element={
               <PrivateRoute>
                 <VariationThemeDetailPage />
+              </PrivateRoute>
+            }/>
+            <Route path='/variation-themes/add' element={
+              <PrivateRoute>
+                <AddVariationThemePage />
               </PrivateRoute>
             }/>
           </Routes>

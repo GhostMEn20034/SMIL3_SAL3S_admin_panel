@@ -1,10 +1,10 @@
 import { Box, TextField, Button, Alert } from "@mui/material";
-import SelectValue from "./SelectValue";
-import MultipleSelect from "./MultipleSelectValue";
+import SelectValue from "../SelectValue";
+import MultipleSelect from "../MultipleSelectValue";
 import { useState, useEffect } from "react";
-import useAxios from "../utils/useAxios";
+import useAxios from "../../utils/useAxios";
 import { useNavigate } from "react-router-dom";
-import ChipsArray from "./ChipsArray";
+import ChipsArray from "../ChipsArray";
 import slugify from "voca/slugify";
 
 
@@ -36,7 +36,7 @@ export default function AddFacet() {
 
     const getCategories = async () => {
         try {
-            let response = await api.get(`/categories/`);
+            let response = await api.get(`/categories/for-choices`);
             let data = await response.data;
             setCategories(data);
         } catch {

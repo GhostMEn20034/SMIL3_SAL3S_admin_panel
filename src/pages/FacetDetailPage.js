@@ -35,7 +35,7 @@ export default function FacetDetailPage() {
 
     const getCategories = async () => {
         try {
-            let response = await api.get(`/categories/`);
+            let response = await api.get(`/categories/for-choices`);
             let data = await response.data;
             setCategories(data);
         } catch {

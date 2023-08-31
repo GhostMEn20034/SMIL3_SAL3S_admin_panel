@@ -96,7 +96,6 @@ export default function FacetDetail({ facet, categories }) {
                                 </ul>
                             </>
                         )}
-                            
                     </Box>
                 </Box>
             )}
