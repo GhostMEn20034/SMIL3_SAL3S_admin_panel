@@ -97,7 +97,7 @@ export default function AddFacet() {
     return (
         <Box>
             {fields.map((field, index) => (
-                <Box sx={{mt: index !== 0 ? 2 : 0}}>
+                <Box sx={{mt: index !== 0 ? 2 : 0}} key={index}>
                     <TextField error={field.error} value={field.value} onChange={field.setValue} label={field.label} disabled={field.disabled} helperText={field.helperText} />
                 </Box>
             ))}

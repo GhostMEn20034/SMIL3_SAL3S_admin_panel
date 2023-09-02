@@ -12,6 +12,10 @@ import AddFacetPage from './pages/AddFacetPage';
 import VariationThemePage from './pages/VariationThemePage';
 import VariationThemeDetailPage from './pages/VariationThemeDetailPage';
 import AddVariationThemePage from './pages/AddVariationThemePage';
+import CategoryPage from './pages/CategoryPage';
+import CategoryDetailPage from './pages/CategoryDetailPage';
+import AddCategoryPage from './pages/AddCategoryPage';
+
 
 
 function App() {
@@ -63,6 +67,21 @@ function App() {
                 <AddVariationThemePage />
               </PrivateRoute>
             }/>
+            <Route path='/categories' element={
+              <PrivateRoute>
+                <CategoryPage />
+              </PrivateRoute>
+            } />
+            <Route path='/categories/:id' element={
+              <PrivateRoute>
+                <CategoryDetailPage />
+              </PrivateRoute>
+            } />
+            <Route path='/categories/add' element={
+              <PrivateRoute>
+                <AddCategoryPage />
+              </PrivateRoute>
+            } />
           </Routes>
         </UserProvider>
       </AuthProvider>

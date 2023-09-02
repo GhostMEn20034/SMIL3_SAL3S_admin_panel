@@ -2,16 +2,17 @@ import { Box, Button, Typography } from "@mui/material";
 import useAxios from "../utils/useAxios";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import FacetDetail from "../components/FacetComponents/FacetDetail";
-import FacetEdit from "../components/FacetComponents/FacetEdit";
-import FacetDelete from "../components/FacetComponents/FacetDelete";
+import CategoryDetail from "../components/CategoryComponents/CategoryDetail";
+import CategoryEdit from "../components/CategoryComponents/CategoryEdit";
+import CategoryDelete from "../components/CategoryComponents/CategoryDelete";
 
-export default function FacetDetailPage() {
+export default function CategoryDetailPage() {
 
-    const [facet, setFacet] = useState({});
-    const [categories, setCategories] = useState([]);
+    const [category, setCategory] = useState({});
+    const [categoriesForChoices, setCategoriesForChoices] = useState([]);
     const [editMode, setEditMode] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
+    const [error, setError] = useState("");
 
     const api = useAxios('products');
 
@@ -23,11 +24,11 @@ export default function FacetDetailPage() {
         navigate(-1);
     };
 
-    const getFacetById = async () => {
+    const getCategoryById = async () => {
         try {
-            let response = await api.get(`/facets/${params.id}`);
+            let response = await api.get(`/categories/${params.id}`);
             let data = await response.data;
-            setFacet(data);
+            setCategory(data);
         } catch (error) {
             console.log(error.response.details);
         }
@@ -37,23 +38,23 @@ export default function FacetDetailPage() {
         try {
             let response = await api.get(`/categories/for-choices`);
             let data = await response.data;
-            setCategories(data);
+            setCategoriesForChoices(data.filter((obj) => obj._id !== params.id));
         } catch {
             console.log("Something went wrong");
         }
     };
 
-    const deleteFacet = async () => {
+    const deleteCategory = async () => {
         try {
-            await api.delete(`/facets/${facet._id}`);
+            await api.delete(`/categories/${category._id}`);
             navigate(-1);
         } catch (error) {
-
+            setError(error.response.data.detail)
         }
     };
 
     useEffect(() => {
-        getFacetById();
+        getCategoryById();
     }, []);
 
     useEffect(() => {
@@ -62,14 +63,20 @@ export default function FacetDetailPage() {
 
 
     return (
-        <>
-            {openDialog && (
-                <FacetDelete open={openDialog} setOpen={setOpenDialog} onSubmit={deleteFacet} />
-            )}
-            {facet && categories && (
+        <>  
+            {category && (
                 <>
                     <Box display={"flex"}>
+                        {openDialog && (
+                            <CategoryDelete open={openDialog} setOpen={setOpenDialog} 
+                            onSubmit={deleteCategory} error={error} setError={setError} />
+                        )}
                         <Box>
+                            <Box sx={{ mt: 5, ml: 5}}>
+                                <Typography variant="h5">
+                                    Detail info of {category.name}
+                                </Typography>
+                            </Box>
                             <Box sx={{ mt: 5, ml: 5 }}>
                                 <Button variant="contained" size="small" color="warning" onClick={goBack}>Go back</Button>
                             </Box>
@@ -77,14 +84,14 @@ export default function FacetDetailPage() {
                                 <Button variant="contained" size="small" onClick={() => setEditMode(!editMode)}>{editMode ? "Go to detail view" : "Edit"}</Button>
                             </Box>
                             <Box sx={{ mt: 2, ml: 5 }}>
-                                <Button variant="contained" color="error" size="small" onClick={() => setOpenDialog(!openDialog)}>Delete Facet</Button>
+                                <Button variant="contained" color="error" size="small" onClick={() => setOpenDialog(true)}>Delete Category</Button>
                             </Box>
                         </Box>
-                        <Box display={"flex"} alignItems={"center"} justifyContent={"center"} sx={{ mt: 4, ml: "30vh", width: "600px" }}>
+                        <Box display={"flex"} alignItems={"center"} justifyContent={"center"} sx={{ mt: 4, width: "600px" }}>
                             {editMode ? (
-                                <FacetEdit facet={facet} categories={categories} />
+                                <CategoryEdit category={category} categoriesForChoices={categoriesForChoices} />
                             ) : (
-                                <FacetDetail facet={facet} categories={categories} />
+                                <CategoryDetail category={category} categoriesForChoices={categoriesForChoices} />
                             )}
                         </Box>
                     </Box>
