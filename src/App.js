@@ -15,6 +15,8 @@ import AddVariationThemePage from './pages/AddVariationThemePage';
 import CategoryPage from './pages/CategoryPage';
 import CategoryDetailPage from './pages/CategoryDetailPage';
 import AddCategoryPage from './pages/AddCategoryPage';
+import ProductPage from './pages/ProductPage';
+import AddProductPageChooseCategory from './pages/AddProductPageChooseCategory';
 
 
 
@@ -80,6 +82,16 @@ function App() {
             <Route path='/categories/add' element={
               <PrivateRoute>
                 <AddCategoryPage />
+              </PrivateRoute>
+            } />
+            <Route path='/products' element={
+              <PrivateRoute>
+                <ProductPage />
+              </PrivateRoute>
+            } />
+            <Route path='/products/add/choose-category' element={
+              <PrivateRoute>
+                <AddProductPageChooseCategory />
               </PrivateRoute>
             } />
           </Routes>

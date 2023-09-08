@@ -29,7 +29,7 @@ export default function SideMenu({ open, setOpen, user }) {
     const iconColor = "#D5D507"
 
     const menuLinks = [
-        '/',
+        '/products',
         '/facets',
         '/variation-themes',
         '/categories'
