@@ -3,18 +3,12 @@ import { useNavigate } from "react-router-dom";
 import {
     Box,
     Button,
-    Typography,
-    Radio,
-    RadioGroup,
-    FormControl,
-    FormLabel,
-    FormControlLabel
+    Typography
 } from "@mui/material";
 import useAxios from "../utils/useAxios";
 import ChooseProductCategory from "../components/ProductComponents/ChooseProductCategory";
 
 export default function AddProductPageChooseCategory() {
-    const [hasVariations, setHasVariations] = useState(false);
     const [category, setCategory] = useState(null);
     const [categoriesToChoose, setCategoriesToChoose] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
@@ -23,10 +17,6 @@ export default function AddProductPageChooseCategory() {
     const navigate = useNavigate();
 
     const api = useAxios('products');
-
-    const handleChange = (event) => {
-        setHasVariations(event.target.value);
-    };
 
     const getCategories = async () => {
         try {
@@ -54,7 +44,7 @@ export default function AddProductPageChooseCategory() {
     return (
         <Box>
             {openDialog && (
-                <ChooseProductCategory open={openDialog} onClose={handleClose} categories={categoriesToChoose} />
+                <ChooseProductCategory open={openDialog} setOpen={setOpenDialog} onClose={handleClose} categories={categoriesToChoose} />
             )}
             <Box sx={{ ml: 3, mt: 3 }}>
                 <Typography variant="h4">
@@ -66,21 +56,6 @@ export default function AddProductPageChooseCategory() {
             </Box>
             <Box display={"flex"} alignItems={"center"} justifyContent={"center"}>
                 <Box>
-                    <Box>
-                        <FormControl>
-                            <FormLabel id="demo-row-radio-buttons-group-label"><Typography variant="h6">Product has variations?</Typography></FormLabel>
-                            <RadioGroup
-                                row
-                                aria-labelledby="demo-row-radio-buttons-group-label"
-                                name="row-radio-buttons-group"
-                                value={hasVariations}
-                                onChange={handleChange}
-                            >
-                                <FormControlLabel value={false} control={<Radio />} label="No" />
-                                <FormControlLabel value={true} control={<Radio />} label="Yes" />
-                            </RadioGroup>
-                        </FormControl>
-                    </Box>
                     <Box sx={{mt: 1}}>
                         <Typography sx={{color: "rgba(0, 0, 0, 0.6)"}} variant="h6">
                             Category:

@@ -1,4 +1,4 @@
-import { Box, TextField, Button, Alert } from "@mui/material";
+import { Box, TextField, Button, Checkbox, FormControlLabel } from "@mui/material";
 import SelectValue from "../SelectValue";
 import MultipleSelect from "../MultipleSelectValue";
 import { useState, useEffect } from "react";
@@ -6,19 +6,29 @@ import useAxios from "../../utils/useAxios";
 import { useNavigate } from "react-router-dom";
 import ChipsArray from "../ChipsArray";
 import slugify from "voca/slugify";
+import { removeItemFromChipsArray, addItemToChipsArray } from "../../utils/FacetServices";
 
 
 export default function AddFacet() {
     const [code, setCode] = useState("");
     const [name, setName] = useState("");
     const [type, setType] = useState("string");
-    const [values, setValues] = useState([]);
+
+    const [facetValues, setFacetValues] = useState([]);
+    const [newFacetValue, setNewFacetValue] = useState("");
+
+    const [newUnitValue, setNewUnitValue] = useState("");
+    const [units, setUnits] = useState([]);
+    const [unitsIsNull, setUnitsIsNull] = useState(true);
+
     const [chosenCategories, setChosenCategories] = useState([]);
+
     const [optional, setOptional] = useState(false);
     const [showInFilters, setShowInFilters] = useState(true);
-    const [newFacetValue, setNewFacetValue] = useState("");
+
     const [facetTypes, setFacetTypes] = useState([]);
     const [categories, setCategories] = useState([]);
+
     const [errors, setErrors] = useState({});
 
     const api = useAxios('products');
@@ -54,9 +64,10 @@ export default function AddFacet() {
             optional: optional,
             show_in_filters: showInFilters,
             categories: chosenCategories.length > 0 ? chosenCategories : "*",
-            values: ["list_string", "list_integer"].includes(type) ? values : null
+            values: type === "list" ? facetValues : null,
+            units: !unitsIsNull && units.length > 0 ? units : null,
         };
-        
+
         try {
             await api.post("/facets/", bodyData);
             navigate(-1);
@@ -70,20 +81,6 @@ export default function AddFacet() {
         getFacetTypes();
     }, []);
 
-    const removeValue = (index) => {
-        setValues((prevValues) => {
-            // Use the filter method to create a new array without the item at the given index
-            return prevValues.filter((item, i) => i !== index);
-        });
-    };
-
-    const addValue = (item) => {
-        setValues((prevValues) => {
-            return [...prevValues, item];
-        });
-        setNewFacetValue("");
-    };
-
     const handleChangeName = (e) => {
         setName(e.target.value);
         setCode(slugify(e.target.value));
@@ -92,12 +89,12 @@ export default function AddFacet() {
     const fields = [
         { value: code, setValue: null, label: "Code", disabled: true, error: errors.code !== undefined, helperText: errors.name ? errors.name : "" },
         { value: name, setValue: handleChangeName, label: "Name", disabled: false, error: errors.name !== undefined, helperText: errors.name ? errors.name : "" }
-    ]
+    ];
 
     return (
         <Box>
             {fields.map((field, index) => (
-                <Box sx={{mt: index !== 0 ? 2 : 0}} key={index}>
+                <Box sx={{ mt: index !== 0 ? 2 : 0 }} key={index}>
                     <TextField error={field.error} value={field.value} onChange={field.setValue} label={field.label} disabled={field.disabled} helperText={field.helperText} />
                 </Box>
             ))}
@@ -106,9 +103,9 @@ export default function AddFacet() {
             </Box>
             <Box sx={{ mt: 2 }}>
                 <MultipleSelect value={chosenCategories === "*" ? [] : chosenCategories} setValue={setChosenCategories}
-                    objectKey={"_id"} objectValue={"name"} menuItems={categories} label={"Categories"} error={errors.categories !== undefined} helperText={errors.categories ? errors.categories : ""}/>
+                    objectKey={"_id"} objectValue={"name"} menuItems={categories} label={"Categories"} error={errors.categories !== undefined} helperText={errors.categories ? errors.categories : ""} />
             </Box>
-            {["list_string", "list_integer"].includes(type) && (
+            {type === 'list' && (
                 <Box sx={{ mt: 2 }}>
                     <Box display={"flex"}>
                         <TextField value={newFacetValue}
@@ -119,15 +116,41 @@ export default function AddFacet() {
                             size="small"
                             sx={{ mr: 2 }}
                         />
-                        <Button size="small" color="primary" variant="contained" sx={{maxHeight: "40px"}}
-                            onClick={() => addValue(newFacetValue)}
+                        <Button size="small" color="primary" variant="contained" sx={{ maxHeight: "40px" }}
+                            onClick={() => addItemToChipsArray(newFacetValue, setFacetValues, setNewFacetValue)}
                             disabled={newFacetValue === ""}
                         >
                             Add new facet value
                         </Button>
                     </Box>
                     <Box sx={{ mt: 2 }}>
-                        <ChipsArray array={values} removeValue={removeValue} />
+                        <ChipsArray array={facetValues} removeValue={(index) => removeItemFromChipsArray(index, setFacetValues)} />
+                    </Box>
+                </Box>
+            )}
+            <Box sx={{ mt: 2 }}>
+                <FormControlLabel control={
+                    <Checkbox checked={unitsIsNull} onChange={() => setUnitsIsNull(!unitsIsNull)} />
+                } label="Facet has no units" />
+            </Box>
+            {!unitsIsNull && (
+                <Box sx={{ mt: 2 }}>
+                    <Box display={"flex"}>
+                        <TextField value={newUnitValue}
+                            onChange={(e) => setNewUnitValue(e.target.value)}
+                            label="New unit value"
+                            size="small"
+                            sx={{ mr: 2 }}
+                        />
+                        <Button size="small" color="primary" variant="contained" sx={{ maxHeight: "40px" }}
+                            onClick={() => addItemToChipsArray(newUnitValue, setUnits, setNewUnitValue)}
+                            disabled={newUnitValue === ""}
+                        >
+                            Add new unit value
+                        </Button>
+                    </Box>
+                    <Box sx={{ mt: 2 }}>
+                        <ChipsArray array={units} removeValue={(index) => removeItemFromChipsArray(index, setUnits)} />
                     </Box>
                 </Box>
             )}

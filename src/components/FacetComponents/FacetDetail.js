@@ -100,6 +100,35 @@ export default function FacetDetail({ facet, categories }) {
                 </Box>
             )}
             <Divider />
+            {facet.units && (
+                <>
+                <Box>
+                    <Typography variant="h6">
+                        Units:
+                    </Typography>
+                    <Box sx={{ ml: 5 }}>
+                        {facet.categories === null ? (
+                            <Typography variant="h6">
+                                {"No units"}
+                            </Typography>
+                        ) : (
+                            <>
+                                <ul style={{ marginBlockStart: 0 }}>
+                                    {facet["units"].map((value, index) => (
+                                        <li key={`${index}-li`}>
+                                            <Typography variant="h6">
+                                                {value}
+                                            </Typography>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </>
+                        )}
+                    </Box>
+                </Box>
+                <Divider />
+                </>
+            )}
         </Box>
     )
 }
