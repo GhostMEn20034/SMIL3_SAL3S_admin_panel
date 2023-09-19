@@ -42,7 +42,7 @@ export default function AppBarMenu() {
                             <MenuIcon sx={{color: "#D5D507"}}/>
                         </IconButton>
                         <Box sx={{ mr: 3 }}>
-                            <img style={{ height: "70px", width: "120px" }} src="/smile_sales_logo_dark_theme.svg" alt="image" />
+                            <img style={{ height: "70px", width: "120px" }} src="/smile_sales_logo_dark_theme.svg" alt="Logo" />
                         </Box>
                         <Typography variant="h6" color={"#D5D507"} component="div" sx={{ flexGrow: 1 }}>
                             Smile Sales Admin Menu

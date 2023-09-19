@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
   List,
   ListItem,
   ListItemText,
   Button,
-  Slide
+  Slide,
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton
 } from "@mui/material";
-
+import CloseIcon from '@mui/icons-material/Close';
 
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -72,7 +75,7 @@ function ChooseProductCategory(props) {
       clonedArray.splice(-1);
       let lastElement = clonedArray[clonedArray.length - 1];
 
-      
+
       setCategory(lastElement);
       setPath(clonedArray);
       setLevel((prevLevel) => prevLevel - 1);
@@ -82,15 +85,30 @@ function ChooseProductCategory(props) {
   return (
     <div>
       <Dialog open={props.open} onClose={() => props.onClose(null)} fullScreen TransitionComponent={Transition}>
-        <DialogTitle>
+        <AppBar sx={{backgroundColor: "#292929", color: "#D5D507"}}>
+          <Toolbar>
+          <IconButton
+              edge="start"
+              color="inherit"
+              onClick={() => props.setOpen(false)}
+              aria-label="close"
+              sx={{mr: 2}}
+            >
+              <CloseIcon />
+            </IconButton>
+          <Typography variant="h6">
           Choose a category
+          </Typography>
           {level >= 1 && (
-            <Button variant="contained" size="small" onClick={handleBackClick} sx={{ ml: 2 }}>
+            <Button variant="contained" size="small" onClick={handleBackClick} sx={{ 
+              ml: 2, backgroundColor: "#D5D507", color: "black", ":hover": {backgroundColor: "#bdbd02"}
+              }}>
               Back
             </Button>
           )}
-        </DialogTitle>
-        <DialogContent>
+          </Toolbar>
+        </AppBar>
+        <DialogContent sx={{mt: "70px", padding: 0}}>
           <List>
             {list.map((item) => (
               <ListItem key={item._id} button onClick={() => handleItemClick(item)}>

@@ -1,5 +1,4 @@
 import { Box, Typography, Divider } from "@mui/material";
-import findCategoryByID from "../../utils/FacetServices";
 import { Fragment } from "react";
 
 

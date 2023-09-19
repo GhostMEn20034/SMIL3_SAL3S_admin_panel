@@ -17,6 +17,7 @@ import CategoryDetailPage from './pages/CategoryDetailPage';
 import AddCategoryPage from './pages/AddCategoryPage';
 import ProductPage from './pages/ProductPage';
 import AddProductPageChooseCategory from './pages/AddProductPageChooseCategory';
+import CreateProductPage from './pages/CreateProductPage';
 
 
 
@@ -92,6 +93,11 @@ function App() {
             <Route path='/products/add/choose-category' element={
               <PrivateRoute>
                 <AddProductPageChooseCategory />
+              </PrivateRoute>
+            } />
+            <Route path='/products/add' element={
+              <PrivateRoute>
+                <CreateProductPage />
               </PrivateRoute>
             } />
           </Routes>

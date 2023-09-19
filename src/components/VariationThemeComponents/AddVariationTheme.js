@@ -119,7 +119,7 @@ export default function AddVariationTheme() {
             await api.post("/variation-themes/", {
                 name: name,
                 filters: filters,
-                categories: chosenCategories
+                categories: chosenCategories 
             });
             navigate(-1);
         } catch (error) {
@@ -204,13 +204,16 @@ export default function AddVariationTheme() {
             <Typography sx={{ mt: 1 }} variant="h6">
                 Categories:
             </Typography>
-            <Box sx={{ mt: 1, mb: 2 }}>
+            <Box sx={{ mt: 1, mb: 1 }}>
                 <MultipleSelect value={chosenCategories === "*" ? [] : chosenCategories} setValue={setChosenCategories}
                     objectKey={"_id"}
                     objectValue={"name"}
                     menuItems={categories}
                     label={"Categories"} />
             </Box>
+            <Typography sx={{ mb: 1 }} variant="body2">
+                * An empty list of categories means that variation theme can be used for a product with any category
+            </Typography>
             <Box sx={{ mb: 2 }}>
                 <Button variant="contained" size="large" color="primary"
                     onClick={addVariationTheme}

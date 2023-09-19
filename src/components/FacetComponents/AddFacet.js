@@ -1,4 +1,4 @@
-import { Box, TextField, Button, Checkbox, FormControlLabel } from "@mui/material";
+import { Box, TextField, Button, Checkbox, FormControlLabel, Typography } from "@mui/material";
 import SelectValue from "../SelectValue";
 import MultipleSelect from "../MultipleSelectValue";
 import { useState, useEffect } from "react";
@@ -6,7 +6,7 @@ import useAxios from "../../utils/useAxios";
 import { useNavigate } from "react-router-dom";
 import ChipsArray from "../ChipsArray";
 import slugify from "voca/slugify";
-import { removeItemFromChipsArray, addItemToChipsArray } from "../../utils/FacetServices";
+import { removeItemFromChipsArray, addItemToChipsArray } from "../../utils/Services";
 
 
 export default function AddFacet() {
@@ -105,6 +105,9 @@ export default function AddFacet() {
                 <MultipleSelect value={chosenCategories === "*" ? [] : chosenCategories} setValue={setChosenCategories}
                     objectKey={"_id"} objectValue={"name"} menuItems={categories} label={"Categories"} error={errors.categories !== undefined} helperText={errors.categories ? errors.categories : ""} />
             </Box>
+            <Typography sx={{ mt: 1 }} variant="body2">
+                * An empty list of categories means that facet can be used for a product with any category
+            </Typography>
             {type === 'list' && (
                 <Box sx={{ mt: 2 }}>
                     <Box display={"flex"}>
@@ -128,7 +131,7 @@ export default function AddFacet() {
                     </Box>
                 </Box>
             )}
-            <Box sx={{ mt: 2 }}>
+            <Box sx={{ mt: 1 }}>
                 <FormControlLabel control={
                     <Checkbox checked={unitsIsNull} onChange={() => setUnitsIsNull(!unitsIsNull)} />
                 } label="Facet has no units" />

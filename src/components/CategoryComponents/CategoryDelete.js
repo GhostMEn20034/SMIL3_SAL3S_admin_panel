@@ -25,7 +25,7 @@ export default function CategoryDelete({ open, setOpen, onSubmit, error, setErro
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete facet?
+            Are you sure you want to delete category?
           </DialogContentText>
           {error && (
             <Alert severity='error' sx={{mt: 2}} onClose={() => setError("")}>

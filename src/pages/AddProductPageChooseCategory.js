@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { createSearchParams, useNavigate } from "react-router-dom";
 import {
     Box,
     Button,
-    Typography
+    Typography,
 } from "@mui/material";
+
 import useAxios from "../utils/useAxios";
 import ChooseProductCategory from "../components/ProductComponents/ChooseProductCategory";
 
 export default function AddProductPageChooseCategory() {
-    const [category, setCategory] = useState(null);
-    const [categoriesToChoose, setCategoriesToChoose] = useState([]);
+    const [chosenCategory, setChosenCategory] = useState(null);
+    const [categories, setCategories] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
 
 
@@ -22,7 +23,7 @@ export default function AddProductPageChooseCategory() {
         try {
             let response = await api.get("/categories/");
             let data = await response.data;
-            setCategoriesToChoose(data);
+            setCategories(data);
         } catch (err) {
             console.log("Something went wrong!");
         }
@@ -32,10 +33,18 @@ export default function AddProductPageChooseCategory() {
         setOpenDialog(false);
         // If there is a selected category, write it into category variable
         if (selectedCategory) {
-          setCategory(selectedCategory);
-          // You can also do other things with the selected category here
+            setChosenCategory(selectedCategory);
+            // You can also do other things with the selected category here
         }
-      };
+    };
+
+    const isFormValid = () => {
+        return !chosenCategory
+    };
+
+    const handleSubmit = () => {
+        navigate({pathname: '/products/add', search: createSearchParams({"categoryID": chosenCategory._id}).toString()});
+    };
 
     useEffect(() => {
         getCategories();
@@ -44,7 +53,7 @@ export default function AddProductPageChooseCategory() {
     return (
         <Box>
             {openDialog && (
-                <ChooseProductCategory open={openDialog} setOpen={setOpenDialog} onClose={handleClose} categories={categoriesToChoose} />
+                <ChooseProductCategory open={openDialog} setOpen={setOpenDialog} onClose={handleClose} categories={categories} />
             )}
             <Box sx={{ ml: 3, mt: 3 }}>
                 <Typography variant="h4">
@@ -56,19 +65,31 @@ export default function AddProductPageChooseCategory() {
             </Box>
             <Box display={"flex"} alignItems={"center"} justifyContent={"center"}>
                 <Box>
-                    <Box sx={{mt: 1}}>
-                        <Typography sx={{color: "rgba(0, 0, 0, 0.6)"}} variant="h6">
-                            Category:
+                    <Box>
+                        <Typography variant="h6">
+                            What category will the product be?
                         </Typography>
-                        <Box display={"flex"}>
-                        <Typography variant="subtitle1">
-                            {category ? category.name : "No category selected"}
-                        </Typography>
-                        <Button variant="outlined" size="small" sx={{ml: 2}} 
-                        onClick={() => setOpenDialog(!openDialog)}>
-                            Choose category
-                        </Button>
+                    </Box>
+                    <Box>
+                        <Box sx={{ mt: 1 }}>
+                            <Typography sx={{ color: "rgba(0, 0, 0, 0.6)" }} variant="h6">
+                                Category:
+                            </Typography>
+                            <Box display={"flex"}>
+                                <Typography variant="subtitle1">
+                                    {chosenCategory ? chosenCategory.name : "No category selected"}
+                                </Typography>
+                                <Button variant="outlined" size="small" sx={{ ml: 2 }}
+                                    onClick={() => setOpenDialog(!openDialog)}>
+                                    Choose category
+                                </Button>
+                            </Box>
                         </Box>
+                    </Box>
+                    <Box sx={{mt: 2}}>
+                        <Button variant="contained" size="small" disabled={isFormValid()} onClick={handleSubmit}>
+                            Continue
+                        </Button>
                     </Box>
                 </Box>
             </Box>
