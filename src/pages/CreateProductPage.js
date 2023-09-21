@@ -43,7 +43,7 @@ export default function CreateProductPage() {
   }, []);
 
   console.log(attrs);
-  console.log(hasVariations);
+  console.log(variationTheme);
 
   return (
     <>
@@ -59,19 +59,19 @@ export default function CreateProductPage() {
             <SelectValueRadioGroup label={"Does product has Variations?"} value={hasVariations} setValue={setHasVariations} menuItems={[
               { name: "No", value: false },
               { name: "Yes", value: true }
-            ]} />
+            ]} valueType={"boolean"}/>
           </Box>
-          {formData && hasVariations && (
+          {hasVariations && (
             <Box sx={{ mb: 2 }}>
               <Typography variant="body1">
                   Variation theme
               </Typography>
-              <SelectValue value={variationTheme} setValue={setVariationTheme} menuItems={formData.variation_themes} objectKey={"_id"} />
+              <SelectValue value={variationTheme ? variationTheme : ""} setValue={setVariationTheme} menuItems={formData.variation_themes} objectKey={"_id"} />
             </Box>
           )}
-          <Box sx={{ maxWidth: "600px" }}>
+          <Box sx={{ maxWidth: "700px" }}>
             {formData && (
-              <ProductAttrs attrs={attrs} facets={formData.facets} />
+              <ProductAttrs attrs={attrs} facets={formData.facets} setAttrs={setAttrs} />
             )}
           </Box>
         </Box>

@@ -16,7 +16,7 @@ export default function SelectValue({ value, setValue, menuItems, label, disable
 
 
   return (
-    <FormControl sx={{ minWidth: 120 }} size="small" disabled={disabledInput}>
+    <FormControl sx={{ minWidth: 120, maxWidth: 460 }} size="small" disabled={disabledInput}>
       <InputLabel id="demo-select-small-label">{label}</InputLabel>
       <Select
         labelId="demo-select-small-label"

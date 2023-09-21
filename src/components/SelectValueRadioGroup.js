@@ -9,7 +9,19 @@ export default function SelectValueRadioGroup(props) {
 
 
   const handleChange = (event) => {
-    props.setValue(event.target.value);
+    let value;
+    switch (props.valueType) {
+      case "boolean":
+        value = JSON.parse(event.target.value);
+        break;
+      case "number":
+        value = Number(event.target.value);
+        break;
+      // add more cases for other types as needed
+      default:
+        value = event.target.value;
+    }
+    props.setValue(value);
   };
 
   return (

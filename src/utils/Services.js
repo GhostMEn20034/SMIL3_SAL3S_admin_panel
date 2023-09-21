@@ -69,3 +69,55 @@ export const facetsToAttrs = (facets) => {
 
     return attrs;
 }
+
+
+export const handleChangeAttrs = (index, newValue, setAttrs, valueIndex) => {
+    // index - index of product attribute.
+    // newValue - new attribute value.
+    // setAttrs - setState function
+    // valueIndex - Value index, optional parameter, used only for bivariate attributes.
+
+    setAttrs((prevAttrs) => {
+        return [
+            // Copy the elements before the index
+            ...prevAttrs.slice(0, index),
+            // Create a new object with the updated value for the index
+            {
+                ...prevAttrs[index],
+                // If valueIndex is defined, use it to update the value array at the given index
+                // Otherwise, use newValue as the value
+                value: valueIndex !== undefined ? [
+                    // Copy the elements before the valueIndex
+                    ...prevAttrs[index].value.slice(0, valueIndex),
+                    // Use newValue as the new element at the valueIndex
+                    newValue,
+                    // Copy the elements after the valueIndex
+                    ...prevAttrs[index].value.slice(valueIndex + 1),
+                ] : newValue,
+            },
+            // Copy the elements after the index
+            ...prevAttrs.slice(index + 1),
+        ];
+    });
+};
+
+
+export const handleChangeAttrUnit = (index, newValue, setAttrs) => {
+    // index - index of product attribute.
+    // newValue - new attribute value.
+    // setAttrs - setState function
+    setAttrs((prevAttrs) => {
+        return [
+            // Copy the elements before the index
+            ...prevAttrs.slice(0, index),
+            // Create a new object with the updated value for the index
+            {
+                ...prevAttrs[index],
+                // update attribute unit
+                unit: newValue
+            },
+            // Copy the elements after the index
+            ...prevAttrs.slice(index + 1),
+        ];
+    });
+};
