@@ -1,0 +1,2 @@
+export const extraAttr = { code: "", name: "", value: "", type: "string", optional: true, unit: null, group: null };
+export const productMenuNavigationItems = ["Product attributes", "Product Variations", "Photos", "Submit"];

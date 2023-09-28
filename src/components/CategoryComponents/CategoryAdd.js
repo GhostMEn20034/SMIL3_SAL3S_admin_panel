@@ -3,10 +3,14 @@ import useAxios from "../../utils/useAxios";
 import { Box, Button, TextField, Typography, Alert } from "@mui/material";
 import SelectValue from "../SelectValue";
 import { useNavigate } from "react-router-dom";
+import { addItemToChipsArray, removeItemFromChipsArray } from "../../utils/Services";
+import ChipsArray from "../ChipsArray";
 
 export default function CategoryAdd() {
     const [name, setName] = useState("");
     const [parent, setParent] = useState(null);
+    const [newGroupValue, setNewGroupValue] = useState("");
+    const [groups, setGroups] = useState([]);
     const [errors, setErrors] = useState([]);
     const [categoriesForChoices, setCategoriesForChoices] = useState([]);
     const [specificError, setSpecificError] = useState("");
@@ -30,7 +34,8 @@ export default function CategoryAdd() {
         try {
             await api.post("/categories/", {
                 name: name,
-                parent_id: parent
+                parent_id: parent,
+                groups: groups.length > 0 ? groups : null,
             });
             navigate(-1);
         } catch (error) {
@@ -63,8 +68,27 @@ export default function CategoryAdd() {
                         * Empty value means that category has no parent
                     </Typography>
                 </Box>
+                <Box sx={{ mt: 1 }}>
+                    <Box display={"flex"}>
+                        <TextField value={newGroupValue}
+                            onChange={(e) => setNewGroupValue(e.target.value)}
+                            label="New group value (OPTIONAL)"
+                            size="small"
+                            sx={{ mr: 2, minWidth: 250 }}
+                        />
+                        <Button size="small" color="primary" variant="contained" sx={{ maxHeight: "40px" }}
+                            onClick={() => addItemToChipsArray(newGroupValue, setGroups, setNewGroupValue)}
+                            disabled={newGroupValue === ""}
+                        >
+                            Add new group value
+                        </Button>
+                    </Box>
+                    <Box sx={{ mt: 2 }}>
+                        <ChipsArray array={groups} removeValue={(index) => removeItemFromChipsArray(index, setGroups)} />
+                    </Box>
+                </Box>
                 {specificError && (
-                    <Box sx={{mt: 1}}>
+                    <Box sx={{ mt: 1 }}>
                         <Alert severity="error" onClose={() => setSpecificError("")}>
                             {specificError}
                         </Alert>
@@ -72,7 +96,7 @@ export default function CategoryAdd() {
                 )}
                 <Box sx={{ mt: 1 }}>
                     <Button variant="contained" color="primary"
-                    onClick={createCategory}
+                        onClick={createCategory}
                     >
                         Submit
                     </Button>

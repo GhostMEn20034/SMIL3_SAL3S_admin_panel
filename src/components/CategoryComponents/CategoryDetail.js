@@ -21,7 +21,7 @@ export default function CategoryDetail({ category, categoriesForChoices }) {
             fieldName: "Tree Id",
             fieldValue: "tree_id"
         },
-    ]
+    ];
 
     return (
         <Box sx={{
@@ -51,6 +51,33 @@ export default function CategoryDetail({ category, categoriesForChoices }) {
                     {category.parent_id ? categoriesForChoices.find(categoryObj => categoryObj._id === category.parent_id)?.name : "No parent"}
                 </Typography>
             </Box>
+            <Divider />
+            <Box>
+                <Typography variant="h6">
+                    Groups:
+                </Typography>
+                <Box sx={{ ml: 5 }}>
+                    {!category.groups ? (
+                        <Typography variant="h6">
+                            {"No groups"}
+                        </Typography>
+                    ) : (
+                        <>
+                            <ul style={{ marginBlockStart: 0 }}>
+                                {category.groups.map((value, index) => (
+                                    <li key={`${index}-li`}>
+                                        <Typography variant="body1">
+                                            {value}
+                                        </Typography>
+                                    </li>
+                                ))}
+                            </ul>
+                        </>
+                    )}
+                </Box>
+            </Box>
+            <Divider />
+
         </Box>
     )
 }
