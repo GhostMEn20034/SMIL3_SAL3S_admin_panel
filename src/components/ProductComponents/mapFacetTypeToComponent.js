@@ -1,19 +1,64 @@
+import { useState } from "react";
 import TextField from "@mui/material/TextField";
 import SelectValue from "../SelectValue";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import { NumericFormat } from 'react-number-format';
-import { arrayToMenuItems, handleChangeAttrs, handleChangeAttrUnit } from "../../utils/Services";
+import ChipsArray from "../ChipsArray";
+import { arrayToMenuItems, handleChangeAttrs, handleChangeAttrUnit, addListValue } from "../../utils/Services";
 
 
 
 export default function FacetInput(props) {
+    const [newListValue, setNewListValue] = useState("");
+
     switch (props.attr.type) {
         case "list":
             return (
                 <Stack sx={{ minWidth: 325 }}>
-                    <SelectValue value={props.attr.value} menuItems={arrayToMenuItems(props.facet.values)} label={props.attr.name} setValue={(newValue) => handleChangeAttrs(props.index, newValue, props.setAttrs)} />
+                    <Box display={"flex"}>
+                        <TextField value={newListValue}
+                            onChange={(e) => setNewListValue(e.target.value)}
+                            label={`New ${props.attr.name}`}
+                            size="small"
+                            sx={{ mr: 2 }}
+                        />
+                        <Button size="small" color="primary" variant="contained" sx={{ maxHeight: "40px" }}
+                            onClick={
+                                () => {
+                                    addListValue(props.index, newListValue, props.setAttrs);
+                                    setNewListValue("");
+                                }
+                            }
+                            disabled={newListValue === ""}
+                        >
+                            {`Add new ${props.attr.name}`}
+                        </Button>
+                    </Box>
+                    <Box sx={{mt: 1}}>
+                        <ChipsArray array={props.attr.value} removeValue={
+                            (listValueIndex) => {
+                                props.setAttrs(
+                                    (prevAttrs) => {
+                                        return [
+                                            // Copy the elements before the index
+                                            ...prevAttrs.slice(0, props.index),
+                                            // Create a new object with the updated value for the index
+                                            {
+                                                ...prevAttrs[props.index],
+                                                // Update value array
+                                                value: prevAttrs[props.index].value.filter((item, i) => i !== listValueIndex)
+                                            },
+                                            // Copy the elements after the index
+                                            ...prevAttrs.slice(props.index + 1),
+                                        ];
+                                    }
+                                );
+                            }
+                        } />
+                    </Box>
                 </Stack>
             );
         case "integer":
@@ -62,7 +107,23 @@ export default function FacetInput(props) {
         case "string":
             return (
                 <Stack direction="row">
-                    <TextField value={props.attr.value} label={props.attr.name} size="small" sx={{ minWidth: 325 }} onChange={(e) => handleChangeAttrs(props.index, e.target.value, props.setAttrs)} />
+                    {!props.facet?.values ? (
+                        <TextField
+                            value={props.attr.value}
+                            label={props.attr.name}
+                            size="small" sx={{ minWidth: 325 }}
+                            onChange={(e) => handleChangeAttrs(props.index, e.target.value, props.setAttrs)}
+                        />
+                    ) : (
+                        <SelectValue
+                            value={props.attr.value}
+                            menuItems={arrayToMenuItems(props.facet.values)}
+                            label={props.attr.name}
+                            setValue={(newValue) => handleChangeAttrs(props.index, newValue, props.setAttrs)}
+                            formProperties={{ minWidth: 325 }}
+                        />
+                    )}
+
                     {props.facet?.units && (
                         <Stack sx={{ ml: 1 }}>
                             <SelectValue value={props.attr.unit} menuItems={arrayToMenuItems(props.facet.units)} label="Unit" setValue={(newValue) => handleChangeAttrUnit(props.index, newValue, props.setAttrs)} />
@@ -97,9 +158,9 @@ export default function FacetInput(props) {
                         onChange={(e) => handleChangeAttrs(props.index, e.target.value, props.setAttrs, 1)}
                     />
                     {props.facet?.units && (
-                    <Stack sx={{ ml: 1 }}>
-                        <SelectValue value={props.attr.unit} menuItems={arrayToMenuItems(props.facet.units)} label="Unit" setValue={(newValue) => handleChangeAttrUnit(props.index, newValue, props.setAttrs)} />
-                    </Stack>
+                        <Stack sx={{ ml: 1 }}>
+                            <SelectValue value={props.attr.unit} menuItems={arrayToMenuItems(props.facet.units)} label="Unit" setValue={(newValue) => handleChangeAttrUnit(props.index, newValue, props.setAttrs)} />
+                        </Stack>
                     )}
                 </Stack>
             );

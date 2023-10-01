@@ -9,6 +9,7 @@ import ProductAttrs from "../components/CreateProductComponents/ProductAttrs";
 import AdditionalProductAttrs from "../components/CreateProductComponents/AdditionalProductAttrs";
 import { extraAttr, productMenuNavigationItems } from "../utils/consts";
 import ProductNavigation from "../components/CreateProductComponents/ProductMenusNavigation";
+import AddProductVariations from "../components/CreateProductComponents/ProductVariations/AddProductVariations";
 
 export default function CreateProductPage() {
   const [loading, setLoading] = useState(false);
@@ -53,7 +54,6 @@ export default function CreateProductPage() {
   }, []);
 
   const handleChangeHasVariation = (value) => {
-    console.log(value);
     setHasVariations((prevValue) => {
       if (prevValue) { // if prevValue is true
         setVariationTheme(null);
@@ -85,10 +85,6 @@ export default function CreateProductPage() {
     navigate(-1);
   };
 
-  // console.log(attrs);
-  // console.log(currentMenu);
-  // console.log(extraAttrs);
-
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: "center", alignItems: "center", height: "100vh" }}>
@@ -104,7 +100,7 @@ export default function CreateProductPage() {
           Create product
         </Typography>
         <Box sx={{ ml: 20 }}>
-          <ProductNavigation value={currentMenu} setValue={setCurrentMenu} values={productMenuNavigationItems} />
+          <ProductNavigation value={currentMenu} setValue={setCurrentMenu} labels={productMenuNavigationItems} disabledButtonIndex={hasVariations && variationTheme ? null : 1}/>
         </Box>
       </Box>
       {/* Choosen category */}
@@ -129,18 +125,22 @@ export default function CreateProductPage() {
 
           <Box>
 
-            <Box sx={{ mb: 1, ml: "25%" }}>
-              <SelectValueRadioGroup label={"Does product has variations?"} value={hasVariations} setValue={handleChangeHasVariation} menuItems={[
+            <Box sx={{ mb: 1, ml: "13.5%" }}>
+              <SelectValueRadioGroup label={"Does the product has variations?"} value={hasVariations} setValue={handleChangeHasVariation} menuItems={[
                 { name: "No", value: false },
                 { name: "Yes", value: true }
               ]} valueType={"boolean"} />
             </Box>
             {hasVariations && (
-              <Box sx={{ mb: 2, ml: "25%" }}>
+              <Box sx={{ mb: 2, ml: "13.5%", width: "325px" }}>
                 <Typography variant="body1">
                   Variation theme
                 </Typography>
-                <SelectValue value={variationTheme ? variationTheme : ""} setValue={(newValue) => handleChangeVariationTheme(newValue)} menuItems={formData.variation_themes} objectKey={"_id"} />
+                <SelectValue value={variationTheme ? variationTheme : ""} 
+                setValue={(newValue) => handleChangeVariationTheme(newValue)} 
+                menuItems={formData.variation_themes} objectKey={"_id"} 
+                formProperties={{minWidth: 300}}
+                />
               </Box>
             )}
 
@@ -167,6 +167,14 @@ export default function CreateProductPage() {
               </Box>
             )}
 
+          </Box>
+
+        )}
+
+        {currentMenu === 1 && hasVariations && (
+
+          <Box>
+            <AddProductVariations facets={formData.facets.filter(facet => variationThemeFields.includes(facet.code))} />
           </Box>
 
         )}

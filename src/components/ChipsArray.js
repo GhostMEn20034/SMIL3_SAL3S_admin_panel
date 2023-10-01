@@ -18,6 +18,7 @@ export default function ChipsArray({ array, removeValue }) {
       {array.length > 0 && (
         <Paper
           sx={{
+            display: "flex",
             flexWrap: 'wrap',
             listStyle: 'none',
             p: 0.5,

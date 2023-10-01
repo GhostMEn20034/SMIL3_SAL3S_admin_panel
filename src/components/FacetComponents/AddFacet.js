@@ -64,7 +64,7 @@ export default function AddFacet() {
             optional: optional,
             show_in_filters: showInFilters,
             categories: chosenCategories.length > 0 ? chosenCategories : "*",
-            values: type === "list" ? facetValues : null,
+            values: facetValues.length > 0 ? facetValues : null,
             units: !unitsIsNull && units.length > 0 ? units : null,
         };
 
@@ -108,7 +108,7 @@ export default function AddFacet() {
             <Typography sx={{ mt: 1 }} variant="body2">
                 * An empty list of categories means that facet can be used for a product with any category
             </Typography>
-            {type === 'list' && (
+            {type === 'string' && (
                 <Box sx={{ mt: 2 }}>
                     <Box display={"flex"}>
                         <TextField value={newFacetValue}

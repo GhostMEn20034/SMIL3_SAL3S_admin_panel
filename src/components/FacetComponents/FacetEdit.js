@@ -17,7 +17,7 @@ export default function FacetEdit({ facet, categories }) {
     const [optional, setOptional] = useState(facet.optional);
     const [showInFilters, setShowInFilters] = useState(facet.show_in_filters);
 
-    const [facetValues, setFacetValues] = useState(facet.values);
+    const [facetValues, setFacetValues] = useState(facet.values ? facet.values : []);
     const [newFacetValue, setNewFacetValue] = useState("");
 
     const [newUnitValue, setNewUnitValue] = useState("");
@@ -52,7 +52,7 @@ export default function FacetEdit({ facet, categories }) {
                 optional: optional,
                 show_in_filters: showInFilters,
                 categories: chosenCategories.length > 0 ? chosenCategories : "*",
-                values: facetValues,
+                values: facetValues.length > 0 ? facetValues : null,
                 units: !unitsIsNull && units.length > 0 ? units : null,
             });
             navigate(-1);
@@ -93,7 +93,7 @@ export default function FacetEdit({ facet, categories }) {
                 <Typography sx={{ mt: 1 }} variant="body2">
                     * An empty list of categories means that facet can be used for a product with any category
                 </Typography>
-                {type === 'list' && (
+                {type === 'string' && (
                     <Box sx={{ mt: 2 }}>
                         <Box display={"flex"}>
                             <TextField value={newFacetValue}

@@ -39,7 +39,7 @@ const mapValueToFacetType = (facet) => {
 
     switch (facet.type) {
         case "list":
-            value = facet.values[0];
+            value = [];
             break;
         case "string":
             value = "";
@@ -241,3 +241,21 @@ export const getArrayElems = (arrayOfObj, propertyName) => {
     // Return the result array
     return result;
 }
+
+
+export const addListValue = (index, newValue, setAttrs) => {
+    setAttrs((prevAttrs) => {
+        return [
+            // Copy the elements before the index
+            ...prevAttrs.slice(0, index),
+             // Create a new object with the updated value for the index
+             {
+                ...prevAttrs[index],
+                // update value array
+                value: [...prevAttrs[index].value, newValue]
+            },
+            // Copy the elements after the index
+            ...prevAttrs.slice(index + 1),
+        ]
+    });
+};

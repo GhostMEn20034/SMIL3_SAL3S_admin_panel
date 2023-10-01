@@ -1,4 +1,4 @@
-import { Box, Stack, Typography, IconButton } from "@mui/material";
+import { Box, Stack, IconButton } from "@mui/material";
 import RemoveIcon from '@mui/icons-material/Remove';
 import FacetInput from "../ProductComponents/mapFacetTypeToComponent";
 import SelectValue from "../SelectValue";
@@ -10,8 +10,10 @@ export default function ProductAttrs(props) {
     return (
         <Box>
             {props.attrs.map((attr, index) => (
-                <Stack sx={{ mb: 2 }} key={index} direction="row" alignItems="center">
-                    <FacetInput attr={attr} facet={props.facets.find(facet => facet.code === attr.code)} index={index} setAttrs={props.setAttrs} />
+                <Stack direction="row" alignItems={attr.type === "list" ? undefined : "center"} sx={{ mb: 2}}>
+                    <Stack key={index}>
+                        <FacetInput attr={attr} facet={props.facets.find(facet => facet.code === attr.code)} index={index} setAttrs={props.setAttrs} />
+                    </Stack>
                     <Stack sx={{ ml: 1 }}>
                         <SelectValue label={"Group"} value={attr.group ? attr.group : ""} setValue={(newValue) => handleChangeAttrGroup(index, newValue, props.setAttrs)}
                             menuItems={[
@@ -21,7 +23,7 @@ export default function ProductAttrs(props) {
                         />
                     </Stack>
                     {attr.optional === true && (
-                        <IconButton onClick={() => removeAttr(index, props.setAttrs)} sx={{ml: 1}}>
+                        <IconButton onClick={() => removeAttr(index, props.setAttrs)} sx={{ ml: 1, maxHeight: "40px" }}>
                             <RemoveIcon />
                         </IconButton>
                     )}

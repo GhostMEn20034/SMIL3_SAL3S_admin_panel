@@ -4,7 +4,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
-export default function SelectValue({ value, setValue, menuItems, label, disabled, objectKey, objectValue }) {
+export default function SelectValue({ value, setValue, menuItems, label, disabled, objectKey, objectValue, formProperties }) {
 
   const handleChange = (event) => {
     setValue(event.target.value);
@@ -16,7 +16,7 @@ export default function SelectValue({ value, setValue, menuItems, label, disable
 
 
   return (
-    <FormControl sx={{ minWidth: 120, maxWidth: 460 }} size="small" disabled={disabledInput}>
+    <FormControl sx={{ minWidth: !formProperties?.minWidth ? 120 : formProperties?.minWidth, maxWidth: !formProperties?.maxWidth ? 480 : formProperties?.maxWidth, ...formProperties }} size="small" disabled={disabledInput}>
       <InputLabel id="demo-select-small-label">{label}</InputLabel>
       <Select
         labelId="demo-select-small-label"
