@@ -11,13 +11,13 @@ import { arrayToMenuItems, handleChangeAttrs, handleChangeAttrUnit, addListValue
 
 
 
-export default function FacetInput(props) {
+export default function AttrInput(props) {
     const [newListValue, setNewListValue] = useState("");
 
     switch (props.attr.type) {
         case "list":
             return (
-                <Stack sx={{ minWidth: 325 }}>
+                <Stack sx={{ minWidth: 325, maxWidth: 395 }}>
                     <Box display={"flex"}>
                         <TextField value={newListValue}
                             onChange={(e) => setNewListValue(e.target.value)}

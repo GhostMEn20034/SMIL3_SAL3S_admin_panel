@@ -10,17 +10,28 @@ import AdditionalProductAttrs from "../components/CreateProductComponents/Additi
 import { extraAttr, productMenuNavigationItems } from "../utils/consts";
 import ProductNavigation from "../components/CreateProductComponents/ProductMenusNavigation";
 import AddProductVariations from "../components/CreateProductComponents/ProductVariations/AddProductVariations";
+import ProductVariationList from "../components/CreateProductComponents/ProductVariations/ProductVariationList";
 
 export default function CreateProductPage() {
   const [loading, setLoading] = useState(false);
-  const [currentMenu, setCurrentMenu] = useState(0); // index of current product menu (Show productMenuNavigationItems in the utils/consts)
+
+  const [currentMenu, setCurrentMenu] = useState(0); // index of current product menu (See productMenuNavigationItems in the utils/consts)
+
   const [searchParams] = useSearchParams();
+
   const [formData, setFormData] = useState(null); // Data required to create a product
+
   const [hasVariations, setHasVariations] = useState(false); // Determine whether product has variations
   const [variationTheme, setVariationTheme] = useState(null); // Chosen variation theme ID
   const [variationThemeFields, setVariationThemeFields] = useState([]); // Chosen variation theme fields
+
+  const [productVariationFields, setProductVariationFields] = useState({}); // Values of fields for product variations
+  const [productVariations, setProductVariations] = useState([]); // Array of product variations
+
   const [baseAttrs, setBaseAttrs] = useState([]); // Base attributes such as product name, price, sku etc
+
   const [attrs, setAttrs] = useState([]); // Product specs, for example: screen size, CPU, storage size etc
+
   const [extraAttrs, setExtraAttrs] = useState([extraAttr]) // attributes to provide additional information about product 
 
   const api = useAxios('products');
@@ -93,6 +104,8 @@ export default function CreateProductPage() {
     )
   }
 
+  console.log(productVariations);
+
   return (
     <>
       <Box padding={2} display="flex">
@@ -100,7 +113,7 @@ export default function CreateProductPage() {
           Create product
         </Typography>
         <Box sx={{ ml: 20 }}>
-          <ProductNavigation value={currentMenu} setValue={setCurrentMenu} labels={productMenuNavigationItems} disabledButtonIndex={hasVariations && variationTheme ? null : 1}/>
+          <ProductNavigation value={currentMenu} setValue={setCurrentMenu} labels={productMenuNavigationItems} disabledButtonIndex={hasVariations && variationTheme ? null : 1} />
         </Box>
       </Box>
       {/* Choosen category */}
@@ -136,10 +149,10 @@ export default function CreateProductPage() {
                 <Typography variant="body1">
                   Variation theme
                 </Typography>
-                <SelectValue value={variationTheme ? variationTheme : ""} 
-                setValue={(newValue) => handleChangeVariationTheme(newValue)} 
-                menuItems={formData.variation_themes} objectKey={"_id"} 
-                formProperties={{minWidth: 300}}
+                <SelectValue value={variationTheme ? variationTheme : ""}
+                  setValue={(newValue) => handleChangeVariationTheme(newValue)}
+                  menuItems={formData.variation_themes} objectKey={"_id"}
+                  formProperties={{ minWidth: 300 }}
                 />
               </Box>
             )}
@@ -173,8 +186,22 @@ export default function CreateProductPage() {
 
         {currentMenu === 1 && hasVariations && (
 
-          <Box>
-            <AddProductVariations facets={formData.facets.filter(facet => variationThemeFields.includes(facet.code))} />
+          <Box sx={{ width: 1000 }}>
+            <Box>
+              <AddProductVariations facets={formData.facets.filter(facet => variationThemeFields.includes(facet.code))}
+                productVariationFields={productVariationFields}
+                setProductVariationFields={setProductVariationFields}
+                productVariations={productVariations}
+                setProductVariations={setProductVariations}
+                groups={formData?.category.groups}
+              />
+            </Box>
+            <Box sx={{mt: 2}}>
+              <ProductVariationList 
+                productVariations={productVariations}
+                setProductVariations={setProductVariations}
+                productVariationFields={productVariationFields} />
+            </Box>
           </Box>
 
         )}

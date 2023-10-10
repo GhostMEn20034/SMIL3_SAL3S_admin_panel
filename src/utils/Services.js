@@ -259,3 +259,20 @@ export const addListValue = (index, newValue, setAttrs) => {
         ]
     });
 };
+
+
+export const removeKey = (obj, key) => {
+  // Create a new object to store the result
+  let result = {};
+  // Loop through the keys of the original object
+  for (let k in obj) { //
+    // If the key is not equal to the one to be removed, copy it to the result object
+    if (k !== key) {
+      result[k] = obj[k];
+    }
+    // Return the result object
+    
+  }
+
+  return result;
+};
