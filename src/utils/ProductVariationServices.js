@@ -9,8 +9,8 @@ const generateProducts = (productVariationFields, newAttr, products = [], index 
   if (keys.length === 0) {
     let product = { ...baseAttrs, attrs: [] };
 
-     // Add the new attribute to the product attrs
-     product.attrs.push(newAttr);
+    // Add the new attribute to the product attrs
+    product.attrs.push(newAttr);
 
     return [product]
   }
@@ -70,7 +70,7 @@ const generateProducts = (productVariationFields, newAttr, products = [], index 
 
   // Call the function recursively with the updated products and index parameters
   return generateProducts(productVariationFields, newAttr, products, index);
-}
+};
 
 
 export const generateCombinations = (productVariationFields, setProductVariations, attr) => {
@@ -84,20 +84,29 @@ export const generateCombinations = (productVariationFields, setProductVariation
 
   let keyName = attr.code; // Name of key in productVariationFields
 
-  let noPropertyOrPropertyLengthLt1 = (
+  let noPropertyOrPropertyLengthLT1 = (
     !productVariationFields[keyName] ||
     productVariationFields[keyName]?.length < 1
   ); // returns true if no property with the name stored in the keyName
   // or if property with the name stored in the keyname has length less than 1.
 
   setProductVariations((prevValues) => {
+
+    // If there are keys in the productVariationFields, but productVariations array is empty, 
+    // return all product combinations.
+    if (Object.keys(productVariationFields).length > 0 && prevValues?.length < 1) {
+      return [
+        ...generateProducts(removeKey(productVariationFields, keyName), attr)
+      ];
+    }
+
     // if no property with value attr.code in the productVariationFields 
     // and ProductVariations array is empty, then function creates a product variation with the 
-    // new attribute in the ProductVariations array
-    if (noPropertyOrPropertyLengthLt1 && prevValues?.length < 1) {
-      return [
-        { ...baseAttrs, attrs: [attr,] }
-      ];
+    // new attribute in the ProductVariations array.
+    if (noPropertyOrPropertyLengthLT1 && prevValues?.length < 1) {
+        return [
+          { ...baseAttrs, attrs: [attr,] }
+        ];
     }
 
     // if no property with value attr.code in the productVariationFields, BUT
@@ -109,8 +118,7 @@ export const generateCombinations = (productVariationFields, setProductVariation
       }));
     }
 
-    if (productVariationFields[keyName]?.length > 0 && prevValues.length > 0) {
-      console.log("UWUUW")
+    if (productVariationFields[keyName].length > 0 && prevValues.length > 0) {
       return [
         ...prevValues,
         ...generateProducts(removeKey(productVariationFields, keyName), attr)
@@ -118,4 +126,31 @@ export const generateCombinations = (productVariationFields, setProductVariation
     }
   });
 
+};
+
+// Removes all products variations that have the same attribute as passed into the function
+export const removeProducts = (attr, setProductVariations) => {
+
+  const hasAttribute = (obj, code, value, unit) => {
+    // Loop through the attrs array of the object
+    for (let attr of obj.attrs) {
+      // Check if the attr matches the code, value, and unit
+      if (attr.code === code && attr.value === value && attr.unit === unit) {
+        // Return true if a match is found
+        return true;
+      }
+    }
+    // Return false if no match is found
+    return false;
+  };
+
+  // Update the state with the new list of products
+  setProductVariations((prevValues) => {
+    let newProducts = prevValues.filter((product) => {
+      // Return true if the product does not have the attribute
+      return !hasAttribute(product, attr.code, attr.value, attr.unit);
+    });
+
+    return newProducts;
+  });
 };

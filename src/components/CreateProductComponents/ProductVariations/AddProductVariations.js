@@ -4,8 +4,7 @@ import { facetsToAttrs, arrayToMenuItems, handleChangeAttrGroup } from "../../..
 import AttrInput from "../../ProductComponents/mapAttrTypeToComponent";
 import SelectValue from "../../SelectValue";
 import ProductVariationChips from "./ProductVariationChips";
-import { generateCombinations } from "../../../utils/ProductVariationServices";
-import { removeKey } from "../../../utils/Services";
+import { generateCombinations, removeProducts } from "../../../utils/ProductVariationServices";
 
 export default function AddProductVariations(props) {
     const [newFields, setNewFields] = useState(facetsToAttrs(props.facets)); // Fields for the new varition theme, list of objects
@@ -31,7 +30,7 @@ export default function AddProductVariations(props) {
                 ...prevValues,
                 [keyName]: [...(prevValues[keyName] || []), attr] // Add new attribute to array located in specified property
             };
-
+            
             generateCombinations(prevValues, props.setProductVariations, attr);
             return newObject
         });
@@ -42,16 +41,27 @@ export default function AddProductVariations(props) {
         props.setProductVariationFields((prevValues) => {
             // Make a copy of the array
             const newArray = [...prevValues[keyName]];
+            
+            // remove all products where code, value, unit the same as in the attribute to delete
+            removeProducts(newArray[index], props.setProductVariations);
+
             // Remove the element at index
             newArray.splice(index, 1);
-            return {
-                ...prevValues,
-                [keyName]: newArray
+
+            // if array in the keyName has length 0
+            if (newArray.length === 0) {
+                // remove key from the object
+                return {};
+
+            } else {
+                // Otherwise return object but with modified array in the keyName
+                return {
+                    ...prevValues,
+                    [keyName]: newArray
+                };
             }
         })
     };
-
-    // console.log(props.productVariationFields);
 
     return (
         <Box

@@ -15,13 +15,65 @@ import {
 } from "@mui/material";
 import { NumericFormat } from "react-number-format";
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
-import { Fragment } from "react";
+import { useState } from "react";
 
 
 export default function ProductVariationList(props) {
+    const [newProdValues, setNewProdValues] = useState({ name: null, price: null, discount_rate: null, tax_rate: null, stock: null }); // Used to set new values of product variation properties
+    const [checked, setChecked] = useState([]); // An array with indexes of checked products
 
     let variationLength = props.productVariations?.length;
 
+    // Returns true if object has non-null values
+    const hasNonNullValues = (obj) => {
+        return Object.values(obj).some(value => value !== null);
+    };
+
+    // Add a product with the specified to the checked
+    const handleCheck = (index) => {
+
+        if (checked.includes(index)) {
+            // if the checked array already includes the index
+            setChecked((prevChecked) => prevChecked.filter((item) => item !== index)); // remove the index from the checked array using filter
+        } else {
+            // Otherwise
+            setChecked((prevChecked) => (
+                [
+                    ...prevChecked,
+                    index
+                ]
+            )); // add the index to the checked array using spread operator
+        }
+    };
+
+    // Add all product indexes to the checked
+    const handleCheckAll = () => {
+        // define a function that handles the select all option
+        if (checked.length === props.productVariations.length) {
+            // if the checked array has the same length as the objects array
+            setChecked([]); // clear the checked array
+        } else {
+            // Otherwise
+            setChecked(props.productVariations.map((obj, i) => i)); // fill the checked array with all indexes
+        }
+    };
+
+    // Changes the value of the specified property in the newProdValues
+    const handleChangeNewProdValues = (keyName, value) => {
+
+        if (value === "" || value === 0) {
+            value = null;
+        }
+
+        setNewProdValues((prevValue) => (
+            {
+                ...prevValue,
+                [keyName]: value
+            }
+        ));
+    };
+
+    // Changes the value of the specified properties in the product with the specified index
     const handleChangeProductVariations = (keyName, value, productIndex) => {
         props.setProductVariations((prevValues) => {
             return prevValues.map((prevValue, index) => {
@@ -37,18 +89,66 @@ export default function ProductVariationList(props) {
         });
     };
 
+    // Deletes checked products
+    const deleteChecked = () => {
+        props.setProductVariations((prevValues) => {
+            let filteredPrevValues = prevValues.filter((prevValue, i) => !checked.includes(i));
+            if (filteredPrevValues.length === 0) {
+                props.setProductVariationFields({});
+            }
+
+            return filteredPrevValues;
+        }); // Return a new array with the product variations whose indexes are not in checked
+        setChecked([]); // Reset checked to the empty list
+    };
+
+    // Applies values of properties to the chosen products
+    const applyProductProps = () => {
+        // Create a copy of newProdValues object
+        let copy = Object.assign({}, newProdValues);
+        Object.keys(copy).forEach((key) => {
+            // Loop through the keys of the copy object
+            if (copy[key] === null) {
+                // If the value of the key is null
+                delete copy[key]; // Delete the property from the copy object
+            }
+        });
+        props.setProductVariations((prevValues) => {
+            return prevValues.map((prevValue, i) => {
+                if (checked.includes(i)) {
+                    return {
+                        ...prevValue,
+                        ...copy
+                    };
+                }
+
+                return prevValue
+            });
+        });
+
+        // Reset newProdValues
+        setNewProdValues({ 
+              name: null, price: null, 
+              discount_rate: null, tax_rate: null, 
+              stock: null 
+        });
+    };
+
     return (
         <Box sx={{ mb: 2 }}>
             {variationLength > 0 && (
                 <>
                     <Box display={"flex"} sx={{ mb: 2 }} alignItems={"center"}>
-                        <Button size="small" variant="contained">
+                        <Button size="small" variant="contained" 
+                        disabled={!(hasNonNullValues(newProdValues) && checked.length > 0)}
+                        onClick={applyProductProps}
+                        >
                             Apply Changes
                         </Button>
-                        <Button size="small" variant="contained" sx={{ ml: 1 }}>
+                        <Button size="small" variant="contained" sx={{ ml: 1 }} disabled={checked.length < 1} onClick={deleteChecked}>
                             Delete selected
                         </Button>
-                        <Button size="small" variant="contained" sx={{ ml: 1 }}>
+                        <Button size="small" variant="contained" sx={{ ml: 1 }} disabled={checked.length < 1} onClick={() => setChecked([])}>
                             Unselect variations
                         </Button>
                         <Typography variant="body1" sx={{ ml: 1 }}>
@@ -59,7 +159,7 @@ export default function ProductVariationList(props) {
                         <Table sx={{ minWidth: 650 }}>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell> 
+                                    <TableCell>
                                     </TableCell>
                                     {Object.keys(props.productVariationFields).map((key, index) => (
                                         <TableCell align="center" key={index + "P"}>
@@ -90,107 +190,192 @@ export default function ProductVariationList(props) {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
+                                <TableRow>
+                                    <TableCell align="center">
+                                        <Checkbox checked={checked.length === props.productVariations.length} onChange={handleCheckAll} />
+                                    </TableCell>
+                                    {Object.keys(props.productVariationFields).map((key, index) => (
+                                        <TableCell align="center" key={index} sx={{ minWidth: 45 }}>
+
+                                        </TableCell>
+                                    ))}
+                                    <TableCell align="center">
+                                        <Box display={"flex"}>
+                                            <TextField
+                                                value={newProdValues.name ? newProdValues.name : ""}
+                                                onChange={(e) => handleChangeNewProdValues(e.target.name, e.target.value)}
+                                                sx={{ minWidth: 200 }}
+                                                size="small"
+                                                label={"Product name"} name={"name"}
+                                            />
+                                            <IconButton size="small" sx={{ ml: 1, px: 1 }}>
+                                                <AutoFixHighIcon fontSize="small" />
+                                            </IconButton>
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <NumericFormat
+                                            value={newProdValues.price ? newProdValues.price : 0}
+                                            onChange={(e) => handleChangeNewProdValues(e.target.name, Number(e.target.value))}
+                                            decimalScale={2}
+                                            decimalSeparator="."
+                                            allowNegative={false}
+                                            // Use customInput prop to pass TextField component
+                                            customInput={TextField}
+                                            sx={{ minWidth: 100 }}
+                                            size="small"
+                                            label={"Price"}
+                                            name={"price"}
+                                        />
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <NumericFormat
+                                            value={newProdValues.discount_rate ? newProdValues.discount_rate : 0}
+                                            onChange={(e) => handleChangeNewProdValues(e.target.name, Number(e.target.value))}
+                                            decimalScale={2}
+                                            decimalSeparator="."
+                                            // Use customInput prop to pass TextField component
+                                            customInput={TextField}
+                                            sx={{ minWidth: 100 }}
+                                            size="small"
+                                            label={"Discount rate"}
+                                            name={"discount_rate"}
+                                        />
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <NumericFormat
+                                            value={newProdValues.tax_rate ? newProdValues.tax_rate : 0}
+                                            onChange={(e) => handleChangeNewProdValues(e.target.name, Number(e.target.value))}
+                                            decimalScale={2}
+                                            decimalSeparator="."
+                                            // Use customInput prop to pass TextField component
+                                            customInput={TextField}
+                                            sx={{ minWidth: 100 }}
+                                            size="small"
+                                            label={"Tax rate"}
+                                            name={"tax_rate"}
+                                        />
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <NumericFormat
+                                            value={newProdValues.stock ? newProdValues.stock : 0}
+                                            onChange={(e) => handleChangeNewProdValues(e.target.name, Number(e.target.value))}
+                                            decimalScale={0}
+                                            // Use customInput prop to pass TextField component
+                                            customInput={TextField}
+                                            sx={{ minWidth: 75 }}
+                                            size="small"
+                                            label={"Stock"}
+                                            name={"stock"} />
+                                    </TableCell>
+                                    <TableCell>
+
+                                    </TableCell>
+                                    <TableCell>
+
+                                    </TableCell>
+                                </TableRow>
                                 {props.productVariations.map((productVariation, index) => (
-                                        <TableRow key={index}>
-                                            <TableCell>
-                                                <Checkbox />
-                                            </TableCell>
-                                            {Object.keys(props.productVariationFields).map((key, index) => {
-                                                let attr = productVariation.attrs.find(attr => attr.code === key);
-                                                return (
-                                                    <TableCell align="center" key={index} sx={{ minWidth: 45 }}>
-                                                        {attr.value} {attr.unit ? " " + attr.unit : ""}
-                                                    </TableCell>
-                                                )
-                                            })}
-                                            <TableCell align="center">
-                                                <Box display={"flex"}>
-                                                    <TextField
-                                                        value={productVariation.name}
-                                                        onChange={(e) => handleChangeProductVariations(e.target.name, e.target.value, index)}
-                                                        sx={{ minWidth: 200 }}
-                                                        size="small"
-                                                        label={"Product name"} name={"name"}
-                                                    />
-                                                    <IconButton size="small" sx={{ ml: 1, px: 1 }}>
-                                                        <AutoFixHighIcon fontSize="small" />
-                                                    </IconButton>
-                                                </Box>
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                <NumericFormat
-                                                    value={productVariation.price}
-                                                    onChange={(e) => handleChangeProductVariations(e.target.name, Number(e.target.value), index)}
-                                                    decimalScale={2}
-                                                    decimalSeparator="."
-                                                    allowNegative={false}
-                                                    // Use customInput prop to pass TextField component
-                                                    customInput={TextField}
-                                                    sx={{ minWidth: 100 }}
-                                                    size="small"
-                                                    label={"Price"}
-                                                    name={"price"}
-                                                />
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                <NumericFormat
-                                                    value={productVariation.discount_rate}
-                                                    onChange={(e) => handleChangeProductVariations(e.target.name, Number(e.target.value), index)}
-                                                    decimalScale={2}
-                                                    decimalSeparator="."
-                                                    // Use customInput prop to pass TextField component
-                                                    customInput={TextField}
-                                                    sx={{ minWidth: 100 }}
-                                                    size="small"
-                                                    label={"Discount rate"}
-                                                    name={"discount_rate"}
-                                                />
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                <NumericFormat
-                                                    value={productVariation.tax_rate}
-                                                    onChange={(e) => handleChangeProductVariations(e.target.name, Number(e.target.value), index)}
-                                                    decimalScale={2}
-                                                    decimalSeparator="."
-                                                    // Use customInput prop to pass TextField component
-                                                    customInput={TextField}
-                                                    sx={{ minWidth: 100 }}
-                                                    size="small"
-                                                    label={"Tax rate"}
-                                                    name={"tax_rate"}
-                                                />
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                <NumericFormat
-                                                    value={productVariation.stock}
-                                                    onChange={(e) => handleChangeProductVariations(e.target.name, Number(e.target.value), index)}
-                                                    decimalScale={0}
-                                                    // Use customInput prop to pass TextField component
-                                                    customInput={TextField}
-                                                    sx={{ minWidth: 75 }}
-                                                    size="small"
-                                                    label={"Stock"}
-                                                    name={"stock"} />
-                                            </TableCell>
-                                            <TableCell align="center">
+                                    <TableRow key={index}>
+                                        <TableCell>
+                                            <Checkbox checked={checked.includes(index)} onChange={() => handleCheck(index)} />
+                                        </TableCell>
+                                        {Object.keys(props.productVariationFields).map((key, index) => {
+                                            let attr = productVariation.attrs.find(attr => attr.code === key);
+                                            return (
+                                                <TableCell align="center" key={index} sx={{ minWidth: 45 }}>
+                                                    {attr.value} {attr.unit ? " " + attr.unit : ""}
+                                                </TableCell>
+                                            )
+                                        })}
+                                        <TableCell align="center">
+                                            <Box display={"flex"}>
                                                 <TextField
-                                                    value={productVariation.sku}
+                                                    value={productVariation.name}
                                                     onChange={(e) => handleChangeProductVariations(e.target.name, e.target.value, index)}
-                                                    sx={{ minWidth: 125 }}
+                                                    sx={{ minWidth: 200 }}
                                                     size="small"
-                                                    label={"SKU"}
-                                                    name={"sku"} />
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                <TextField
-                                                    value={productVariation.external_id}
-                                                    onChange={(e) => handleChangeProductVariations(e.target.name, e.target.value, index)}
-                                                    sx={{ minWidth: 175 }}
-                                                    size="small"
-                                                    label={"External product id"}
-                                                    name={"external_id"} />
-                                            </TableCell>
-                                        </TableRow>
+                                                    label={"Product name"} name={"name"}
+                                                />
+                                                <IconButton size="small" sx={{ ml: 1, px: 1 }}>
+                                                    <AutoFixHighIcon fontSize="small" />
+                                                </IconButton>
+                                            </Box>
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <NumericFormat
+                                                value={productVariation.price}
+                                                onChange={(e) => handleChangeProductVariations(e.target.name, Number(e.target.value), index)}
+                                                decimalScale={2}
+                                                decimalSeparator="."
+                                                allowNegative={false}
+                                                // Use customInput prop to pass TextField component
+                                                customInput={TextField}
+                                                sx={{ minWidth: 100 }}
+                                                size="small"
+                                                label={"Price"}
+                                                name={"price"}
+                                            />
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <NumericFormat
+                                                value={productVariation.discount_rate}
+                                                onChange={(e) => handleChangeProductVariations(e.target.name, Number(e.target.value), index)}
+                                                decimalScale={2}
+                                                decimalSeparator="."
+                                                // Use customInput prop to pass TextField component
+                                                customInput={TextField}
+                                                sx={{ minWidth: 100 }}
+                                                size="small"
+                                                label={"Discount rate"}
+                                                name={"discount_rate"}
+                                            />
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <NumericFormat
+                                                value={productVariation.tax_rate}
+                                                onChange={(e) => handleChangeProductVariations(e.target.name, Number(e.target.value), index)}
+                                                decimalScale={2}
+                                                decimalSeparator="."
+                                                // Use customInput prop to pass TextField component
+                                                customInput={TextField}
+                                                sx={{ minWidth: 100 }}
+                                                size="small"
+                                                label={"Tax rate"}
+                                                name={"tax_rate"}
+                                            />
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <NumericFormat
+                                                value={productVariation.stock}
+                                                onChange={(e) => handleChangeProductVariations(e.target.name, Number(e.target.value), index)}
+                                                decimalScale={0}
+                                                // Use customInput prop to pass TextField component
+                                                customInput={TextField}
+                                                sx={{ minWidth: 75 }}
+                                                size="small"
+                                                label={"Stock"}
+                                                name={"stock"} />
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <TextField
+                                                value={productVariation.sku}
+                                                onChange={(e) => handleChangeProductVariations(e.target.name, e.target.value, index)}
+                                                sx={{ minWidth: 125 }}
+                                                size="small"
+                                                label={"SKU"}
+                                                name={"sku"} />
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <TextField
+                                                value={productVariation.external_id}
+                                                onChange={(e) => handleChangeProductVariations(e.target.name, e.target.value, index)}
+                                                sx={{ minWidth: 175 }}
+                                                size="small"
+                                                label={"External product id"}
+                                                name={"external_id"} />
+                                        </TableCell>
+                                    </TableRow>
                                 ))}
                             </TableBody>
                         </Table>

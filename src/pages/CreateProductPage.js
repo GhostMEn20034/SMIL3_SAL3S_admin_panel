@@ -104,8 +104,6 @@ export default function CreateProductPage() {
     )
   }
 
-  console.log(productVariations);
-
   return (
     <>
       <Box padding={2} display="flex">
@@ -200,7 +198,8 @@ export default function CreateProductPage() {
               <ProductVariationList 
                 productVariations={productVariations}
                 setProductVariations={setProductVariations}
-                productVariationFields={productVariationFields} />
+                productVariationFields={productVariationFields} 
+                setProductVariationFields={setProductVariationFields} />
             </Box>
           </Box>
 
