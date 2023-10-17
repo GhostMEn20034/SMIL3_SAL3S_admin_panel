@@ -202,7 +202,7 @@ export const removeAttr = (index, setAttrs) => {
         let newAttrs = [...prevAttrs];
         // Remove the element at the given index using splice
         newAttrs.splice(index, 1);
-        
+
         // If the new array has length 0, then return object extraAttr
         if (newAttrs.length === 0) {
             return [extraAttr]
@@ -248,8 +248,8 @@ export const addListValue = (index, newValue, setAttrs) => {
         return [
             // Copy the elements before the index
             ...prevAttrs.slice(0, index),
-             // Create a new object with the updated value for the index
-             {
+            // Create a new object with the updated value for the index
+            {
                 ...prevAttrs[index],
                 // update value array
                 value: [...prevAttrs[index].value, newValue]
@@ -262,17 +262,73 @@ export const addListValue = (index, newValue, setAttrs) => {
 
 
 export const removeKey = (obj, key) => {
-  // Create a new object to store the result
-  let result = {};
-  // Loop through the keys of the original object
-  for (let k in obj) { //
-    // If the key is not equal to the one to be removed, copy it to the result object
-    if (k !== key) {
-      result[k] = obj[k];
-    }
-    // Return the result object
-    
-  }
+    // Create a new object to store the result
+    let result = {};
+    // Loop through the keys of the original object
+    for (let k in obj) { //
+        // If the key is not equal to the one to be removed, copy it to the result object
+        if (k !== key) {
+            result[k] = obj[k];
+        }
+        // Return the result object
 
-  return result;
+    }
+
+    return result;
 };
+
+// Returns a string with the attribute values, names and units for a product name
+export const getAttrString = (attrs, separator) => {
+    // Create an array of strings with the attribute values, names and units
+    let attrStrings = attrs.map(attr => {
+        
+        let unit = attr.unit;
+        let value = attr.value;
+        let name = attr.name;
+
+        // if attribute type is bivariate or trivariate
+        if (["bivariate", "trivariate"].includes(attr.type)) {            
+            value = value.join(" x ");
+        }
+
+        // If the unit is null, return only the value and name
+        if (unit === null) {
+            return `${value} ${name}`;
+        }
+        // Otherwise, return the value, name and unit
+        else {
+            return `${value} ${unit} ${name}`;
+        }
+    });
+    // Join the attrStrings array with the separator
+    let attrString = attrStrings.join(separator);
+    // Return the attrString
+    return attrString;
+}
+
+// Modifies name for each productVariation based on the chosen attrs
+export const modifyName = (attrs, separator, checkedProducts, setProductVariations, addVariationAttrs) => {
+    /**
+     * @param attrs: array of objects, stores list of product attributes that will used to in the product name.
+     * @param separator: string, symbol to separate attrs in the product name.
+     * @param checkedProducts: array of integers, list of indexes of checked products.
+     * @param setProductVariations: react setState function.
+     * @param addVariationAttrs: boolean, defines whether include product variation attrs to the product name.
+     */
+
+    setProductVariations((prevValues) => {
+        let newProducts = prevValues.map((product, index) => {
+            if (checkedProducts.includes(index)) {
+                let concatenatedAttrs = addVariationAttrs ? attrs.concat(product.attrs) : attrs; // if addVariationAttrs is true, 
+                // then add product variation attrs to the attrs passed to the function
+                let attrString = getAttrString(concatenatedAttrs, separator);
+                let newName = product.name + " " + attrString;
+                // Return a new object with the modified name
+                return {...product, name: newName};
+            } else {
+                return product;
+            }
+        });
+        return newProducts;
+    });
+}

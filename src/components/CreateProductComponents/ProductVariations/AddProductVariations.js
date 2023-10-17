@@ -60,7 +60,7 @@ export default function AddProductVariations(props) {
                     [keyName]: newArray
                 };
             }
-        })
+        });
     };
 
     return (

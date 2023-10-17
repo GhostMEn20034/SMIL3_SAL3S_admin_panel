@@ -14,7 +14,6 @@ export default function SelectValue({ value, setValue, menuItems, label, disable
   const displayName = objectValue ? objectValue : "name";
   const menuValue = objectKey ? objectKey : "value";
 
-
   return (
     <FormControl sx={{ minWidth: !formProperties?.minWidth ? 120 : formProperties?.minWidth, maxWidth: !formProperties?.maxWidth ? 480 : formProperties?.maxWidth, ...formProperties }} size="small" disabled={disabledInput}>
       <InputLabel id="demo-select-small-label">{label}</InputLabel>

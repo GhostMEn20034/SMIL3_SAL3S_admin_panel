@@ -5,3 +5,5 @@ export const baseAttrs = {_id: 0, name: "",
                           tax_rate: 0, stock: 0, 
                           sku: "", 
                           external_id: null}; // Base product attributes
+
+export const attrSeparators = [" | ", " , ", " / "]; // Used to separate attributes in the product name

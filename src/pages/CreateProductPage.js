@@ -199,7 +199,9 @@ export default function CreateProductPage() {
                 productVariations={productVariations}
                 setProductVariations={setProductVariations}
                 productVariationFields={productVariationFields} 
-                setProductVariationFields={setProductVariationFields} />
+                setProductVariationFields={setProductVariationFields}
+                attrs={attrs}
+                />
             </Box>
           </Box>
 

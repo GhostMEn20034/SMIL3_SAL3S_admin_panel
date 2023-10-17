@@ -16,11 +16,13 @@ import {
 import { NumericFormat } from "react-number-format";
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import { useState } from "react";
+import ModifyNameDialog from "../ModifyNameDialog";
 
 
 export default function ProductVariationList(props) {
     const [newProdValues, setNewProdValues] = useState({ name: null, price: null, discount_rate: null, tax_rate: null, stock: null }); // Used to set new values of product variation properties
     const [checked, setChecked] = useState([]); // An array with indexes of checked products
+    const [openDialog, setOpenDialog] = useState(false);
 
     let variationLength = props.productVariations?.length;
 
@@ -127,21 +129,32 @@ export default function ProductVariationList(props) {
         });
 
         // Reset newProdValues
-        setNewProdValues({ 
-              name: null, price: null, 
-              discount_rate: null, tax_rate: null, 
-              stock: null 
+        setNewProdValues({
+            name: null, price: null,
+            discount_rate: null, tax_rate: null,
+            stock: null
         });
     };
 
     return (
         <Box sx={{ mb: 2 }}>
+            {openDialog && (
+                <ModifyNameDialog 
+                    open={openDialog} // boolean value that determines is modal window opened
+                    setOpen={setOpenDialog} // react setState function to set is modal window opened
+                    checkedProducts={checked} // array of the checked products
+                    setProductVariations={props.setProductVariations} // react setState function to set productVariations
+                    attrs={props.attrs.filter((attr) => !Object.keys(props.productVariationFields).includes(attr.code))} // array of the attributes
+                    nameValue={newProdValues.name ? newProdValues.name : ""} // value of the name property of newProdValues obj
+                    changeName={(e) => handleChangeNewProdValues("name", e.target.value)} // function to change a name property of the newProdValues obj
+                />
+            )}
             {variationLength > 0 && (
                 <>
                     <Box display={"flex"} sx={{ mb: 2 }} alignItems={"center"}>
-                        <Button size="small" variant="contained" 
-                        disabled={!(hasNonNullValues(newProdValues) && checked.length > 0)}
-                        onClick={applyProductProps}
+                        <Button size="small" variant="contained"
+                            disabled={!(hasNonNullValues(newProdValues) && checked.length > 0)}
+                            onClick={applyProductProps}
                         >
                             Apply Changes
                         </Button>
@@ -204,11 +217,11 @@ export default function ProductVariationList(props) {
                                             <TextField
                                                 value={newProdValues.name ? newProdValues.name : ""}
                                                 onChange={(e) => handleChangeNewProdValues(e.target.name, e.target.value)}
-                                                sx={{ minWidth: 200 }}
+                                                sx={{ minWidth: 350 }}
                                                 size="small"
                                                 label={"Product name"} name={"name"}
                                             />
-                                            <IconButton size="small" sx={{ ml: 1, px: 1 }}>
+                                            <IconButton size="small" sx={{ ml: 1, px: 1 }} onClick={() => setOpenDialog(!openDialog)}>
                                                 <AutoFixHighIcon fontSize="small" />
                                             </IconButton>
                                         </Box>
@@ -293,7 +306,7 @@ export default function ProductVariationList(props) {
                                                 <TextField
                                                     value={productVariation.name}
                                                     onChange={(e) => handleChangeProductVariations(e.target.name, e.target.value, index)}
-                                                    sx={{ minWidth: 200 }}
+                                                    sx={{ minWidth: 350 }}
                                                     size="small"
                                                     label={"Product name"} name={"name"}
                                                 />
