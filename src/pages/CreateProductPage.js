@@ -7,10 +7,14 @@ import SelectValueRadioGroup from "../components/SelectValueRadioGroup";
 import SelectValue from "../components/SelectValue";
 import ProductAttrs from "../components/CreateProductComponents/ProductAttrs";
 import AdditionalProductAttrs from "../components/CreateProductComponents/AdditionalProductAttrs";
-import { extraAttr, productMenuNavigationItems } from "../utils/consts";
+import { extraAttr, productImages, productMenuNavigationItems } from "../utils/consts";
 import ProductNavigation from "../components/CreateProductComponents/ProductMenusNavigation";
 import AddProductVariations from "../components/CreateProductComponents/ProductVariations/AddProductVariations";
 import ProductVariationList from "../components/CreateProductComponents/ProductVariations/ProductVariationList";
+import { baseAttrs } from "../utils/consts";
+import BaseAttrsForm from "../components/CreateProductComponents/BaseAttrsForm";
+import { ModifyNameDialog } from "../components/CreateProductComponents/ModifyNameDialog";
+import AddProductImages from "../components/ProductComponents/Images/AddProductImages";
 
 export default function CreateProductPage() {
   const [loading, setLoading] = useState(false);
@@ -28,11 +32,16 @@ export default function CreateProductPage() {
   const [productVariationFields, setProductVariationFields] = useState({}); // Values of fields for product variations
   const [productVariations, setProductVariations] = useState([]); // Array of product variations
 
-  const [baseAttrs, setBaseAttrs] = useState([]); // Base attributes such as product name, price, sku etc
+  const [baseAttributes, setBaseAttributes] = useState(baseAttrs); // Base attributes such as product name, price, sku etc
+
+  const [images, setImages] = useState(productImages); // Object of product images
+  const [sameImages, setSameImages] = useState(false); // Determines whether user wants to upload the same photos to all variations 
 
   const [attrs, setAttrs] = useState([]); // Product specs, for example: screen size, CPU, storage size etc
 
   const [extraAttrs, setExtraAttrs] = useState([extraAttr]) // attributes to provide additional information about product 
+
+  const [openDialog, setOpenDialog] = useState(false); // Determines whether dialog window to modify product name opened
 
   const api = useAxios('products');
   const navigate = useNavigate();
@@ -69,8 +78,11 @@ export default function CreateProductPage() {
       if (prevValue) { // if prevValue is true
         setVariationTheme(null);
         setVariationThemeFields([]);
+        setProductVariations([]);
+        setProductVariationFields({});
         return value
       }
+
 
       return value;
     })
@@ -135,7 +147,28 @@ export default function CreateProductPage() {
         {currentMenu === 0 && (
 
           <Box>
+            {openDialog && (
+              <ModifyNameDialog
+                open={openDialog} // boolean value that determines is modal window opened
+                setOpen={setOpenDialog} // react setState function to set is modal window opened
+                attrs={attrs.filter((attr) => !Object.keys(productVariationFields).includes(attr.code))} // array of the attributes
+                nameValue={baseAttributes.name ? baseAttributes.name : ""} // value of the name property of newProdValues obj
+                changeName={(newValue) => {
 
+                  if (newValue === "" || newValue === 0) {
+                      newValue = null;
+                  }
+          
+                  setBaseAttributes((prevValue) => (
+                      {
+                          ...prevValue,
+                          name: newValue
+                      }
+                  ));
+              }} // function to change a name property of the newProdValues obj
+                resetProductName={() => setBaseAttributes((prevValue) => ({...prevValue, name: null}))} // function to reset product name
+              />
+            )}
             <Box sx={{ mb: 1, ml: "13.5%" }}>
               <SelectValueRadioGroup label={"Does the product has variations?"} value={hasVariations} setValue={handleChangeHasVariation} menuItems={[
                 { name: "No", value: false },
@@ -154,6 +187,10 @@ export default function CreateProductPage() {
                 />
               </Box>
             )}
+            <Box sx={{ ml: "13.5%", mb: 2 }}>
+              <BaseAttrsForm baseAttrs={baseAttributes} setBaseAttrs={setBaseAttributes} openDialog={openDialog} setOpenDialog={setOpenDialog}/>
+            </Box>
+
 
             {/* Dynamic forms for product attributes and additional product attributes */}
             {formData && (
@@ -194,17 +231,30 @@ export default function CreateProductPage() {
                 groups={formData?.category.groups}
               />
             </Box>
-            <Box sx={{mt: 2}}>
-              <ProductVariationList 
+            <Box sx={{ mt: 2 }}>
+              <ProductVariationList
                 productVariations={productVariations}
                 setProductVariations={setProductVariations}
-                productVariationFields={productVariationFields} 
+                productVariationFields={productVariationFields}
                 setProductVariationFields={setProductVariationFields}
                 attrs={attrs}
-                />
+              />
             </Box>
           </Box>
 
+        )}
+
+        {currentMenu === 2 && (
+          <Box sx={{ width: 1200 }}>
+              <AddProductImages productVariations={productVariations} 
+              setProductVariations={setProductVariations} 
+              hasVariations={hasVariations}
+              images={images}
+              setImages={setImages}
+              sameImages={sameImages}
+              setSameImages={setSameImages}
+              />
+          </Box>
         )}
 
       </Box>

@@ -8,7 +8,7 @@ import { generateCombinations, removeProducts } from "../../../utils/ProductVari
 
 export default function AddProductVariations(props) {
     const [newFields, setNewFields] = useState(facetsToAttrs(props.facets)); // Fields for the new varition theme, list of objects
-    const [groups, setGroups] = useState(() => newFields.map(field => field.group)); // Stores previous group values for each field
+    const [groups, setGroups] = useState(() => newFields.map(field => field.group)); // Stores group values for each field
 
 
     const addProductVariationFields = (attr, keyName) => {

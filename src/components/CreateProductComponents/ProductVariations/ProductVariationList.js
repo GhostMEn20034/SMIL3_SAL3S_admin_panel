@@ -16,7 +16,7 @@ import {
 import { NumericFormat } from "react-number-format";
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import { useState } from "react";
-import ModifyNameDialog from "../ModifyNameDialog";
+import { ModifyMultipleNamesDialog } from "../ModifyNameDialog";
 
 
 export default function ProductVariationList(props) {
@@ -136,17 +136,20 @@ export default function ProductVariationList(props) {
         });
     };
 
+    console.log(props.productVariations);
+
     return (
         <Box sx={{ mb: 2 }}>
             {openDialog && (
-                <ModifyNameDialog 
+                <ModifyMultipleNamesDialog 
                     open={openDialog} // boolean value that determines is modal window opened
                     setOpen={setOpenDialog} // react setState function to set is modal window opened
                     checkedProducts={checked} // array of the checked products
                     setProductVariations={props.setProductVariations} // react setState function to set productVariations
                     attrs={props.attrs.filter((attr) => !Object.keys(props.productVariationFields).includes(attr.code))} // array of the attributes
                     nameValue={newProdValues.name ? newProdValues.name : ""} // value of the name property of newProdValues obj
-                    changeName={(e) => handleChangeNewProdValues("name", e.target.value)} // function to change a name property of the newProdValues obj
+                    changeName={(newValue) => handleChangeNewProdValues("name", newValue)} // function to change a name property of the newProdValues obj
+                    resetProductName={() => handleChangeNewProdValues("name", null)} // function to reset product name
                 />
             )}
             {variationLength > 0 && (
@@ -302,22 +305,19 @@ export default function ProductVariationList(props) {
                                             )
                                         })}
                                         <TableCell align="center">
-                                            <Box display={"flex"}>
+                                            <Box>
                                                 <TextField
-                                                    value={productVariation.name}
+                                                    value={productVariation.name ? productVariation.name : ""}
                                                     onChange={(e) => handleChangeProductVariations(e.target.name, e.target.value, index)}
-                                                    sx={{ minWidth: 350 }}
+                                                    sx={{ minWidth: 400 }}
                                                     size="small"
                                                     label={"Product name"} name={"name"}
                                                 />
-                                                <IconButton size="small" sx={{ ml: 1, px: 1 }}>
-                                                    <AutoFixHighIcon fontSize="small" />
-                                                </IconButton>
                                             </Box>
                                         </TableCell>
                                         <TableCell align="center">
                                             <NumericFormat
-                                                value={productVariation.price}
+                                                value={productVariation.price ? productVariation.price : 0}
                                                 onChange={(e) => handleChangeProductVariations(e.target.name, Number(e.target.value), index)}
                                                 decimalScale={2}
                                                 decimalSeparator="."
@@ -332,7 +332,7 @@ export default function ProductVariationList(props) {
                                         </TableCell>
                                         <TableCell align="center">
                                             <NumericFormat
-                                                value={productVariation.discount_rate}
+                                                value={productVariation.discount_rate ? productVariation.discount_rate : 0}
                                                 onChange={(e) => handleChangeProductVariations(e.target.name, Number(e.target.value), index)}
                                                 decimalScale={2}
                                                 decimalSeparator="."
@@ -346,7 +346,7 @@ export default function ProductVariationList(props) {
                                         </TableCell>
                                         <TableCell align="center">
                                             <NumericFormat
-                                                value={productVariation.tax_rate}
+                                                value={productVariation.tax_rate ? productVariation.tax_rate : 0}
                                                 onChange={(e) => handleChangeProductVariations(e.target.name, Number(e.target.value), index)}
                                                 decimalScale={2}
                                                 decimalSeparator="."
@@ -360,7 +360,7 @@ export default function ProductVariationList(props) {
                                         </TableCell>
                                         <TableCell align="center">
                                             <NumericFormat
-                                                value={productVariation.stock}
+                                                value={productVariation.stock ? productVariation.stock : 0}
                                                 onChange={(e) => handleChangeProductVariations(e.target.name, Number(e.target.value), index)}
                                                 decimalScale={0}
                                                 // Use customInput prop to pass TextField component
@@ -372,7 +372,7 @@ export default function ProductVariationList(props) {
                                         </TableCell>
                                         <TableCell align="center">
                                             <TextField
-                                                value={productVariation.sku}
+                                                value={productVariation.sku ? productVariation.sku : ""}
                                                 onChange={(e) => handleChangeProductVariations(e.target.name, e.target.value, index)}
                                                 sx={{ minWidth: 125 }}
                                                 size="small"
@@ -381,7 +381,7 @@ export default function ProductVariationList(props) {
                                         </TableCell>
                                         <TableCell align="center">
                                             <TextField
-                                                value={productVariation.external_id}
+                                                value={productVariation.external_id ? productVariation.external_id : ""}
                                                 onChange={(e) => handleChangeProductVariations(e.target.name, e.target.value, index)}
                                                 sx={{ minWidth: 175 }}
                                                 size="small"

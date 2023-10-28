@@ -307,7 +307,7 @@ export const getAttrString = (attrs, separator) => {
 }
 
 // Modifies name for each productVariation based on the chosen attrs
-export const modifyName = (attrs, separator, checkedProducts, setProductVariations, addVariationAttrs) => {
+export const modifyName = (baseName ,attrs, separator, checkedProducts, setProductVariations, addVariationAttrs) => {
     /**
      * @param attrs: array of objects, stores list of product attributes that will used to in the product name.
      * @param separator: string, symbol to separate attrs in the product name.
@@ -322,7 +322,7 @@ export const modifyName = (attrs, separator, checkedProducts, setProductVariatio
                 let concatenatedAttrs = addVariationAttrs ? attrs.concat(product.attrs) : attrs; // if addVariationAttrs is true, 
                 // then add product variation attrs to the attrs passed to the function
                 let attrString = getAttrString(concatenatedAttrs, separator);
-                let newName = product.name + " " + attrString;
+                let newName = baseName +  (baseName.length > 0 ? " " : "") + attrString;
                 // Return a new object with the modified name
                 return {...product, name: newName};
             } else {
