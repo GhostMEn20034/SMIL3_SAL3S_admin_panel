@@ -136,7 +136,7 @@ export default function ProductVariationList(props) {
         });
     };
 
-    console.log(props.productVariations);
+    // console.log(props.productVariations);
 
     return (
         <Box sx={{ mb: 2 }}>

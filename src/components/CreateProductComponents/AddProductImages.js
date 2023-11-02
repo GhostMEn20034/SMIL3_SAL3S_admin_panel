@@ -1,13 +1,22 @@
-import { Paper, Box, IconButton, Button } from "@mui/material";
+import { Paper, Box, IconButton, Button, Typography } from "@mui/material";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import HighlightOffRoundedIcon from '@mui/icons-material/HighlightOffRounded';
-import { VisuallyHiddenInput } from "../../HiddenInput";
-import SelectValueRadioGroup from "../../SelectValueRadioGroup";
+import { VisuallyHiddenInput } from "../HiddenInput";
+import SelectValueRadioGroup from "../SelectValueRadioGroup";
+import { Fragment } from "react";
 
 
 
 function ImageListMultipleProducts(props) {
-
+    /**
+    * Renders form to upload images for product that has variations.
+    * List of props:
+    * ------------------------------------------------------------------------
+    * productVariations - array of objects, state of productVariations
+    * setProductVariations - react setState function for productVariations
+    * hasVariations - boolean, determines whether product has variaitions
+    * sameImages - boolean, determines whether the user wants to use the same images for all product variations
+    */
     const handleChange = (e, index) => {
         props.setProductVariations((prevValues) => {
             // get all the files from the input element
@@ -26,14 +35,6 @@ function ImageListMultipleProducts(props) {
                         img.url = URL.createObjectURL(img);
 
                         return prevValues.map((product, i) => {
-                            // If user specified that he wants same images for all variations,
-                            // then apply the same photo to all variations.
-                            if (props.sameImages) {
-                                let modifiedImages = { ...product.images };
-                                modifiedImages.main = img;
-                                return { ...product, images: modifiedImages };
-                            }
-
                             // if product index equals to the index passed into the function, then modify product images
                             if (i === index) {
                                 let modifiedImages = { ...product.images };
@@ -62,15 +63,6 @@ function ImageListMultipleProducts(props) {
 
                         // return the updated images state with the new secondary images
                         return prevValues.map((product, i) => {
-                            // If user specified that he wants same images for all variations,
-                            // then apply the same photo to all variations.
-                            if (props.sameImages) {
-                                let modifiedImages = { ...product.images };
-                                let secondaryImages = modifiedImages.secondaryImages;
-                                // Unzip previous secondary images if it is not null and add new images
-                                modifiedImages.secondaryImages = [...(secondaryImages ? secondaryImages : []), ...temp];
-                                return { ...product, images: modifiedImages };
-                            }
 
                             // if product index equals to the index passed into the function, then modify product images
                             if (i === index) {
@@ -99,10 +91,18 @@ function ImageListMultipleProducts(props) {
             switch (name) {
                 case "main":
                     return prevValues.map((product, i) => {
-
+                        // If user specified that he wants same images for all variations,
+                        // then remove the same main photo from all variations.
+                        if (props.sameImages) {
+                            let modifiedImages = { ...product.images };
+                            URL.revokeObjectURL(modifiedImages.main?.url);
+                            modifiedImages.main = null;
+                            return { ...product, images: modifiedImages };
+                        }
                         // if product index equals to the index passed into the function, then remove main image
                         if (i === index) {
                             let modifiedImages = { ...product.images };
+                            URL.revokeObjectURL(modifiedImages.main?.url);
                             modifiedImages.main = null;
                             return { ...product, images: modifiedImages };
                         }
@@ -141,70 +141,82 @@ function ImageListMultipleProducts(props) {
     return (
         <>
             {props.productVariations.map((productVariaton, index) => (
-                <Box display={"flex"} key={index}>
-                    <Box display={"flex"} mb={2}>
-                        <Paper elevation={3} sx={{ height: "175px", width: "175px" }}>
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    alignItems: "center",
-                                    justifyContent: "flex-end",
-                                    height: "90%",
-                                    padding: 1
-                                }}
-                            >
-                                {productVariaton.images.main && (
-                                    <Box>
-                                        <img src={productVariaton.images.main.url} alt={productVariaton.name}
-                                            style={{ width: "100%", maxHeight: "120px", objectFit: "scale-down" }} />
+                <Fragment key={index}>
+                    <Typography variant="body1" sx={{ mb: 1 }}>
+                        {productVariaton?.name}
+                    </Typography>
+                    <Box display={"flex"} key={index}>
+                        <Box display={"flex"} mb={2}>
+                            <Paper elevation={3} sx={{ height: "175px", width: "175px" }}>
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        alignItems: "center",
+                                        justifyContent: "flex-end",
+                                        height: "90%",
+                                        padding: 1
+                                    }}
+                                >
+                                    {productVariaton.images.main && (
+                                        <Box>
+                                            <img src={productVariaton.images.main.url} alt={productVariaton.name}
+                                                style={{ width: "100%", maxHeight: "120px", objectFit: "scale-down" }} />
 
-                                    </Box>
-                                )}
-                                <Button component="label" variant="contained" size="small" sx={{ fontSize: 12 }}>
-                                    Upload Main Image
-                                    <VisuallyHiddenInput name="main" type="file" accept="image/*" onChange={(e) => handleChange(e, index)} />
-                                </Button>
-                            </Box>
-                        </Paper>
-                        <IconButton sx={{ alignSelf: "start" }} onClick={() => removeImage(index, "main")}>
-                            <DeleteForeverIcon />
-                        </IconButton>
+                                        </Box>
+                                    )}
+                                    <Button component="label" variant="contained" size="small" sx={{ fontSize: 12 }}>
+                                        Upload Main Image
+                                        <VisuallyHiddenInput name="main" type="file" accept="image/*" onChange={(e) => handleChange(e, index)} />
+                                    </Button>
+                                </Box>
+                            </Paper>
+                            <IconButton sx={{ alignSelf: "start" }} onClick={() => removeImage(index, "main")}>
+                                <DeleteForeverIcon />
+                            </IconButton>
+                        </Box>
+                        <Box>
+                            <Paper elevation={3} sx={{ height: "175px", minWidth: "400px", px: 2 }}>
+                                <Box sx={{ height: "40%", width: "100%", display: "flex", justifyContent: "center", alignItems: "end" }}>
+                                    <Button component="label" variant="contained" size="small">
+                                        Upload Secondary Images
+                                        <VisuallyHiddenInput name="secondary" type="file" accept="image/*" multiple onChange={(e) => handleChange(e, index)} />
+                                    </Button>
+                                </Box>
+                                <Box sx={{ display: "flex", mt: 3 }}>
+                                    {productVariaton.images.secondaryImages && (
+                                        productVariaton.images.secondaryImages.map((secImage, secImageIndex) => (
+                                            <Paper key={secImageIndex} elevation={2} sx={{ position: "relative", display: "inline-block", mr: 3 }}>
+                                                <Box>
+                                                    <img src={secImage.url} key={secImageIndex} alt={productVariaton.name}
+                                                        style={{ minWidth: "100px", width: "100%", maxHeight: "60px", objectFit: "scale-down" }} />
+                                                </Box>
+                                                <Box sx={{ ml: 1 }}>
+                                                    <IconButton sx={{ top: -17, right: -17, position: "absolute", padding: 0 }} size="small" onClick={() => removeImage(index, "secondary", secImageIndex)}>
+                                                        <HighlightOffRoundedIcon />
+                                                    </IconButton>
+                                                </Box>
+                                            </Paper>
+                                        ))
+                                    )}
+                                </Box>
+                            </Paper>
+                        </Box>
                     </Box>
-                    <Box>
-                        <Paper elevation={3} sx={{ height: "175px", minWidth: "400px", px: 2 }}>
-                            <Box sx={{ height: "40%", width: "100%", display: "flex", justifyContent: "center", alignItems: "end" }}>
-                                <Button component="label" variant="contained" size="small">
-                                    Upload Secondary Images
-                                    <VisuallyHiddenInput name="secondary" type="file" accept="image/*" multiple onChange={(e) => handleChange(e, index)} />
-                                </Button>
-                            </Box>
-                            <Box sx={{ display: "flex", mt: 3 }}>
-                                {productVariaton.images.secondaryImages && (
-                                    productVariaton.images.secondaryImages.map((secImage, secImageIndex) => (
-                                        <Paper key={secImageIndex} elevation={2} sx={{ position: "relative", display: "inline-block", mr: 3 }}>
-                                            <Box>
-                                                <img src={secImage.url} key={secImageIndex} alt={productVariaton.name}
-                                                    style={{ minWidth: "100px", width: "100%", maxHeight: "60px", objectFit: "scale-down" }} />
-                                            </Box>
-                                            <Box sx={{ ml: 1 }}>
-                                                <IconButton sx={{ top: -17, right: -17, position: "absolute", padding: 0 }} size="small" onClick={() => removeImage(index, "secondary", secImageIndex)}>
-                                                    <HighlightOffRoundedIcon />
-                                                </IconButton>
-                                            </Box>
-                                        </Paper>
-                                    ))
-                                )}
-                            </Box>
-                        </Paper>
-                    </Box>
-                </Box>
+                </Fragment>
             ))}
         </>
     );
 }
 
 function ImageListOneProduct(props) {
+    /**
+     * Renders form to upload images for product that has no variations.
+     * List of props:
+     * ------------------------------------------------------------------------
+     * images - array of files, state of images for product without variations
+     * setImages - react setState function for images variable
+     */
 
     const handleChange = (e) => {
         props.setImages((prevValues) => {
@@ -347,27 +359,43 @@ function ImageListOneProduct(props) {
 }
 
 export default function AddProductImages(props) {
-
+    /**
+     * Renders form to upload images.
+     * If product has no variations, then component 
+     * renders form where the user can upload images only for one product.
+     * Otherwise, component renders form where the user can upload images for all product variations.
+     * List of props:
+     * ------------------------------------------------------------------------
+     * images - array of files, state of images for product without variations
+     * setImages - react setState function for images variable
+     * productVariations - array of objects, state of productVariations
+     * setProductVariations - react setState function for productVariations
+     * hasVariations - boolean, determines whether product has variaitions
+     * sameImages - boolean, determines whether the user wants to use the same images for all product variations
+     */
 
     return (
-        <Box sx={{ padding: 2, width: 1200 }}>
-            {!props.hasVariations ? (
+        <Box sx={{ padding: 2 }}>
+            {props.hasVariations && (
+                <Box sx={{ mb: 1 }}>
+                    <SelectValueRadioGroup label={"Use the same images for all variations"} value={props.sameImages} setValue={props.setSameImages} menuItems={[
+                        { name: "No", value: false },
+                        { name: "Yes", value: true }
+                    ]} valueType={"boolean"} />
+                </Box>
+            )
+            }
+            {!props.hasVariations || props.sameImages ? (
                 <ImageListOneProduct
                     images={props.images}
                     setImages={props.setImages}
                 />
             ) : (
-                <>
-                    <SelectValueRadioGroup label={"Use the same images for all variations"} value={props.sameImages} setValue={props.setSameImages} menuItems={[
-                        { name: "No", value: false },
-                        { name: "Yes", value: true }
-                    ]} valueType={"boolean"} />
-                    <ImageListMultipleProducts
-                        productVariations={props.productVariations}
-                        setProductVariations={props.setProductVariations}
-                        sameImages={props.sameImages}
-                    />
-                </>
+                <ImageListMultipleProducts
+                    productVariations={props.productVariations}
+                    setProductVariations={props.setProductVariations}
+                    sameImages={props.sameImages}
+                />
             )}
         </Box>
     )

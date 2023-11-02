@@ -14,7 +14,9 @@ import ProductVariationList from "../components/CreateProductComponents/ProductV
 import { baseAttrs } from "../utils/consts";
 import BaseAttrsForm from "../components/CreateProductComponents/BaseAttrsForm";
 import { ModifyNameDialog } from "../components/CreateProductComponents/ModifyNameDialog";
-import AddProductImages from "../components/ProductComponents/Images/AddProductImages";
+import AddProductImages from "../components/CreateProductComponents/AddProductImages";
+import SubmitMenu from "../components/CreateProductComponents/SubmitMenu";
+import { encodeImages } from "../utils/ImageServices";
 
 export default function CreateProductPage() {
   const [loading, setLoading] = useState(false);
@@ -80,7 +82,7 @@ export default function CreateProductPage() {
         setVariationThemeFields([]);
         setProductVariations([]);
         setProductVariationFields({});
-        return value
+        return value;
       }
 
 
@@ -104,9 +106,75 @@ export default function CreateProductPage() {
 
   };
 
+
+
+  const handleSubmit = async () => {
+    // Request body
+    let body = {
+      base_attrs: baseAttributes,
+      attrs: attrs,
+      extra_attrs: extraAttrs,
+      has_variations: hasVariations,
+      same_images: sameImages,
+      variation_theme: variationTheme,
+
+
+    }
+
+    // if product has variations and variation theme is chosen
+    if (hasVariations && variationTheme) {
+
+      // Make a deep clone of products array
+      let clonedProducts = structuredClone(productVariations);
+
+      // if sameImages is true (if user wants to use the same images for all variations)
+      if (sameImages) {
+        // remove old images from all product variations
+        let products = clonedProducts.map((product) => {
+          delete product.images;
+          return product
+        });
+
+        // convert all images from File object to the base64 string
+        let encodedImages = await encodeImages(images);
+
+        // Add product variations and images to the request body
+        body.variations = products;
+        body.images = encodedImages;
+      } else { // if sameImages is false (if user don't want to use the same images for all variations)
+
+        // Convert each image from File object to base64 string
+        let products = await Promise.all(clonedProducts.map(async (product) => {
+          // use the await keyword to wait for the encodeImages function to resolve
+          let encodedImages = await encodeImages(product.images);
+
+          // replace File objects on base64 encoded images 
+          product.images = encodedImages;
+          return product;
+        }));
+
+        // Add product variations to the request body
+        body.variations = products;
+      }
+
+    // if product has no variations and variation theme is not chosen
+    } else {
+        // Add only images to the request body
+        let encodedImages = await encodeImages(images);
+        body.images = encodedImages;
+    }
+
+    console.log(body);
+    let response = await api.post('/admin/products/create', body);
+    console.log(await response.data);
+  };
+
   const goBack = () => {
     navigate(-1);
   };
+
+
+  console.log(attrs);
 
   if (loading) {
     return (
@@ -115,6 +183,7 @@ export default function CreateProductPage() {
       </Box>
     )
   }
+
 
   return (
     <>
@@ -156,17 +225,17 @@ export default function CreateProductPage() {
                 changeName={(newValue) => {
 
                   if (newValue === "" || newValue === 0) {
-                      newValue = null;
+                    newValue = null;
                   }
-          
+
                   setBaseAttributes((prevValue) => (
-                      {
-                          ...prevValue,
-                          name: newValue
-                      }
+                    {
+                      ...prevValue,
+                      name: newValue
+                    }
                   ));
-              }} // function to change a name property of the newProdValues obj
-                resetProductName={() => setBaseAttributes((prevValue) => ({...prevValue, name: null}))} // function to reset product name
+                }} // function to change a name property of the newProdValues obj
+                resetProductName={() => setBaseAttributes((prevValue) => ({ ...prevValue, name: null }))} // function to reset product name
               />
             )}
             <Box sx={{ mb: 1, ml: "13.5%" }}>
@@ -188,7 +257,7 @@ export default function CreateProductPage() {
               </Box>
             )}
             <Box sx={{ ml: "13.5%", mb: 2 }}>
-              <BaseAttrsForm baseAttrs={baseAttributes} setBaseAttrs={setBaseAttributes} openDialog={openDialog} setOpenDialog={setOpenDialog}/>
+              <BaseAttrsForm baseAttrs={baseAttributes} setBaseAttrs={setBaseAttributes} openDialog={openDialog} setOpenDialog={setOpenDialog} />
             </Box>
 
 
@@ -246,17 +315,21 @@ export default function CreateProductPage() {
 
         {currentMenu === 2 && (
           <Box sx={{ width: 1200 }}>
-              <AddProductImages productVariations={productVariations} 
-              setProductVariations={setProductVariations} 
+            <AddProductImages productVariations={productVariations}
+              setProductVariations={setProductVariations}
               hasVariations={hasVariations}
               images={images}
               setImages={setImages}
               sameImages={sameImages}
               setSameImages={setSameImages}
-              />
+            />
           </Box>
         )}
-
+        {currentMenu === 3 && (
+          <Box sx={{ width: 1200 }}>
+            <SubmitMenu hasVariations={hasVariations} productVariationCount={productVariations.length} handleSubmit={handleSubmit} />
+          </Box>
+        )}
       </Box>
     </>
   )
