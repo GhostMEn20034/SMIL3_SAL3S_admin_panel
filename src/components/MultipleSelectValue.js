@@ -49,7 +49,7 @@ export default function MultipleSelect({ value, setValue, objectKey, objectValue
                     renderValue={(selected) => (
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                             {selected.map((value) => (
-                                <Chip key={value} label={menuItems.find(item => item[objectKey] === value).name} />
+                                <Chip key={value} label={menuItems.find(item => item[objectKey] === value)[objectValue]} />
                             ))}
                         </Box>
                     )}

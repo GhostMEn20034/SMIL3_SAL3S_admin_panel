@@ -159,7 +159,7 @@ export default function VariationThemeEdit({ variationTheme, categories }) {
                                                 value={filter.field_codes}
                                                 setValue={changeFieldCodes}
                                                 objectKey={"code"}
-                                                objectValue={"name"}
+                                                objectValue={"code"}
                                                 menuItems={facets}
                                                 label={"Field codes"}
                                                 index={indexFilterName}

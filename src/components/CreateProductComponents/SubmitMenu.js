@@ -1,4 +1,5 @@
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Alert } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 export default function SubmitMenu (props) {
     return (
@@ -20,9 +21,14 @@ export default function SubmitMenu (props) {
                     Variation count: {props.productVariationCount}
                 </Typography>
             )}
-            <Button variant="contained" size="small" onClick={props.handleSubmit}>
+            {JSON.stringify(props.errorHandler.obj) !== JSON.stringify({}) && (
+                <Alert severity="error" sx={{mb: 1, width: "50%"}}>
+                    An Error Happen 
+                </Alert>
+            )}
+            <LoadingButton loading={props.loading} variant="contained" size="small" onClick={props.handleSubmit}>
                 Create Product
-            </Button>
+            </LoadingButton>
         </Box>
     )
 }

@@ -2,7 +2,7 @@ import { baseAttrs } from "./consts";
 import { removeKey } from "./Services";
 
 
-const generateProducts = (productVariationFields, newAttr, products = [], index = 0) => {
+const generateProducts = (productVariationFields, newAttr) => {
   // Get the keys of the productVariationFields object as an array
   let keys = Object.keys(productVariationFields);
 
@@ -15,61 +15,53 @@ const generateProducts = (productVariationFields, newAttr, products = [], index 
     return [product]
   }
 
-  // If the index is equal to the length of the keys array, it means that we have reached the end of the recursion
-  if (index === keys.length) {
-    // Return the products array as the final output
-    return products;
-  }
+  // Initialize an array to store the products
+  let products = [];
 
-  // Get the current key from the keys array at the index position
-  let key = keys[index];
+  // Loop through each key in the keys array
+  for (let key of keys) {
+    // Get the array of values for the current key from the productVariationFields object
+    let values = productVariationFields[key];
 
-  // Get the array of values for the current key from the productVariationFields object
-  let values = productVariationFields[key];
+    // Initialize a temporary array to store the new products
+    let temp = [];
 
-  // Initialize a temporary array to store the new products
-  let temp = [];
+    // Loop through each value in the values array
+    for (let value of values) {
+      // If the products array is empty, create a new product with an empty name, price, stock and attrs
+      if (products.length === 0) {
+        let product = { ...baseAttrs, attrs: [] };
 
-  // Loop through each value in the values array
-  for (let value of values) {
-    // If the products array is empty, create a new product with an empty name, price, stock and attrs
-    if (products.length === 0) {
-      let product = { ...baseAttrs, attrs: [] };
+        // Add the new attribute to the product attrs
+        product.attrs.push(newAttr);
 
-      // Add the new attribute to the product attrs
-      product.attrs.push(newAttr);
+        // Add the current value to the product attrs
+        product.attrs.push(value);
 
-      // Add the current value to the product attrs
-      product.attrs.push(value);
+        // Push the product to the temporary array
+        temp.push(product);
+      } else {
+        // If the products array is not empty, create a new product for each existing product and the current value in the values array
+        // Loop through each existing product in the products array
+        for (let product of products) {
+          // Create a copy of the existing product
+          let copy = JSON.parse(JSON.stringify(product));
 
-      // Push the product to the temporary array
-      temp.push(product);
-    } else {
-      // If the products array is not empty, create a new product for each existing product and the current value in the values array
-      // Loop through each existing product in the products array
-      for (let product of products) {
-        // Create a copy of the existing product
-        let copy = JSON.parse(JSON.stringify(product));
+          // Add the current value to the copy attrs
+          copy.attrs.push(value);
 
-        // Add the current value to the copy attrs
-        copy.attrs.push(value);
-
-        // Push the copy to the temporary array
-        temp.push(copy);
+          // Push the copy to the temporary array
+          temp.push(copy);
+        }
       }
     }
+
+    // Replace the products array with the temporary array
+    products = temp;
   }
 
-  // Replace the products array with the temporary array
-  products = temp;
-
-
-
-  // Increment the index by one
-  index++;
-
-  // Call the function recursively with the updated products and index parameters
-  return generateProducts(productVariationFields, newAttr, products, index);
+  // Return the products array as the final output
+  return products;
 };
 
 

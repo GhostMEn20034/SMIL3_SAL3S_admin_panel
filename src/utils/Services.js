@@ -24,6 +24,12 @@ export const removeItemFromChipsArray = (index, setValues) => {
 };
 
 export const arrayToMenuItems = (array) => {
+    
+    // If there's no input array, then return empty array
+    if (!array) {
+        return [];
+    }
+    
     // Use the map method to apply an arrow function to each element of the array
     let menuItems = array.map(element => ({
         name: element,
@@ -307,20 +313,26 @@ export const getAttrString = (attrs, separator) => {
 }
 
 // Modifies name for each productVariation based on the chosen attrs
-export const modifyName = (baseName ,attrs, separator, checkedProducts, setProductVariations, addVariationAttrs) => {
+export const modifyName = (baseName ,attrs, separator, checkedProducts, setProductVariations, addVariationAttrs, variationAttrs) => {
     /**
      * @param attrs: array of objects, stores list of product attributes that will used to in the product name.
      * @param separator: string, symbol to separate attrs in the product name.
      * @param checkedProducts: array of integers, list of indexes of checked products.
      * @param setProductVariations: react setState function.
      * @param addVariationAttrs: boolean, defines whether include product variation attrs to the product name.
+     * @param variationAttrs:  Product variation attributes
      */
 
     setProductVariations((prevValues) => {
         let newProducts = prevValues.map((product, index) => {
+            // if addVariationAttrs is true, then return array of product attributes, otherwise - an empty array
+            let productAttrs = addVariationAttrs && variationAttrs.length > 0 
+            ? variationAttrs.map((variationAttr) => product.attrs.find((attr) => attr.code === variationAttr)) : [];
+
+            
             if (checkedProducts.includes(index)) {
-                let concatenatedAttrs = addVariationAttrs ? attrs.concat(product.attrs) : attrs; // if addVariationAttrs is true, 
-                // then add product variation attrs to the attrs passed to the function
+                let concatenatedAttrs = attrs.concat(productAttrs); 
+                
                 let attrString = getAttrString(concatenatedAttrs, separator);
                 let newName = baseName +  (baseName.length > 0 ? " " : "") + attrString;
                 // Return a new object with the modified name

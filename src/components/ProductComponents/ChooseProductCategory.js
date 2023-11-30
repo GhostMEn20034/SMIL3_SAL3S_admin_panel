@@ -82,6 +82,10 @@ function ChooseProductCategory(props) {
     }
   };
 
+  const handleSubmit = () => {
+    props.onClose(category);
+  };
+
   return (
     <div>
       <Dialog open={props.open} onClose={() => props.onClose(null)} fullScreen TransitionComponent={Transition}>
@@ -105,6 +109,14 @@ function ChooseProductCategory(props) {
               }}>
               Back
             </Button>
+          )}
+          {level > 1 && (
+          <Button variant="contained" size="small" 
+          sx={{ml: 2, backgroundColor: "#D5D507", color: "black", ":hover": {backgroundColor: "#bdbd02"}}}
+          onClick={handleSubmit}
+          >
+              Submit
+          </Button>
           )}
           </Toolbar>
         </AppBar>

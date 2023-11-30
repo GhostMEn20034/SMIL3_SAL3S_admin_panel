@@ -59,7 +59,7 @@ export default function CategoryAdd() {
                         error={errors.name !== undefined} helperText={errors.name ? errors.name : ""} />
                 </Box>
                 <Box sx={{ mt: 2 }}>
-                    <SelectValue value={parent} setValue={setParent} menuItems={[
+                    <SelectValue value={parent ? parent : ""} setValue={setParent} menuItems={[
                         { name: "No parent", _id: null },
                         ...categoriesForChoices
                     ]}

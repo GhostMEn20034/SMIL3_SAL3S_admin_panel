@@ -26,6 +26,8 @@ export default function BaseAttrsForm(props) {
         <Box>
             <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
                 <TextField
+                    error={props.errorHandler.isValueExist("base_attrs", "name")}
+                    helperText={props.errorHandler.getObjectValue("base_attrs", "name")?.[0]}
                     value={props.baseAttrs.name ? props.baseAttrs.name : ""}
                     onChange={(e) => handleChange(e.target.name, e.target.value)}
                     sx={{ minWidth: 325 }}
@@ -49,6 +51,8 @@ export default function BaseAttrsForm(props) {
                     size="small"
                     label={"Price"}
                     name={"price"}
+                    error={props.errorHandler.isValueExist("base_attrs", "price")}
+                    helperText={props.errorHandler.getObjectValue("base_attrs", "price")?.[0]}
                 />
             </Box>
             <Box sx={{ mb: 2 }}>
@@ -63,6 +67,8 @@ export default function BaseAttrsForm(props) {
                     size="small"
                     label={"Discount rate"}
                     name={"discount_rate"}
+                    error={props.errorHandler.isValueExist("base_attrs", "discount_rate")}
+                    helperText={props.errorHandler.getObjectValue("base_attrs", "discount_rate")?.[0]}
                 />
             </Box>
             <Box sx={{ mb: 2 }}>
@@ -70,6 +76,7 @@ export default function BaseAttrsForm(props) {
                     value={props.baseAttrs.tax_rate ? props.baseAttrs.tax_rate : 0}
                     onChange={(e) => handleChange(e.target.name, Number(e.target.value))}
                     decimalScale={2}
+                    allowNegative={false}
                     decimalSeparator="."
                     // Use customInput prop to pass TextField component
                     customInput={TextField}
@@ -77,6 +84,8 @@ export default function BaseAttrsForm(props) {
                     size="small"
                     label={"Tax rate"}
                     name={"tax_rate"}
+                    error={props.errorHandler.isValueExist("base_attrs", "tax_rate")}
+                    helperText={props.errorHandler.getObjectValue("base_attrs", "tax_rate")?.[0]}
                 />
             </Box>
             <Box sx={{ mb: 2 }}>
@@ -84,12 +93,16 @@ export default function BaseAttrsForm(props) {
                     value={props.baseAttrs.stock ? props.baseAttrs.stock : 0}
                     onChange={(e) => handleChange(e.target.name, Number(e.target.value))}
                     decimalScale={0}
+                    allowNegative={false}
                     // Use customInput prop to pass TextField component
                     customInput={TextField}
                     sx={{ minWidth: 325 }}
                     size="small"
                     label={"Stock"}
-                    name={"stock"} />
+                    name={"stock"}
+                    error={props.errorHandler.isValueExist("base_attrs", "stock")}
+                    helperText={props.errorHandler.getObjectValue("base_attrs", "stock")?.[0]}
+                    />
             </Box>
             <Box sx={{ mb: 2 }}>
                 <TextField
@@ -98,7 +111,10 @@ export default function BaseAttrsForm(props) {
                     sx={{ minWidth: 325 }}
                     size="small"
                     label={"SKU"}
-                    name={"sku"} />
+                    name={"sku"} 
+                    error={props.errorHandler.isValueExist("base_attrs", "sku")}
+                    helperText={props.errorHandler.getObjectValue("base_attrs", "sku")?.[0]}
+                    />
             </Box>
             <Box>
                 <TextField

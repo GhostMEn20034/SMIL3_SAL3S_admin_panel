@@ -1,4 +1,4 @@
-import { Paper, Box, IconButton, Button, Typography } from "@mui/material";
+import { Paper, Box, IconButton, Button, Typography, Alert } from "@mui/material";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import HighlightOffRoundedIcon from '@mui/icons-material/HighlightOffRounded';
 import { VisuallyHiddenInput } from "../HiddenInput";
@@ -15,7 +15,10 @@ function ImageListMultipleProducts(props) {
     * productVariations - array of objects, state of productVariations
     * setProductVariations - react setState function for productVariations
     * hasVariations - boolean, determines whether product has variaitions
-    * sameImages - boolean, determines whether the user wants to use the same images for all product variations
+    * displayErrors - boolean, determines whether component should display errors.
+    * errorHandler - class that returns errors
+    * baseErrorPath - Base path to the error, used by the function that finds an error. Suppose your value located in the key images[secondary][1], 
+    * in this case you can consider "images" key as base path.
     */
     const handleChange = (e, index) => {
         props.setProductVariations((prevValues) => {
@@ -91,14 +94,6 @@ function ImageListMultipleProducts(props) {
             switch (name) {
                 case "main":
                     return prevValues.map((product, i) => {
-                        // If user specified that he wants same images for all variations,
-                        // then remove the same main photo from all variations.
-                        if (props.sameImages) {
-                            let modifiedImages = { ...product.images };
-                            URL.revokeObjectURL(modifiedImages.main?.url);
-                            modifiedImages.main = null;
-                            return { ...product, images: modifiedImages };
-                        }
                         // if product index equals to the index passed into the function, then remove main image
                         if (i === index) {
                             let modifiedImages = { ...product.images };
@@ -146,41 +141,53 @@ function ImageListMultipleProducts(props) {
                         {productVariaton?.name}
                     </Typography>
                     <Box display={"flex"} key={index}>
-                        <Box display={"flex"} mb={2}>
-                            <Paper elevation={3} sx={{ height: "175px", width: "175px" }}>
-                                <Box
-                                    sx={{
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        alignItems: "center",
-                                        justifyContent: "flex-end",
-                                        height: "90%",
-                                        padding: 1
-                                    }}
-                                >
-                                    {productVariaton.images.main && (
-                                        <Box>
-                                            <img src={productVariaton.images.main.url} alt={productVariaton.name}
-                                                style={{ width: "100%", maxHeight: "120px", objectFit: "scale-down" }} />
-
-                                        </Box>
-                                    )}
-                                    <Button component="label" variant="contained" size="small" sx={{ fontSize: 12 }}>
-                                        Upload Main Image
-                                        <VisuallyHiddenInput name="main" type="file" accept="image/*" onChange={(e) => handleChange(e, index)} />
-                                    </Button>
-                                </Box>
-                            </Paper>
-                            <IconButton sx={{ alignSelf: "start" }} onClick={() => removeImage(index, "main")}>
-                                <DeleteForeverIcon />
-                            </IconButton>
-                        </Box>
                         <Box>
+                            <Box display={"flex"} mb={2}>
+                                <Paper elevation={3} sx={{ height: "175px", width: "175px" }}>
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            alignItems: "center",
+                                            justifyContent: "flex-end",
+                                            height: "90%",
+                                            padding: 1
+                                        }}
+                                    >
+                                        {productVariaton.images.main && (
+                                            <Box>
+                                                <img src={productVariaton.images.main.url} alt={productVariaton.name}
+                                                    style={{ width: "100%", maxHeight: "120px", objectFit: "scale-down" }} />
+
+                                            </Box>
+                                        )}
+                                        <Button component="label" variant="contained" size="small" sx={{ fontSize: 12 }}>
+                                            Upload Main Image
+                                            <VisuallyHiddenInput name="main" type="file" accept="image/jpeg" onChange={(e) => handleChange(e, index)} />
+                                        </Button>
+                                    </Box>
+                                </Paper>
+                                <IconButton sx={{ alignSelf: "start" }} onClick={() => removeImage(index, "main")}>
+                                    <DeleteForeverIcon />
+                                </IconButton>
+                            </Box>
+                            {(props.displayErrors && props.errorHandler) && (
+                                <Box sx={{ mb: 2 }}>
+                                    {props.findErrors("variations", index, "images", "main").map((errMsg, index) => (
+                                        
+                                        <Alert icon={false} severity="error" key={index}>
+                                            {errMsg}
+                                        </Alert>
+                                    ))}
+                                </Box>
+                            )}
+                        </Box>
+                        <Box sx={{ ml: 4 }}>
                             <Paper elevation={3} sx={{ height: "175px", minWidth: "400px", px: 2 }}>
                                 <Box sx={{ height: "40%", width: "100%", display: "flex", justifyContent: "center", alignItems: "end" }}>
                                     <Button component="label" variant="contained" size="small">
                                         Upload Secondary Images
-                                        <VisuallyHiddenInput name="secondary" type="file" accept="image/*" multiple onChange={(e) => handleChange(e, index)} />
+                                        <VisuallyHiddenInput name="secondary" type="file" accept="image/jpeg" multiple onChange={(e) => handleChange(e, index)} />
                                     </Button>
                                 </Box>
                                 <Box sx={{ display: "flex", mt: 3 }}>
@@ -188,7 +195,7 @@ function ImageListMultipleProducts(props) {
                                         productVariaton.images.secondaryImages.map((secImage, secImageIndex) => (
                                             <Paper key={secImageIndex} elevation={2} sx={{ position: "relative", display: "inline-block", mr: 3 }}>
                                                 <Box>
-                                                    <img src={secImage.url} key={secImageIndex} alt={productVariaton.name}
+                                                    <img src={secImage.url} key={secImageIndex} alt={"Img " + (secImageIndex + 1) }
                                                         style={{ minWidth: "100px", width: "100%", maxHeight: "60px", objectFit: "scale-down" }} />
                                                 </Box>
                                                 <Box sx={{ ml: 1 }}>
@@ -201,6 +208,15 @@ function ImageListMultipleProducts(props) {
                                     )}
                                 </Box>
                             </Paper>
+                            {(props.displayErrors && props.errorHandler) && (
+                                <Box sx={{mt: 2}}>
+                                    {Object.keys(props.findErrors("variations", index, "images", "secondaryImages")).map((errKey, errIndex) => (
+                                        <Alert icon={false} severity="error" key={errIndex} sx={{ mb: 1 }}>
+                                            Secondary image №{Number(errKey) + 1} - {props.findErrors("variations", index, "images", "secondaryImages", errKey).join(", ")}
+                                        </Alert>
+                                    ))}
+                                </Box>
+                            )}
                         </Box>
                     </Box>
                 </Fragment>
@@ -211,12 +227,16 @@ function ImageListMultipleProducts(props) {
 
 function ImageListOneProduct(props) {
     /**
-     * Renders form to upload images for product that has no variations.
-     * List of props:
-     * ------------------------------------------------------------------------
-     * images - array of files, state of images for product without variations
-     * setImages - react setState function for images variable
-     */
+    * Renders form to upload images for product that has no variations.
+    * List of props:
+    * ------------------------------------------------------------------------
+    * images - array of files, state of images for product without variations
+    * setImages - react setState function for images variable
+    * displayErrors - boolean, determines whether component should display errors.
+    * errorHandler - class that returns errors
+    * baseErrorPath - Base path to the error, used by the function that finds an error. Suppose your value located in the key images[secondary][1], 
+    * in this case you can consider "images" key as base path.
+    */
 
     const handleChange = (e) => {
         props.setImages((prevValues) => {
@@ -266,6 +286,8 @@ function ImageListOneProduct(props) {
                         return prevValues;
                 }
             }
+
+            return prevValues;
         });
     };
 
@@ -281,7 +303,7 @@ function ImageListOneProduct(props) {
                     secondaryImages.splice(secImageIndex, 1);
 
                     if (secondaryImages.length === 0) {
-                        secondaryImages = null;
+                        modifiedImages.secondaryImages = null;
                     }
 
                     return modifiedImages;
@@ -295,7 +317,7 @@ function ImageListOneProduct(props) {
 
     return (
         <Box display={"flex"}>
-            <Box display={"flex"}>
+            <Box>
                 <Box display={"flex"} mb={2}>
                     <Paper elevation={3} sx={{ height: "175px", width: "175px" }}>
                         <Box
@@ -317,7 +339,7 @@ function ImageListOneProduct(props) {
                             )}
                             <Button component="label" variant="contained" size="small" sx={{ fontSize: 12 }} onChange={(e) => handleChange(e)}>
                                 Upload Main Image
-                                <VisuallyHiddenInput name="main" type="file" accept="image/*" />
+                                <VisuallyHiddenInput name="main" type="file" accept="image/jpeg" />
                             </Button>
                         </Box>
                     </Paper>
@@ -325,13 +347,22 @@ function ImageListOneProduct(props) {
                         <DeleteForeverIcon />
                     </IconButton>
                 </Box>
+                {(props.displayErrors && props.errorHandler) && (
+                    <>
+                        {props.findErrors(...(props.baseErrorPath ? props.baseErrorPath : props.baseErrorPath), "main").map((errMsg, index) => (
+                            <Alert icon={false} severity="error" key={index}>
+                                {errMsg}
+                            </Alert>
+                        ))}
+                    </>
+                )}
             </Box>
-            <Box>
-                <Paper elevation={3} sx={{ height: "175px", minWidth: "400px", px: 2 }}>
+            <Box sx={{ ml: 4 }}>
+                <Paper elevation={3} sx={{ height: "175px", minWidth: "400px", px: 2, mb: 2 }}>
                     <Box sx={{ height: "40%", width: "100%", display: "flex", justifyContent: "center", alignItems: "end" }}>
                         <Button component="label" variant="contained" size="small">
                             Upload Secondary Images
-                            <VisuallyHiddenInput name="secondary" type="file" accept="image/*" multiple onChange={(e) => handleChange(e)} />
+                            <VisuallyHiddenInput name="secondary" type="file" accept="image/jpeg" multiple onChange={(e) => handleChange(e)} />
                         </Button>
                     </Box>
                     <Box sx={{ display: "flex", mt: 3 }}>
@@ -353,6 +384,15 @@ function ImageListOneProduct(props) {
                         )}
                     </Box>
                 </Paper>
+                {(props.displayErrors && props.errorHandler) && (
+                    <>
+                        {Object.keys(props.findErrors(...(props.baseErrorPath ? props.baseErrorPath : props.baseErrorPath), "secondaryImages")).map((errKey, index) => (
+                            <Alert icon={false} severity="error" key={index} sx={{ mb: 1 }}>
+                                Secondary image №{index + 1} - {props.findErrors(...(props.baseErrorPath ? props.baseErrorPath : props.baseErrorPath), "secondaryImages", errKey).join(", ")}
+                            </Alert>
+                        ))}
+                    </>
+                )}
             </Box>
         </Box>
     )
@@ -372,7 +412,27 @@ export default function AddProductImages(props) {
      * setProductVariations - react setState function for productVariations
      * hasVariations - boolean, determines whether product has variaitions
      * sameImages - boolean, determines whether the user wants to use the same images for all product variations
+     * displayErrors - boolean, determines whether component should display errors.
+     * errorHandler - class that returns errors
+     * baseErrorPath - Base path to the error, used by the function that finds an error. Suppose your value located in the key images[secondary][1], 
+     * in this case you can consider "images" key as base path.
      */
+
+    const findErrors = (...path) => {
+        /**
+         * Finds errors and return them if they find, otherwise returns an empty array
+         */
+        if (!props.displayErrors || !props.errorHandler) {
+            return [];
+        }
+
+        if (!props?.errorHandler?.isValueExist(...path)) {
+            return [];
+        }
+        
+        return props.errorHandler.getObjectValue(...path);
+    };
+
 
     return (
         <Box sx={{ padding: 2 }}>
@@ -389,12 +449,19 @@ export default function AddProductImages(props) {
                 <ImageListOneProduct
                     images={props.images}
                     setImages={props.setImages}
+                    errorHandler={props.errorHandler}
+                    displayErrors={props.displayErrors}
+                    baseErrorPath={props.baseErrorPath}
+                    findErrors={findErrors}
                 />
             ) : (
                 <ImageListMultipleProducts
                     productVariations={props.productVariations}
                     setProductVariations={props.setProductVariations}
-                    sameImages={props.sameImages}
+                    errorHandler={props.errorHandler}
+                    displayErrors={props.displayErrors}
+                    baseErrorPath={props.baseErrorPath}
+                    findErrors={findErrors}
                 />
             )}
         </Box>

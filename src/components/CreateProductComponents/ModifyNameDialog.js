@@ -29,12 +29,14 @@ export function ModifyMultipleNamesDialog(props) {
   };
 
   const handleSubmit = () => {
-    let filteredAttrs = props.attrs.filter((attr) => selectedAttrs.includes(attr.code));
+    // Attrs where attribute code equals to the one of selected attributes
+    let filteredAttrs = selectedAttrs.map((attrCode) => props.attrs.find((attr) => attr.code === attrCode));
     modifyName(
       props.nameValue,
       filteredAttrs,
       separator, props.checkedProducts,
-      props.setProductVariations, addVariationAttrs
+      props.setProductVariations, addVariationAttrs,
+      props.variationAttrs
     );
     handleClose();
     props.resetProductName();
@@ -110,7 +112,7 @@ export function ModifyNameDialog (props) {
   };
 
   const handleSubmit = () => {
-    let filteredAttrs = props.attrs.filter((attr) => selectedAttrs.includes(attr.code));
+    let filteredAttrs = selectedAttrs.map((attrCode) => props.attrs.find((attr) => attr.code === attrCode));
     let modifiedProductName = props.nameValue + (props.nameValue.length > 0 ? " " : "") + getAttrString(filteredAttrs, separator);
     props.changeName(modifiedProductName);
     handleClose();

@@ -14,6 +14,22 @@ import { arrayToMenuItems, handleChangeAttrs, handleChangeAttrUnit, addListValue
 export default function AttrInput(props) {
     const [newListValue, setNewListValue] = useState("");
 
+    // if displayErrors is true and class for error handling was passed, then return
+    const findError = (code) => {
+        if (!props.displayErrors || !props.errorHandler) {
+            return {};
+        }
+
+        if (!props?.errorHandler?.isValueExist(...(props?.baseErrorPath ? props?.baseErrorPath : ""), code)) {
+            return {};
+        }
+
+        return {
+            "error": true,
+            "helperText": props.errorHandler.getObjectValue(...(props?.baseErrorPath ? props?.baseErrorPath : ""), code)
+        };
+    };
+
     switch (props.attr.type) {
         case "list":
             return (
@@ -24,6 +40,7 @@ export default function AttrInput(props) {
                             label={`New ${props.attr.name}`}
                             size="small"
                             sx={{ mr: 2 }}
+                            {...findError(props.attr.code)}
                         />
                         <Button size="small" color="primary" variant="contained" sx={{ maxHeight: "40px" }}
                             onClick={
@@ -37,7 +54,7 @@ export default function AttrInput(props) {
                             {`Add new ${props.attr.name}`}
                         </Button>
                     </Box>
-                    <Box sx={{mt: 1}}>
+                    <Box sx={{ mt: 1 }}>
                         <ChipsArray array={props.attr.value} removeValue={
                             (listValueIndex) => {
                                 props.setAttrs(
@@ -74,6 +91,7 @@ export default function AttrInput(props) {
                         label={props.attr.name}
                         size="small"
                         sx={{ minWidth: 325 }}
+                        {...findError(props.attr.code)}
                     />
                     {props.facet?.units && (
                         <Stack sx={{ ml: 1 }}>
@@ -96,6 +114,7 @@ export default function AttrInput(props) {
                         label={props.attr.name}
                         size="small"
                         sx={{ minWidth: 325 }}
+                        {...findError(props.attr.code)}
                     />
                     {props.facet?.units && (
                         <Stack sx={{ ml: 1 }}>
@@ -113,6 +132,7 @@ export default function AttrInput(props) {
                             label={props.attr.name}
                             size="small" sx={{ minWidth: 325 }}
                             onChange={(e) => handleChangeAttrs(props.index, e.target.value, props.setAttrs)}
+                            {...findError(props.attr.code)}
                         />
                     ) : (
                         <SelectValue
@@ -120,7 +140,8 @@ export default function AttrInput(props) {
                             menuItems={arrayToMenuItems(props.facet.values)}
                             label={props.attr.name}
                             setValue={(newValue) => handleChangeAttrs(props.index, newValue, props.setAttrs)}
-                            formProperties={{ minWidth: 325 }}
+                            otherProps={{ minWidth: 325}}
+                            errors={{...findError(props.attr.code)}}
                         />
                     )}
 
@@ -137,11 +158,13 @@ export default function AttrInput(props) {
                     <NumericFormat
                         decimalScale={2}
                         decimalSeparator="."
+                        // Use customInput prop to pass TextField component
                         customInput={TextField}
                         value={props.attr.value[0]}
                         label={props.attr.name}
                         size="small"
-                        onChange={(e) => handleChangeAttrs(props.index, e.target.value, props.setAttrs, 0)}
+                        onChange={(e) => handleChangeAttrs(props.index, Number(e.target.value), props.setAttrs, 0)}
+                        {...findError(props.attr.code)}
                     />
                     <Box display="flex" justifyContent="center" alignItems="center" sx={{ mx: 1 }}>
                         <Typography variant="body1">
@@ -151,11 +174,13 @@ export default function AttrInput(props) {
                     <NumericFormat
                         decimalScale={2}
                         decimalSeparator="."
+                        // Use customInput prop to pass TextField component
                         customInput={TextField}
                         value={props.attr.value[1]}
                         label={props.attr.name}
                         size="small"
-                        onChange={(e) => handleChangeAttrs(props.index, e.target.value, props.setAttrs, 1)}
+                        onChange={(e) => handleChangeAttrs(props.index, Number(e.target.value), props.setAttrs, 1)}
+                        {...findError(props.attr.code)}
                     />
                     {props.facet?.units && (
                         <Stack sx={{ ml: 1 }}>
@@ -170,11 +195,13 @@ export default function AttrInput(props) {
                     <NumericFormat
                         decimalScale={2}
                         decimalSeparator="."
+                        // Use customInput prop to pass TextField component
                         customInput={TextField}
                         value={props.attr.value[0]}
                         label={props.attr.name}
                         size="small"
-                        onChange={(e) => handleChangeAttrs(props.index, e.target.value, props.setAttrs, 0)}
+                        onChange={(e) => handleChangeAttrs(props.index, Number(e.target.value), props.setAttrs, 0)}
+                        {...findError(props.attr.code)}
                     />
                     <Box display="flex" justifyContent="center" alignItems="center" sx={{ mx: 1 }}>
                         <Typography variant="body1">
@@ -184,11 +211,13 @@ export default function AttrInput(props) {
                     <NumericFormat
                         decimalScale={2}
                         decimalSeparator="."
+                        // Use customInput prop to pass TextField component
                         customInput={TextField}
                         value={props.attr.value[1]}
                         label={props.attr.name}
                         size="small"
-                        onChange={(e) => handleChangeAttrs(props.index, e.target.value, props.setAttrs, 1)}
+                        onChange={(e) => handleChangeAttrs(props.index, Number(e.target.value), props.setAttrs, 1)}
+                        {...findError(props.attr.code)}
                     />
                     <Box display="flex" justifyContent="center" alignItems="center" sx={{ mx: 1 }}>
                         <Typography variant="body1">
@@ -198,11 +227,13 @@ export default function AttrInput(props) {
                     <NumericFormat
                         decimalScale={2}
                         decimalSeparator="."
+                        // Use customInput prop to pass TextField component
                         customInput={TextField}
                         value={props.attr.value[2]}
                         label={props.attr.name}
                         size="small"
-                        onChange={(e) => handleChangeAttrs(props.index, e.target.value, props.setAttrs, 2)}
+                        onChange={(e) => handleChangeAttrs(props.index, Number(e.target.value), props.setAttrs, 2)}
+                        {...findError(props.attr.code)}
                     />
                     {props.facet?.units && (
                         <Stack sx={{ ml: 1 }}>
@@ -214,7 +245,13 @@ export default function AttrInput(props) {
         default:
             return (
                 <Stack>
-                    <SelectValue value={props.attr.value} menuItems={arrayToMenuItems(props.facet.values)} label={props.attr.name} />
+                    <TextField
+                        value={props.attr.value}
+                        label={props.attr.name}
+                        size="small" sx={{ minWidth: 325 }}
+                        onChange={(e) => handleChangeAttrs(props.index, e.target.value, props.setAttrs)}
+                        {...findError(props.attr.code)}
+                    />
                 </Stack>
             )
     }

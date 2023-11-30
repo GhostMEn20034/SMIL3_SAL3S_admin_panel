@@ -11,15 +11,29 @@ export default function AdditionalProductAttrs(props) {
         <Box>
             {props.additionalAttrs.map((additionalAttr, index) => (
                 <Stack sx={{ mb: 2 }} key={index} direction="row">
-                    <TextField size="small" value={additionalAttr.name} label={"Name"} onChange={(e) => handleChangeAttrName(index, e.target.value, props.setAdditionalAttrs)} sx={{mr: 1}} />
-                    <AttrInput attr={additionalAttr} index={index} setAttrs={props.setAdditionalAttrs} />
+                    <TextField
+                    size="small" 
+                    value={additionalAttr.name} 
+                    label={"Name"} 
+                    onChange={(e) => handleChangeAttrName(index, e.target.value, props.setAdditionalAttrs)} sx={{mr: 1}}
+                    error={props.errorHandler?.isValueExist("extra_attrs", index, "name")}
+                    helperText={props.errorHandler?.getObjectValue("extra_attrs", index, "name")}
+                    />
+                    <AttrInput 
+                    attr={additionalAttr} 
+                    index={index} 
+                    setAttrs={props.setAdditionalAttrs} 
+                    errorHandler={props.errorHandler} 
+                    displayErrors={props.displayErrors}
+                    baseErrorPath={props.baseErrorPath}
+                    />
                     <TextField size="small" value={additionalAttr.unit ? additionalAttr.unit : ""} label={"Unit"} onChange={(e) => handleChangeAttrUnit(index, e.target.value, props.setAdditionalAttrs)} sx={{mr: 1, ml: 1 }}/>
                     <SelectValue value={additionalAttr.type} menuItems={props.facetTypes} label={"Type"} setValue={(newValue) => handleChangeAttrType(index, newValue, props.setAdditionalAttrs)}/>
                     <Stack direction="row" sx={{ml: 1}}>
-                        <IconButton onClick={() => removeAttr(index, props.setAdditionalAttrs)}>
+                        <IconButton sx={{height: 40}} onClick={() => removeAttr(index, props.setAdditionalAttrs)}>
                             <RemoveIcon />
                         </IconButton>
-                        <IconButton onClick={() => addAttr(props.setAdditionalAttrs, extraAttr)}>
+                        <IconButton sx={{height: 40}} onClick={() => addAttr(props.setAdditionalAttrs, extraAttr)}>
                             <AddIcon />
                         </IconButton>
                     </Stack>

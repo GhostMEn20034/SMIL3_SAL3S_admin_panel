@@ -78,6 +78,11 @@ export default function ProductVariationList(props) {
     // Changes the value of the specified properties in the product with the specified index
     const handleChangeProductVariations = (keyName, value, productIndex) => {
         props.setProductVariations((prevValues) => {
+
+            if (keyName === "discount_rate" && value === 0) {
+                value = null;
+            }
+
             return prevValues.map((prevValue, index) => {
                 if (productIndex === index) {
                     return {
@@ -136,8 +141,6 @@ export default function ProductVariationList(props) {
         });
     };
 
-    // console.log(props.productVariations);
-
     return (
         <Box sx={{ mb: 2 }}>
             {openDialog && (
@@ -150,6 +153,7 @@ export default function ProductVariationList(props) {
                     nameValue={newProdValues.name ? newProdValues.name : ""} // value of the name property of newProdValues obj
                     changeName={(newValue) => handleChangeNewProdValues("name", newValue)} // function to change a name property of the newProdValues obj
                     resetProductName={() => handleChangeNewProdValues("name", null)} // function to reset product name
+                    variationAttrs={Object.keys(props.productVariationFields)} // Product variation attributes
                 />
             )}
             {variationLength > 0 && (
@@ -312,6 +316,8 @@ export default function ProductVariationList(props) {
                                                     sx={{ minWidth: 400 }}
                                                     size="small"
                                                     label={"Product name"} name={"name"}
+                                                    error={props.errorHandler.isValueExist("variations", index, "name")}
+                                                    helperText={props.errorHandler.getObjectValue("variations", index, "name")}
                                                 />
                                             </Box>
                                         </TableCell>
@@ -328,6 +334,8 @@ export default function ProductVariationList(props) {
                                                 size="small"
                                                 label={"Price"}
                                                 name={"price"}
+                                                error={props.errorHandler.isValueExist("variations", index, "price")}
+                                                helperText={props.errorHandler.getObjectValue("variations", index, "price")}
                                             />
                                         </TableCell>
                                         <TableCell align="center">
@@ -342,6 +350,8 @@ export default function ProductVariationList(props) {
                                                 size="small"
                                                 label={"Discount rate"}
                                                 name={"discount_rate"}
+                                                error={props.errorHandler.isValueExist("variations", index, "discount_rate")}
+                                                helperText={props.errorHandler.getObjectValue("variations", index, "discount_rate")}
                                             />
                                         </TableCell>
                                         <TableCell align="center">
@@ -356,6 +366,8 @@ export default function ProductVariationList(props) {
                                                 size="small"
                                                 label={"Tax rate"}
                                                 name={"tax_rate"}
+                                                error={props.errorHandler.isValueExist("variations", index, "tax_rate")}
+                                                helperText={props.errorHandler.getObjectValue("variations", index, "tax_rate")}
                                             />
                                         </TableCell>
                                         <TableCell align="center">
@@ -368,7 +380,10 @@ export default function ProductVariationList(props) {
                                                 sx={{ minWidth: 75 }}
                                                 size="small"
                                                 label={"Stock"}
-                                                name={"stock"} />
+                                                name={"stock"} 
+                                                error={props.errorHandler.isValueExist("variations", index, "stock")}
+                                                helperText={props.errorHandler.getObjectValue("variations", index, "stock")}
+                                            />
                                         </TableCell>
                                         <TableCell align="center">
                                             <TextField
@@ -377,7 +392,10 @@ export default function ProductVariationList(props) {
                                                 sx={{ minWidth: 125 }}
                                                 size="small"
                                                 label={"SKU"}
-                                                name={"sku"} />
+                                                name={"sku"}
+                                                error={props.errorHandler.isValueExist("variations", index, "sku")}
+                                                helperText={props.errorHandler.getObjectValue("variations", index, "sku")}
+                                            />
                                         </TableCell>
                                         <TableCell align="center">
                                             <TextField
@@ -386,7 +404,10 @@ export default function ProductVariationList(props) {
                                                 sx={{ minWidth: 175 }}
                                                 size="small"
                                                 label={"External product id"}
-                                                name={"external_id"} />
+                                                name={"external_id"} 
+                                                error={props.errorHandler.isValueExist("variations", index, "external_id")}
+                                                helperText={props.errorHandler.getObjectValue("variations", index, "external_id")}
+                                                />
                                         </TableCell>
                                     </TableRow>
                                 ))}
