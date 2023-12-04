@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Typography, Pagination, Button } from "@mui/material";
 import { useNavigate, createSearchParams, useLocation, Link } from "react-router-dom";
 import useAxios from "../utils/useAxios";
-import VariationThemeList from "../components/VariationThemeComponents/VariationThemeList";
+import VariationThemeList from "../components/VariationTheme/VariationThemeList";
 
 
 export default function VariationThemePage() {

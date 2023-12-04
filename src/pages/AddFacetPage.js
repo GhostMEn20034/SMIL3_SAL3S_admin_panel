@@ -1,6 +1,6 @@
 import { Box, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import AddFacet from "../components/FacetComponents/AddFacet";
+import AddFacet from "../components/Facet/AddFacet";
 
 export default function AddFacetPage() {
 

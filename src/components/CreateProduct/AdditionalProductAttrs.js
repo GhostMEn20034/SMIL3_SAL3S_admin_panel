@@ -1,7 +1,7 @@
 import { Box, IconButton, Stack, TextField } from "@mui/material";
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
-import AttrInput from "../ProductComponents/mapAttrTypeToComponent";
+import AttrInput from "../Product/mapAttrTypeToComponent";
 import { extraAttr } from "../../utils/consts";
 import { handleChangeAttrName, handleChangeAttrType, handleChangeAttrUnit, removeAttr, addAttr } from "../../utils/Services";
 import SelectValue from "../SelectValue";

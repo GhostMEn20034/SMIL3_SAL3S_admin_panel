@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Typography, Pagination, Button } from "@mui/material";
 import { useNavigate, createSearchParams, useLocation, Link } from "react-router-dom";
 import useAxios from "../utils/useAxios";
-import FacetList from "../components/FacetComponents/FacetList";
+import FacetList from "../components/Facet/FacetList";
 
 
 

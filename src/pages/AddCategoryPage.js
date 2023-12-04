@@ -1,6 +1,6 @@
 import { Box, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import CategoryAdd from "../components/CategoryComponents/CategoryAdd";
+import CategoryAdd from "../components/Category/CategoryAdd";
 
 export default function AddCategoryPage() {
 

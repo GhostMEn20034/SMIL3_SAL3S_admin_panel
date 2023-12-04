@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Typography, Pagination, Button } from "@mui/material";
 import { useNavigate, createSearchParams, useLocation, Link } from "react-router-dom";
 import useAxios from "../utils/useAxios";
-import CategoryList from "../components/CategoryComponents/CategoryList";
+import CategoryList from "../components/Category/CategoryList";
 
 export default function CategoryPage() {
     const [categories, setCategories] = useState([]);

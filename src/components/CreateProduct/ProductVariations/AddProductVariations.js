@@ -1,7 +1,7 @@
 import { Fragment, useState } from "react";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { facetsToAttrs, arrayToMenuItems, handleChangeAttrGroup } from "../../../utils/Services";
-import AttrInput from "../../ProductComponents/mapAttrTypeToComponent";
+import AttrInput from "../../Product/mapAttrTypeToComponent";
 import SelectValue from "../../SelectValue";
 import ProductVariationChips from "./ProductVariationChips";
 import { generateCombinations, removeProducts } from "../../../utils/ProductVariationServices";
