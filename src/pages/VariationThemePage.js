@@ -29,7 +29,7 @@ export default function VariationThemePage() {
 
     const getVariationThemes = async () => {
         try {
-            let response = await api.get("/variation-themes/", {
+            let response = await api.get("/admin/variation-themes/", {
                 params: {
                     page: page
                 }

@@ -19,7 +19,7 @@ export default function VariationThemeEdit({ variationTheme, categories }) {
 
     const getFacets = async () => {
         try {
-            let response = await api.get("/facets/for-choices");
+            let response = await api.get("/admin/facets/for-choices");
             let data = await response.data;
             setFacets(data);
         } catch (error) {
@@ -100,7 +100,7 @@ export default function VariationThemeEdit({ variationTheme, categories }) {
 
     const updateVariationTheme = async () => {
         try {
-            await api.put(`/variation-themes/${variationTheme._id}`, {
+            await api.put(`/admin/variation-themes/${variationTheme._id}`, {
                 filters: filters,
                 categories: chosenCategories
             });

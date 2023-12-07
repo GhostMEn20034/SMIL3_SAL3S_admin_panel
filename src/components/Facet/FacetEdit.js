@@ -33,7 +33,7 @@ export default function FacetEdit({ facet, categories }) {
 
     const getFacetTypes = async () => {
         try {
-            let response = await api.get('/facet-types/');
+            let response = await api.get('/admin/facet-types/');
             let data = await response.data;
             setFacetTypes(data)
         } catch {
@@ -47,7 +47,7 @@ export default function FacetEdit({ facet, categories }) {
 
     const updateFacet = async () => {
         try {
-            await api.put(`/facets/${facet._id}`, {
+            await api.put(`/admin/facets/${facet._id}`, {
                 name: name,
                 optional: optional,
                 show_in_filters: showInFilters,

@@ -36,7 +36,7 @@ export default function AddFacet() {
 
     const getFacetTypes = async () => {
         try {
-            let response = await api.get('/facet-types/');
+            let response = await api.get('/admin/facet-types/');
             let data = await response.data;
             setFacetTypes(data)
         } catch {
@@ -46,7 +46,7 @@ export default function AddFacet() {
 
     const getCategories = async () => {
         try {
-            let response = await api.get(`/categories/for-choices`);
+            let response = await api.get(`/admin/categories/for-choices`);
             let data = await response.data;
             setCategories(data);
         } catch {
@@ -69,7 +69,7 @@ export default function AddFacet() {
         };
 
         try {
-            await api.post("/facets/", bodyData);
+            await api.post("/admin/facets/", bodyData);
             navigate(-1);
         } catch (error) {
             setErrors(error.response.data.errors);

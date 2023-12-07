@@ -4,11 +4,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Box, Button } from "@mui/material";
 import VariationThemeDetail from "../components/VariationTheme/VariationThemeDetail";
 import VariationThemeEdit from "../components/VariationTheme/VariationThemeEdit";
+import VariationThemeDelete from "../components/VariationTheme/VariationThemeDelete";
 
 export default function VariationThemeDetailPage() {
     const [variationTheme, setVariationTheme] = useState({});
     const [categories, setCategories] = useState([]);
     const [editMode, setEditMode] = useState(false);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [error, setError] = useState(null);
 
     const api = useAxios('products');
     const navigate = useNavigate();
@@ -20,7 +23,7 @@ export default function VariationThemeDetailPage() {
 
     const getCategories = async () => {
         try {
-            let response = await api.get(`/categories/for-choices`);
+            let response = await api.get(`/admin/categories/for-choices`);
             let data = await response.data;
             setCategories(data);
         } catch {
@@ -31,7 +34,7 @@ export default function VariationThemeDetailPage() {
 
     const getVariationThemeById = async () => {
         try {
-            let response = await api.get(`variation-themes/${params.id}`);
+            let response = await api.get(`/admin/variation-themes/${params.id}`);
             let data = await response.data;
             setVariationTheme(data);
         } catch (error) {
@@ -50,15 +53,18 @@ export default function VariationThemeDetailPage() {
 
     const deleteVariationTheme = async () => {
         try {
-            await api.delete(`/variation-themes/${params.id}`);
+            await api.delete(`/admin/variation-themes/${params.id}`);
             navigate(-1);
-        } catch {
-            console.log("Something went wrong");
+        } catch (err) {
+            setError(err.response.data.detail);
         }
-    }
+    };
 
     return (
         <>
+            {openDialog && (
+                <VariationThemeDelete open={openDialog} setOpen={setOpenDialog} onSubmit={deleteVariationTheme} error={error} setError={setError} />
+            )}
             {variationTheme && categories && (
                 <Box display={"flex"}>
                     <Box>
@@ -69,7 +75,7 @@ export default function VariationThemeDetailPage() {
                             <Button variant="contained" size="small" onClick={() => setEditMode(!editMode)}>{editMode ? "Go to detail view" : "Edit"}</Button>
                         </Box>
                         <Box sx={{ mt: 2, ml: 5 }}>
-                            <Button variant="contained" color="error" size="small" onClick={deleteVariationTheme}>Delete Variation Theme</Button>
+                            <Button variant="contained" color="error" size="small" onClick={setOpenDialog}>Delete Variation Theme</Button>
                         </Box>
                     </Box>
 

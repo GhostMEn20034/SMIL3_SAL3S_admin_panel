@@ -26,7 +26,7 @@ export default function CategoryDetailPage() {
 
     const getCategoryById = async () => {
         try {
-            let response = await api.get(`/categories/${params.id}`);
+            let response = await api.get(`/admin/categories/${params.id}`);
             let data = await response.data;
             setCategory(data);
         } catch (error) {
@@ -36,7 +36,7 @@ export default function CategoryDetailPage() {
 
     const getCategories = async () => {
         try {
-            let response = await api.get(`/categories/for-choices`);
+            let response = await api.get(`/admin/categories/for-choices`);
             let data = await response.data;
             setCategoriesForChoices(data.filter((obj) => obj._id !== params.id));
         } catch {
@@ -46,7 +46,7 @@ export default function CategoryDetailPage() {
 
     const deleteCategory = async () => {
         try {
-            await api.delete(`/categories/${category._id}`);
+            await api.delete(`/admin/categories/${category._id}`);
             navigate(-1);
         } catch (error) {
             setError(error.response.data.detail)

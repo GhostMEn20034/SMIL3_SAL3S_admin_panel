@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import useAxios from "../utils/useAxios";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -25,7 +25,7 @@ export default function FacetDetailPage() {
 
     const getFacetById = async () => {
         try {
-            let response = await api.get(`/facets/${params.id}`);
+            let response = await api.get(`/admin/facets/${params.id}`);
             let data = await response.data;
             setFacet(data);
         } catch (error) {
@@ -35,7 +35,7 @@ export default function FacetDetailPage() {
 
     const getCategories = async () => {
         try {
-            let response = await api.get(`/categories/for-choices`);
+            let response = await api.get(`/admin/categories/for-choices`);
             let data = await response.data;
             setCategories(data);
         } catch {
@@ -45,7 +45,7 @@ export default function FacetDetailPage() {
 
     const deleteFacet = async () => {
         try {
-            await api.delete(`/facets/${facet._id}`);
+            await api.delete(`/admin/facets/${facet._id}`);
             navigate(-1);
         } catch (error) {
 

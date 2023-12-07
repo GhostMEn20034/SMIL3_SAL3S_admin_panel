@@ -32,7 +32,7 @@ export default function FacetPage() {
 
     const getFacets = async () => {
         try {
-            let response = await api.get("/facets/", {
+            let response = await api.get("/admin/facets/", {
                 params: {
                     page: page
                 }

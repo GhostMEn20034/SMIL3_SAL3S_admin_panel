@@ -20,7 +20,7 @@ export default function CategoryEdit({ category, categoriesForChoices }) {
 
     const updateCategory = async () => {
         try {
-            await api.put(`/categories/${category._id}`, {
+            await api.put(`/admin/categories/${category._id}`, {
                 name: name,
                 parent_id: parent,
                 groups: groups.length > 0 ? groups : null

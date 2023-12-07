@@ -21,7 +21,7 @@ export default function CategoryAdd() {
 
     const getCategories = async () => {
         try {
-            let response = await api.get(`/categories/for-choices`);
+            let response = await api.get(`/admin/categories/for-choices`);
             let data = await response.data;
             setCategoriesForChoices(data);
         } catch {
@@ -32,7 +32,7 @@ export default function CategoryAdd() {
 
     const createCategory = async () => {
         try {
-            await api.post("/categories/", {
+            await api.post("/admin/categories/", {
                 name: name,
                 parent_id: parent,
                 groups: groups.length > 0 ? groups : null,

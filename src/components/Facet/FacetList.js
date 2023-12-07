@@ -20,7 +20,6 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     },
 }));
 
-
 export default function FacetList({ facets }) {
 
     return (

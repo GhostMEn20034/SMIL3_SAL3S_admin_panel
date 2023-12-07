@@ -28,7 +28,7 @@ export default function CategoryPage() {
 
     const getCategories = async () => {
         try {
-            let response = await api.get("/categories/for-admin", {
+            let response = await api.get("/admin/categories/", {
                 params: {
                     page: page
                 }

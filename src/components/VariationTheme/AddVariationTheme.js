@@ -22,7 +22,7 @@ export default function AddVariationTheme() {
 
     const getCategories = async () => {
         try {
-            let response = await api.get(`/categories/for-choices`);
+            let response = await api.get(`/admin/categories/for-choices`);
             let data = await response.data;
             setCategories(data);
         } catch {
@@ -32,7 +32,7 @@ export default function AddVariationTheme() {
 
     const getFacets = async () => {
         try {
-            let response = await api.get("/facets/for-choices");
+            let response = await api.get("/admin/facets/for-choices");
             let data = await response.data;
             setFacets(data);
         } catch (error) {
@@ -116,7 +116,7 @@ export default function AddVariationTheme() {
 
     const addVariationTheme = async () => {
         try {
-            await api.post("/variation-themes/", {
+            await api.post("/admin/variation-themes/", {
                 name: name,
                 filters: filters,
                 categories: chosenCategories 

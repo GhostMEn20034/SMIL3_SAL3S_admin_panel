@@ -21,7 +21,7 @@ export default function AddProductPageChooseCategory() {
 
     const getCategories = async () => {
         try {
-            let response = await api.get("/categories/");
+            let response = await api.get("/admin/categories/tree");
             let data = await response.data;
             setCategories(data);
         } catch (err) {
