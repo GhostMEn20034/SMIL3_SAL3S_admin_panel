@@ -1,13 +1,14 @@
 import { Paper, Box, IconButton, Button, Typography, Alert } from "@mui/material";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import HighlightOffRoundedIcon from '@mui/icons-material/HighlightOffRounded';
+import { Link } from "react-router-dom";
 import { VisuallyHiddenInput } from "../HiddenInput";
 import SelectValueRadioGroup from "../SelectValueRadioGroup";
 import { Fragment } from "react";
 
 
 
-function ImageListMultipleProducts(props) {
+export function ImageListMultipleProducts(props) {
     /**
     * Renders form to upload images for product that has variations.
     * List of props:
@@ -21,6 +22,10 @@ function ImageListMultipleProducts(props) {
     * in this case you can consider "images" key as base path.
     */
     const handleChange = (e, index) => {
+        /**
+         * @param e - event
+         * @param index - index of the product variation
+         */
         props.setProductVariations((prevValues) => {
             // get all the files from the input element
             let files = e.target.files;
@@ -90,6 +95,11 @@ function ImageListMultipleProducts(props) {
     };
 
     const removeImage = (index, name, secImageIndex) => {
+        /**
+         * @param index - index of the product variation
+         * @param name - event.target.name, for this function it can be "main" or "secondary"
+         * @param secImageIndex - index of the secondary image
+         */
         props.setProductVariations((prevValues) => {
             switch (name) {
                 case "main":
@@ -135,89 +145,102 @@ function ImageListMultipleProducts(props) {
 
     return (
         <>
-            {props.productVariations.map((productVariaton, index) => (
+            {props.productVariations.map((productVariation, index) => (
                 <Fragment key={index}>
-                    <Typography variant="body1" sx={{ mb: 1 }}>
-                        {productVariaton?.name}
-                    </Typography>
+                    {!productVariation?._id && (
+                        <Typography variant="body1" sx={{ mb: 1 }}>
+                            {productVariation?.name}
+                        </Typography>
+                    )}
                     <Box display={"flex"} key={index}>
-                        <Box>
-                            <Box display={"flex"} mb={2}>
-                                <Paper elevation={3} sx={{ height: "175px", width: "175px" }}>
-                                    <Box
-                                        sx={{
-                                            display: "flex",
-                                            flexDirection: "column",
-                                            alignItems: "center",
-                                            justifyContent: "flex-end",
-                                            height: "90%",
-                                            padding: 1
-                                        }}
-                                    >
-                                        {productVariaton.images.main && (
-                                            <Box>
-                                                <img src={productVariaton.images.main.url} alt={productVariaton.name}
-                                                    style={{ width: "100%", maxHeight: "120px", objectFit: "scale-down" }} />
+                        {!productVariation?._id ? (
+                            <>
+                                <Box>
+                                    <Box display={"flex"} mb={2}>
+                                        <Paper elevation={3} sx={{ height: "175px", width: "175px" }}>
+                                            <Box
+                                                sx={{
+                                                    display: "flex",
+                                                    flexDirection: "column",
+                                                    alignItems: "center",
+                                                    justifyContent: "flex-end",
+                                                    height: "90%",
+                                                    padding: 1
+                                                }}
+                                            >
+                                                {productVariation.images.main && (
+                                                    <Box>
+                                                        <img src={productVariation.images.main.url} alt={productVariation.name}
+                                                            style={{ width: "100%", maxHeight: "120px", objectFit: "scale-down" }} />
 
+                                                    </Box>
+                                                )}
+                                                <Button component="label" variant="contained" size="small" sx={{ fontSize: 12 }}>
+                                                    Upload Main Image
+                                                    <VisuallyHiddenInput name="main" type="file" accept="image/jpeg" onChange={(e) => handleChange(e, index)} />
+                                                </Button>
                                             </Box>
-                                        )}
-                                        <Button component="label" variant="contained" size="small" sx={{ fontSize: 12 }}>
-                                            Upload Main Image
-                                            <VisuallyHiddenInput name="main" type="file" accept="image/jpeg" onChange={(e) => handleChange(e, index)} />
-                                        </Button>
+                                        </Paper>
+                                        <IconButton sx={{ alignSelf: "start" }} onClick={() => removeImage(index, "main")}>
+                                            <DeleteForeverIcon />
+                                        </IconButton>
                                     </Box>
-                                </Paper>
-                                <IconButton sx={{ alignSelf: "start" }} onClick={() => removeImage(index, "main")}>
-                                    <DeleteForeverIcon />
-                                </IconButton>
-                            </Box>
-                            {(props.displayErrors && props.errorHandler) && (
-                                <Box sx={{ mb: 2 }}>
-                                    {props.findErrors("variations", index, "images", "main").map((errMsg, index) => (
-                                        
-                                        <Alert icon={false} severity="error" key={index}>
-                                            {errMsg}
-                                        </Alert>
-                                    ))}
-                                </Box>
-                            )}
-                        </Box>
-                        <Box sx={{ ml: 4 }}>
-                            <Paper elevation={3} sx={{ height: "175px", minWidth: "400px", px: 2 }}>
-                                <Box sx={{ height: "40%", width: "100%", display: "flex", justifyContent: "center", alignItems: "end" }}>
-                                    <Button component="label" variant="contained" size="small">
-                                        Upload Secondary Images
-                                        <VisuallyHiddenInput name="secondary" type="file" accept="image/jpeg" multiple onChange={(e) => handleChange(e, index)} />
-                                    </Button>
-                                </Box>
-                                <Box sx={{ display: "flex", mt: 3 }}>
-                                    {productVariaton.images.secondaryImages && (
-                                        productVariaton.images.secondaryImages.map((secImage, secImageIndex) => (
-                                            <Paper key={secImageIndex} elevation={2} sx={{ position: "relative", display: "inline-block", mr: 3 }}>
-                                                <Box>
-                                                    <img src={secImage.url} key={secImageIndex} alt={"Img " + (secImageIndex + 1) }
-                                                        style={{ minWidth: "100px", width: "100%", maxHeight: "60px", objectFit: "scale-down" }} />
-                                                </Box>
-                                                <Box sx={{ ml: 1 }}>
-                                                    <IconButton sx={{ top: -17, right: -17, position: "absolute", padding: 0 }} size="small" onClick={() => removeImage(index, "secondary", secImageIndex)}>
-                                                        <HighlightOffRoundedIcon />
-                                                    </IconButton>
-                                                </Box>
-                                            </Paper>
-                                        ))
+                                    {(props.displayErrors && props.errorHandler) && (
+                                        <Box sx={{ mb: 2 }}>
+                                            {props.findErrors("variations", index, "images", "main").map((errMsg, index) => (
+
+                                                <Alert icon={false} severity="error" key={index}>
+                                                    {errMsg}
+                                                </Alert>
+                                            ))}
+                                        </Box>
                                     )}
                                 </Box>
-                            </Paper>
-                            {(props.displayErrors && props.errorHandler) && (
-                                <Box sx={{mt: 2}}>
-                                    {Object.keys(props.findErrors("variations", index, "images", "secondaryImages")).map((errKey, errIndex) => (
-                                        <Alert icon={false} severity="error" key={errIndex} sx={{ mb: 1 }}>
-                                            Secondary image №{Number(errKey) + 1} - {props.findErrors("variations", index, "images", "secondaryImages", errKey).join(", ")}
-                                        </Alert>
-                                    ))}
+                                <Box sx={{ ml: 4 }}>
+
+                                    <Paper elevation={3} sx={{ height: "175px", minWidth: "400px", px: 2 }}>
+                                        <Box sx={{ height: "40%", width: "100%", display: "flex", justifyContent: "center", alignItems: "end" }}>
+                                            <Button component="label" variant="contained" size="small">
+                                                Upload Secondary Images
+                                                <VisuallyHiddenInput name="secondary" type="file" accept="image/jpeg" multiple onChange={(e) => handleChange(e, index)} />
+                                            </Button>
+                                        </Box>
+                                        <Box sx={{ display: "flex", mt: 3 }}>
+                                            {productVariation.images.secondaryImages && (
+                                                productVariation.images.secondaryImages.map((secImage, secImageIndex) => (
+                                                    <Paper key={secImageIndex} elevation={2} sx={{ position: "relative", display: "inline-block", mr: 3 }}>
+                                                        <Box>
+                                                            <img src={secImage.url} key={secImageIndex} alt={"Img " + (secImageIndex + 1)}
+                                                                style={{ minWidth: "100px", width: "100%", maxHeight: "60px", objectFit: "scale-down" }} />
+                                                        </Box>
+                                                        <Box sx={{ ml: 1 }}>
+                                                            <IconButton sx={{ top: -17, right: -17, position: "absolute", padding: 0 }} size="small" onClick={() => removeImage(index, "secondary", secImageIndex)}>
+                                                                <HighlightOffRoundedIcon />
+                                                            </IconButton>
+                                                        </Box>
+                                                    </Paper>
+                                                ))
+                                            )}
+                                        </Box>
+                                    </Paper>
+                                    {(props.displayErrors && props.errorHandler) && (
+                                        <Box sx={{ mt: 2 }}>
+                                            {Object.keys(props.findErrors("variations", index, "images", "secondaryImages")).map((errKey, errIndex) => (
+                                                <Alert icon={false} severity="error" key={errIndex} sx={{ mb: 1 }}>
+                                                    Secondary image №{Number(errKey) + 1} - {props.findErrors("variations", index, "images", "secondaryImages", errKey).join(", ")}
+                                                </Alert>
+                                            ))}
+                                        </Box>
+                                    )}
                                 </Box>
-                            )}
-                        </Box>
+                            </>
+                        ) : (
+                            <Box sx={{ mb: 2 }}>
+                                <Typography component={Link} to={`/products/${productVariation._id}/edit?menuIndex=2`} variant="body1">
+                                    Edit {productVariation.name}
+                                </Typography>
+                            </Box>
+                        )}
                     </Box>
                 </Fragment>
             ))}
@@ -292,6 +315,10 @@ function ImageListOneProduct(props) {
     };
 
     const removeImage = (name, secImageIndex) => {
+        /**
+         * @param name - event.target.name, for this function it can be "main" or "secondary"
+         * @param secImageIndex - index of the secondary image
+         */
         props.setImages((prevValues) => {
             switch (name) {
                 case "main":
@@ -429,8 +456,8 @@ export default function AddProductImages(props) {
         if (!props?.errorHandler?.isValueExist(...path)) {
             return [];
         }
-        
-        return props.errorHandler.getObjectValue(...path);
+
+        return props.errorHandler?.getObjectValue(...path);
     };
 
 

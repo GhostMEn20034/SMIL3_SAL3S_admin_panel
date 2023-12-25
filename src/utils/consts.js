@@ -8,4 +8,4 @@ export const baseAttrs = {name: "",
                           sku: "", 
                           external_id: null}; // Base product attributes
 
-export const attrSeparators = [" | ", " , ", " / "]; // Used to separate attributes in the product name
+export const attrSeparators = [" | ", ", ", " / "]; // Used to separate attributes in the product name

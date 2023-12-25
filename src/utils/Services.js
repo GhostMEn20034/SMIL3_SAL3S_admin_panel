@@ -24,12 +24,12 @@ export const removeItemFromChipsArray = (index, setValues) => {
 };
 
 export const arrayToMenuItems = (array) => {
-    
+
     // If there's no input array, then return empty array
     if (!array) {
         return [];
     }
-    
+
     // Use the map method to apply an arrow function to each element of the array
     let menuItems = array.map(element => ({
         name: element,
@@ -287,13 +287,13 @@ export const removeKey = (obj, key) => {
 export const getAttrString = (attrs, separator) => {
     // Create an array of strings with the attribute values, names and units
     let attrStrings = attrs.map(attr => {
-        
+
         let unit = attr.unit;
         let value = attr.value;
         let name = attr.name;
 
         // if attribute type is bivariate or trivariate
-        if (["bivariate", "trivariate"].includes(attr.type)) {            
+        if (["bivariate", "trivariate"].includes(attr.type)) {
             value = value.join(" x ");
         }
 
@@ -313,7 +313,7 @@ export const getAttrString = (attrs, separator) => {
 }
 
 // Modifies name for each productVariation based on the chosen attrs
-export const modifyName = (baseName ,attrs, separator, checkedProducts, setProductVariations, addVariationAttrs, variationAttrs) => {
+export const modifyName = (baseName, attrs, separator, checkedProducts, setProductVariations, addVariationAttrs, variationAttrs) => {
     /**
      * @param attrs: array of objects, stores list of product attributes that will used to in the product name.
      * @param separator: string, symbol to separate attrs in the product name.
@@ -326,21 +326,41 @@ export const modifyName = (baseName ,attrs, separator, checkedProducts, setProdu
     setProductVariations((prevValues) => {
         let newProducts = prevValues.map((product, index) => {
             // if addVariationAttrs is true, then return array of product attributes, otherwise - an empty array
-            let productAttrs = addVariationAttrs && variationAttrs.length > 0 
-            ? variationAttrs.map((variationAttr) => product.attrs.find((attr) => attr.code === variationAttr)) : [];
+            let productAttrs = addVariationAttrs && variationAttrs.length > 0
+                ? variationAttrs.map((variationAttr) => product.attrs.find((attr) => attr.code === variationAttr)) : [];
 
-            
+
             if (checkedProducts.includes(index)) {
-                let concatenatedAttrs = attrs.concat(productAttrs); 
-                
+                let concatenatedAttrs = attrs.concat(productAttrs);
+
                 let attrString = getAttrString(concatenatedAttrs, separator);
-                let newName = baseName +  (baseName.length > 0 ? " " : "") + attrString;
+                let newName = baseName + (baseName.length > 0 ? " " : "") + attrString;
                 // Return a new object with the modified name
-                return {...product, name: newName};
+                return { ...product, name: newName };
             } else {
                 return product;
             }
         });
         return newProducts;
     });
+};
+
+export function range(start=0, stop, step=1) {
+    // Sequence generator function 
+    return Array.from({ length: ((stop - 1) - start) / step + 1 }, (_, i) => start + (i * step));
 }
+
+export function isValidHttpUrl(str) {
+    /** 
+     * Checks whether input string is url
+     **/
+    let url;
+    
+    try {
+      url = new URL(str);
+    } catch (_) {
+      return false;  
+    }
+  
+    return url.protocol === "http:" || url.protocol === "https:";
+  }

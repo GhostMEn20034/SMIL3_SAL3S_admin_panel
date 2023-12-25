@@ -30,16 +30,17 @@ export default function CreateProductPage() {
 
   const [formData, setFormData] = useState(null); // Data required to create a product
 
-  const [hasVariations, setHasVariations] = useState(false); // Determine whether product has variations
+  const [hasVariations, setHasVariations] = useState(false); // Determines whether product has variations
+  const [isFilterable, setIsFilterable] = useState(false); // Determines whether product's attributes can be used in filters
   const [variationTheme, setVariationTheme] = useState(null); // Chosen variation theme ID
   const [variationThemeFields, setVariationThemeFields] = useState([]); // Chosen variation theme fields
 
   const [productVariationFields, setProductVariationFields] = useState({}); // Values of fields for product variations
   const [productVariations, setProductVariations] = useState([]); // Array of product variations
 
-  const [baseAttributes, setBaseAttributes] = useState({...baseAttrs}); // Base attributes such as product name, price, sku etc
+  const [baseAttributes, setBaseAttributes] = useState({ ...baseAttrs }); // Base attributes such as product name, price, sku etc
 
-  const [images, setImages] = useState(productImages); // Object of product images
+  const [images, setImages] = useState(productImages); // Product images
   const [sameImages, setSameImages] = useState(false); // Determines whether user wants to upload the same photos to all variations 
 
   const [attrs, setAttrs] = useState([]); // Product specs, for example: screen size, CPU, storage size etc
@@ -119,6 +120,7 @@ export default function CreateProductPage() {
     let body = {
       base_attrs: baseAttributes,
       attrs: attrs,
+      is_filterable: isFilterable,
       has_variations: hasVariations,
       same_images: sameImages,
       variation_theme: variationTheme,
@@ -128,7 +130,7 @@ export default function CreateProductPage() {
     delete body.base_attrs.images;
 
     // If extra attrs data are filled, then add extra attrs to the request body
-    if (!(extraAttrs.length === 1 && JSON.stringify(extraAttrs) === JSON.stringify([extraAttr, ]))) {
+    if (!(extraAttrs.length === 1 && JSON.stringify(extraAttrs) === JSON.stringify([extraAttr,]))) {
       body.extra_attrs = extraAttrs;
     }
 
@@ -168,21 +170,22 @@ export default function CreateProductPage() {
         body.variations = products;
       }
 
-    // if product has no variations and variation theme is not chosen
+      // if product has no variations and variation theme is not chosen
     } else {
-        // Add only images to the request body
-        let encodedImages = await encodeImages(images);
-        body.images = encodedImages;
+      // Add only images to the request body
+      let encodedImages = await encodeImages(images);
+      body.images = encodedImages;
     }
 
     console.log(body);
     try {
       setSubmitLoading(true);
       // send a request to create products
-      let response = await api.post('/admin/products/create', body, {timeout: 25 * 1000});
+      let response = await api.post('/admin/products/create', body, { timeout: 25 * 1000 });
       console.log(await response.data);
-
       setSubmitLoading(false);
+      navigate("/products")
+
     } catch (err) {
       console.log(err.response.data);
       setSubmitLoading(false);
@@ -204,7 +207,7 @@ export default function CreateProductPage() {
         }
       })
     }
-    
+
   };
 
   const goBack = () => {
@@ -223,8 +226,6 @@ export default function CreateProductPage() {
     )
   }
 
-  // console.log(productVariations);
-
   return (
     <>
       <Box padding={2} display="flex">
@@ -232,7 +233,7 @@ export default function CreateProductPage() {
           Create product
         </Typography>
         <Box sx={{ ml: 20 }}>
-          <ProductNavigation value={currentMenu} setValue={setCurrentMenu} labels={productMenuNavigationItems} disabledButtonIndex={hasVariations && variationTheme ? null : 1} />
+          <ProductNavigation value={currentMenu} setValue={setCurrentMenu} labels={productMenuNavigationItems} disabledButtonIndexes={[hasVariations && variationTheme ? null : 1]} />
         </Box>
       </Box>
       {/* Choosen category */}
@@ -300,8 +301,27 @@ export default function CreateProductPage() {
                 />
               </Box>
             )}
-            <Box sx={{ ml: "13.5%", mb: 2 }}>
-              <BaseAttrsForm baseAttrs={baseAttributes} setBaseAttrs={setBaseAttributes} openDialog={openDialog} setOpenDialog={setOpenDialog} errorHandler={errorHandler}/>
+            <Box sx={{ ml: "13.5%", mb: 1 }}>
+              <BaseAttrsForm
+                baseAttrs={baseAttributes}
+                setBaseAttrs={setBaseAttributes}
+                openDialog={openDialog}
+                setOpenDialog={setOpenDialog}
+                errorHandler={errorHandler}
+                errorBasePath={["base_attrs",]}
+              />
+              <Box sx={{mt: 1}}>
+                <SelectValueRadioGroup
+                  label={"Is the product is filterable?"}
+                  value={isFilterable}
+                  setValue={setIsFilterable}
+                  menuItems={[
+                    { name: "No", value: false },
+                    { name: "Yes", value: true }
+                  ]}
+                  valueType={"boolean"}
+                />
+              </Box>
             </Box>
 
 
@@ -311,10 +331,10 @@ export default function CreateProductPage() {
 
                 {/* Dynamic forms for product attributes */}
                 <Box sx={{ maxWidth: "1000px", ml: "13.5%" }}>
-                  <ProductAttrs attrs={attrs} facets={formData.facets} setAttrs={setAttrs} 
-                  groups={formData?.category.groups} 
-                  errorHandler={errorHandler} displayErrors={true}
-                  baseErrorPath={["attrs", ]}
+                  <ProductAttrs attrs={attrs} facets={formData.facets} setAttrs={setAttrs}
+                    groups={formData?.category.groups}
+                    errorHandler={errorHandler} displayErrors={true}
+                    baseErrorPath={["attrs",]}
                   />
                 </Box>
 
@@ -326,13 +346,13 @@ export default function CreateProductPage() {
 
                 {/* Dynamic forms for additional product attributes */}
                 <Box sx={{ maxWidth: "1000px" }}>
-                  <AdditionalProductAttrs 
-                  additionalAttrs={extraAttrs} 
-                  setAdditionalAttrs={setExtraAttrs} 
-                  facetTypes={formData.facet_types} 
-                  errorHandler={errorHandler} 
-                  displayErrors={true}
-                  baseErrorPath={["extra_attrs", ]}
+                  <AdditionalProductAttrs
+                    additionalAttrs={extraAttrs}
+                    setAdditionalAttrs={setExtraAttrs}
+                    facetTypes={formData.facet_types}
+                    errorHandler={errorHandler}
+                    displayErrors={true}
+                    baseErrorPath={["extra_attrs",]}
                   />
                 </Box>
 
@@ -347,7 +367,7 @@ export default function CreateProductPage() {
 
           <Box sx={{ width: 1000 }}>
             <Box>
-              <AddProductVariations facets={formData.facets.filter(facet => variationThemeFields.includes(facet.code))}
+              <AddProductVariations facets={variationThemeFields.map((varThemeField) => formData.facets.find(facet => facet.code === varThemeField))}
                 productVariationFields={productVariationFields}
                 setProductVariationFields={setProductVariationFields}
                 productVariations={productVariations}
@@ -362,6 +382,7 @@ export default function CreateProductPage() {
                 productVariationFields={productVariationFields}
                 setProductVariationFields={setProductVariationFields}
                 attrs={attrs}
+                variationFields={variationThemeFields}
                 errorHandler={errorHandler}
               />
             </Box>
@@ -378,20 +399,20 @@ export default function CreateProductPage() {
               setImages={setImages}
               sameImages={sameImages}
               setSameImages={setSameImages}
-              errorHandler={errorHandler} 
+              errorHandler={errorHandler}
               displayErrors={true}
-              baseErrorPath={["images", ]}
+              baseErrorPath={["images",]}
             />
           </Box>
         )}
         {currentMenu === 3 && (
           <Box sx={{ width: 1200 }}>
-            <SubmitMenu 
-            hasVariations={hasVariations} 
-            productVariationCount={productVariations.length} 
-            handleSubmit={handleSubmit} 
-            loading={submitLoading}
-            errorHandler={errorHandler}
+            <SubmitMenu
+              hasVariations={hasVariations}
+              productVariationCount={productVariations.length}
+              handleSubmit={handleSubmit}
+              loading={submitLoading}
+              errorHandler={errorHandler}
             />
           </Box>
         )}

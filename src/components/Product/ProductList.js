@@ -46,7 +46,8 @@ export default function ProductList(props) {
                     <TableRow>
                         <StyledTableCell align="center"></StyledTableCell>
                         <StyledTableCell align="center">Name</StyledTableCell>
-                        <StyledTableCell align="center">price</StyledTableCell>
+                        <StyledTableCell align="center">Price</StyledTableCell>
+                        <StyledTableCell align="center">Tax for each product sold</StyledTableCell>
                         <StyledTableCell align="center">Is for sale</StyledTableCell>
                         <StyledTableCell align="center">Parent</StyledTableCell>
                         <StyledTableCell align="center"></StyledTableCell>
@@ -68,6 +69,7 @@ export default function ProductList(props) {
                                     </Link>
                                 </TableCell>
                                 <TableCell align='center' width={"12%"}>{product.price}</TableCell>
+                                <TableCell align='center' width={"12%"}>{product.tax}</TableCell>
                                 <TableCell align='center' width={"10%"}>{product.for_sale ? "Yes" : "No"}</TableCell>
                                 <TableCell align='center' sx={{ minWidth: "20px" }}>{product.parent ? "Yes" : "No"}</TableCell>
                                 <TableCell align='center' width={"5%"}>
@@ -80,7 +82,7 @@ export default function ProductList(props) {
                                 </TableCell>
                             </TableRow>
                             <TableRow sx={{ px: 0 }}>
-                                <TableCell colSpan={6} sx={{ padding: 0, border: 0 }}>
+                                <TableCell colSpan={7} sx={{ padding: 0, border: 0 }}>
                                     <Collapse in={open === index} timeout="auto" unmountOnExit>
                                         {product.variations.map((variation, variationIndex) => (
                                             <TableRow key={variation._id}>
@@ -96,6 +98,7 @@ export default function ProductList(props) {
                                                     </Link>
                                                 </TableCell>
                                                 <TableCell align='center' width={"12%"}>{variation.price}</TableCell>
+                                                <TableCell align='center' width={"12%"}>{variation.tax}</TableCell>
                                                 <TableCell align='center' width={"10%"}>{variation.for_sale ? "Yes" : "No"}</TableCell>
                                                 <TableCell align='center'>{variation.parent ? "Yes" : "No"}</TableCell>
                                                 <TableCell align='center' width={"5.5%"}></TableCell>

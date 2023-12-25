@@ -9,7 +9,7 @@ export default function BaseAttrsForm(props) {
     // A function changes values of the baseAttrs object
     const handleChange = (keyName, value) => {
 
-        if (value === "" || value === 0) {
+        if (keyName === "discount_rate" && value === 0) {
             value = null;
         }
 
@@ -26,8 +26,8 @@ export default function BaseAttrsForm(props) {
         <Box>
             <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
                 <TextField
-                    error={props.errorHandler.isValueExist("base_attrs", "name")}
-                    helperText={props.errorHandler.getObjectValue("base_attrs", "name")?.[0]}
+                    error={props.errorHandler?.isValueExist(...(props.errorBasePath ? props.errorBasePath : []), "name")}
+                    helperText={props.errorHandler?.getObjectValue("base_attrs", "name")?.[0]}
                     value={props.baseAttrs.name ? props.baseAttrs.name : ""}
                     onChange={(e) => handleChange(e.target.name, e.target.value)}
                     sx={{ minWidth: 325 }}
@@ -51,8 +51,8 @@ export default function BaseAttrsForm(props) {
                     size="small"
                     label={"Price"}
                     name={"price"}
-                    error={props.errorHandler.isValueExist("base_attrs", "price")}
-                    helperText={props.errorHandler.getObjectValue("base_attrs", "price")?.[0]}
+                    error={props.errorHandler?.isValueExist("base_attrs", "price")}
+                    helperText={props.errorHandler?.getObjectValue("base_attrs", "price")?.[0]}
                 />
             </Box>
             <Box sx={{ mb: 2 }}>
@@ -67,8 +67,8 @@ export default function BaseAttrsForm(props) {
                     size="small"
                     label={"Discount rate"}
                     name={"discount_rate"}
-                    error={props.errorHandler.isValueExist("base_attrs", "discount_rate")}
-                    helperText={props.errorHandler.getObjectValue("base_attrs", "discount_rate")?.[0]}
+                    error={props.errorHandler?.isValueExist("base_attrs", "discount_rate")}
+                    helperText={props.errorHandler?.getObjectValue("base_attrs", "discount_rate")?.[0]}
                 />
             </Box>
             <Box sx={{ mb: 2 }}>
@@ -84,8 +84,8 @@ export default function BaseAttrsForm(props) {
                     size="small"
                     label={"Tax rate"}
                     name={"tax_rate"}
-                    error={props.errorHandler.isValueExist("base_attrs", "tax_rate")}
-                    helperText={props.errorHandler.getObjectValue("base_attrs", "tax_rate")?.[0]}
+                    error={props.errorHandler?.isValueExist("base_attrs", "tax_rate")}
+                    helperText={props.errorHandler?.getObjectValue("base_attrs", "tax_rate")?.[0]}
                 />
             </Box>
             <Box sx={{ mb: 2 }}>
@@ -100,8 +100,8 @@ export default function BaseAttrsForm(props) {
                     size="small"
                     label={"Stock"}
                     name={"stock"}
-                    error={props.errorHandler.isValueExist("base_attrs", "stock")}
-                    helperText={props.errorHandler.getObjectValue("base_attrs", "stock")?.[0]}
+                    error={props.errorHandler?.isValueExist("base_attrs", "stock")}
+                    helperText={props.errorHandler?.getObjectValue("base_attrs", "stock")?.[0]}
                     />
             </Box>
             <Box sx={{ mb: 2 }}>
@@ -112,8 +112,8 @@ export default function BaseAttrsForm(props) {
                     size="small"
                     label={"SKU"}
                     name={"sku"} 
-                    error={props.errorHandler.isValueExist("base_attrs", "sku")}
-                    helperText={props.errorHandler.getObjectValue("base_attrs", "sku")?.[0]}
+                    error={props.errorHandler?.isValueExist("base_attrs", "sku")}
+                    helperText={props.errorHandler?.getObjectValue("base_attrs", "sku")?.[0]}
                     />
             </Box>
             <Box>

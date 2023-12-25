@@ -15,10 +15,9 @@ export default function ProductMenusNavigation(props) {
       <Tabs
         value={props.value}
         onChange={handleChange}
-        aria-label="secondary tabs example"
       >
         {props.labels.map((label, index) => (
-            <Tab value={index} label={label} disabled={index === props.disabledButtonIndex} key={index}/>
+            <Tab value={index} label={label} disabled={props.disabledButtonIndexes.includes(index)} key={index}/>
         ))}
       </Tabs>
     </Box>

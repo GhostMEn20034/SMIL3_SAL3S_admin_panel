@@ -3,9 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import { UserProvider } from './context/UserContext';
 import PrivateRoute from './utils/PrivateRoute';
 import AppBarMenu from './components/AppBar';
-import { ResetPasswordEnterEmail } from './components/ResetPasswordComponents';
 import Login from './pages/LoginPage';
-import ResetPasswordPage from './pages/ResetPasswordPage';
 import FacetPage from './pages/FacetPage';
 import FacetDetailPage from './pages/FacetDetailPage';
 import AddFacetPage from './pages/AddFacetPage';
@@ -18,6 +16,7 @@ import AddCategoryPage from './pages/AddCategoryPage';
 import ProductPage from './pages/ProductPage';
 import AddProductPageChooseCategory from './pages/AddProductPageChooseCategory';
 import CreateProductPage from './pages/CreateProductPage';
+import UpdateProductPage from './pages/UpdateProductPage';
 
 
 
@@ -34,12 +33,6 @@ function App() {
           {!authRoutes.includes(location.pathname) && <AppBarMenu />}
           <Routes>
             <Route path='/signin' element={<Login />} />
-            <Route path='/reset-password' element={
-              <ResetPasswordEnterEmail />
-            } />
-            <Route path='/reset-password/confirm' element={
-              <ResetPasswordPage />
-            } />
             <Route path='/facets' element={
               <PrivateRoute>
                 <FacetPage />
@@ -98,6 +91,11 @@ function App() {
             <Route path='/products/add' element={
               <PrivateRoute>
                 <CreateProductPage />
+              </PrivateRoute>
+            } />
+            <Route path='/products/:id/edit' element={
+              <PrivateRoute>
+                <UpdateProductPage />
               </PrivateRoute>
             } />
           </Routes>
