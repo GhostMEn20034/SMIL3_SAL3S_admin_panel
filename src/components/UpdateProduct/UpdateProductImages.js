@@ -241,6 +241,21 @@ function ImageListOneProduct(props) {
                     // Add image at the specified index to the images that need to be deleted
                     modifiedImageOps.delete = [...modifiedImageOps.delete, img];
 
+                    // If there are replaces of secondary images
+                    if (modifiedImageOps.replace.secondaryImages?.length > 0) {
+                        // Decrease index in each object where index is gt index specified by the user
+                        modifiedImageOps.replace.secondaryImages = modifiedImageOps.replace.secondaryImages.map(obj => {
+
+                            // Decrease index for objects with a greater index
+                            if (obj.index > secImageIndex) {
+                                obj.index--;
+                            }
+
+                            return obj;
+                        });
+                        
+                    }
+
                     return modifiedImageOps;
                 });
 
@@ -260,7 +275,6 @@ function ImageListOneProduct(props) {
                 props.setImageOps((prevImgOps) => {
                     // Find a replacement with the specified image index
                     let imgReplacement = prevImgOps.replace.secondaryImages.find(obj => obj.index === secImageIndex);
-                    console.log(imgReplacement);
                     // Define an index of the replacement
                     // let indexOfReplacement = prevImgOps.replace.secondaryImages.indexOf(imgReplacement);
                     // make a copy of previous image operations

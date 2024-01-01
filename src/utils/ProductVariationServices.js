@@ -136,13 +136,24 @@ export const removeProducts = (attr, setProductVariations) => {
     return false;
   };
 
+  // List of deleted products
+  let deletedProducts = [];
+
   // Update the state with the new list of products
   setProductVariations((prevValues) => {
     let newProducts = prevValues.filter((product) => {
-      // Return true if the product does not have the attribute
-      return !hasAttribute(product, attr.code, attr.value, attr.unit);
+      if (hasAttribute(product, attr.code, attr.value, attr.unit)) {
+        // If a product does not have a specified attribute, then push product to the array with deleted products
+        deletedProducts.push(product)
+        return false;
+      }
+      // Return true if a product does not have the attribute
+      return true;
     });
 
     return newProducts;
   });
+
+
+  return deletedProducts;
 };

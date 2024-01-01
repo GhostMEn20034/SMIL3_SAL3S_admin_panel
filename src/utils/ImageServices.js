@@ -1,3 +1,30 @@
+// Function to encode a single image
+export const encodeOneImage = async (image) => {
+
+  if (!image || !(image instanceof File)) {
+    return null; // Handle null or undefined image
+  }
+
+  const imageReader = new FileReader();
+  imageReader.readAsDataURL(image);
+
+  return new Promise((resolve, reject) => {
+    imageReader.onloadend = () => resolve(imageReader.result);
+    imageReader.onerror = () => reject(imageReader.error);
+  });
+};
+
+// Function to encode multiple images
+export const encodeManyImages = async (images) => {
+  if (!images || images.length === 0) {
+    return null; // Handle empty array or undefined images
+  }
+
+  const promises = images.map(encodeOneImage);
+  return await Promise.all(promises);
+};
+
+// Updated encodeImages function
 export const encodeImages = async (images) => {
   /**
    * Returns an object with images encoded in base64 string
@@ -6,54 +33,17 @@ export const encodeImages = async (images) => {
    * ------------------------------------------------------
    * @param images object with files inside
    */
-  let encodedImages = { main: null, secondaryImages: [] };
-  // create a promise that resolves with the main image data URL
-  let mainImagePromise = new Promise((resolve, reject) => {
-    // if "main" property in images obj is null, resolve null in the promise
-    if (!images.main) {
-      resolve(null);
-    }
-    // convert the main image to base64 string
-    const mainImageReader = new FileReader();
-    mainImageReader.readAsDataURL(images.main);
-    mainImageReader.onloadend = () => {
-      // resolve the promise with the result
-      resolve(mainImageReader.result);
-    };
-    mainImageReader.onerror = () => {
-      // reject the promise with the error
-      reject(mainImageReader.error);
-    };
-  });
-  // assign the main image data URL to the 
-  // encodedImages object if "main" property in images obj is not null
-  encodedImages.main = await mainImagePromise;
-  // check if images.secondaryImages is null
-  if (!images.secondaryImages) {
-    // assign null to encodedImages.secondaryImages
-    encodedImages.secondaryImages = null;
-  } else {
-    // create an array of promises for the secondary images
-    let secondaryImagesPromises = [];
-    // convert the secondary images to base64 strings
-    for (let i = 0; i < images.secondaryImages.length; i++) {
-      // create a promise for each secondary image
-      secondaryImagesPromises[i] = new Promise((resolve, reject) => {
-        const secondaryImageReader = new FileReader();
-        secondaryImageReader.readAsDataURL(images.secondaryImages[i]);
-        secondaryImageReader.onloadend = () => {
-          // resolve the promise with the result
-          resolve(secondaryImageReader.result);
-        };
-        secondaryImageReader.onerror = () => {
-          // reject the promise with the error
-          reject(secondaryImageReader.error);
-        };
-      });
-    }
-    // assign the array of secondary images data URLs to the encodedImages object
-    encodedImages.secondaryImages = await Promise.all(secondaryImagesPromises);
+  try {
+    // encode main image
+    const encodedMain = await encodeOneImage(images.main);
+    // encode secondary images
+    const encodedSecondary = await encodeManyImages(images.secondaryImages);
+
+    return { main: encodedMain, secondaryImages: encodedSecondary };
+  } catch (error) {
+    throw new Error("Failed to encode images: " + error.message);
   }
-  // return the encodedImages object
-  return encodedImages;
 };
+
+
+

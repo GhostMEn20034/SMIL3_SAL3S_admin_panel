@@ -57,22 +57,22 @@ export default function ProductList(props) {
                     {props.products.map((product, index) => (
                         <Fragment key={product._id}>
                             <TableRow key={product._id}>
-                                <TableCell align='center' width={"5%"}>
+                                <TableCell sx={{backgroundColor: "#edf4ff"}} align='center' width={"5%"}>
                                     <Checkbox
                                         checked={props.checked[index].checked === true}
                                         onChange={() => props.handleChangeChecked(index)}
                                     />
                                 </TableCell>
-                                <TableCell component="th" scope='row' width={"40%"}>
+                                <TableCell sx={{backgroundColor: "#edf4ff"}} component="th" scope='row' width={"40%"}>
                                     <Link to={`${product._id}/edit`}>
                                         {product.name}
                                     </Link>
                                 </TableCell>
-                                <TableCell align='center' width={"12%"}>{product.price}</TableCell>
-                                <TableCell align='center' width={"12%"}>{product.tax}</TableCell>
-                                <TableCell align='center' width={"10%"}>{product.for_sale ? "Yes" : "No"}</TableCell>
-                                <TableCell align='center' sx={{ minWidth: "20px" }}>{product.parent ? "Yes" : "No"}</TableCell>
-                                <TableCell align='center' width={"5%"}>
+                                <TableCell sx={{backgroundColor: "#edf4ff"}} align='center' width={"12%"}>{product.price}</TableCell>
+                                <TableCell sx={{backgroundColor: "#edf4ff"}} align='center' width={"12%"}>{product.tax}</TableCell>
+                                <TableCell sx={{backgroundColor: "#edf4ff"}} align='center' width={"10%"}>{product.for_sale ? "Yes" : "No"}</TableCell>
+                                <TableCell align='center' sx={{ minWidth: "20px", backgroundColor: "#edf4ff" }}>{product.parent ? "Yes" : "No"}</TableCell>
+                                <TableCell sx={{backgroundColor: "#edf4ff"}} align='center' width={"5%"}>
                                     <IconButton size='small'
                                         onClick={() => handleClick(index)}
                                         disabled={!product.variations?.length > 0}

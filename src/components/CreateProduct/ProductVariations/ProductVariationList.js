@@ -20,6 +20,20 @@ import { Link } from 'react-router-dom';
 import { ModifyMultipleNamesDialog } from "../ModifyNameDialog";
 
 export default function ProductVariationList(props) {
+    /**
+     * productVariationFields - Values of product fields that included to variation theme
+     * setProductVariationFields - set function for productVariationFields
+     * productVariationFields - Values of product fields that included to variation theme
+     * setProductVariationFields - set function for productVariationFields
+     * variationFields - Field codes of the attributes from the variation theme
+     * editMode - Boolean. Is this component used for updating products.
+     * attrs={attrs} - Attributes from the parent product
+     * callbackOnDelete - (OPTIONAL) Function that need to be executed on removal of product variations
+     * keysForCallback - (OPTIONAL) keys which will be used for getting value from each object, suppose keyForCallback = ["id","name"],
+     * then list of  objects with "name" and "id" properties will be passed to the callback function. If keyForCallback is undefined, then the list of whole objects
+     * will passed to the callback function.
+     */
+
     const [newProdValues, setNewProdValues] = useState({ name: null, price: null, discount_rate: null, tax_rate: null, stock: null }); // Used to set new values of product variation properties
     const [checked, setChecked] = useState([]); // An array with indexes of checked products
     const [openDialog, setOpenDialog] = useState(false);
@@ -99,7 +113,47 @@ export default function ProductVariationList(props) {
     // Deletes checked products
     const deleteChecked = () => {
         props.setProductVariations((prevValues) => {
-            let filteredPrevValues = prevValues.filter((prevValue, i) => !checked.includes(i));
+            let deletedProducts = [];
+
+            let filteredPrevValues = prevValues.filter((product, i) => {
+                // if product is not in checked array, then product is remains in productVariations array
+                if (!checked.includes(i)) {
+                    return true
+                }
+                // Otherwise, push product object to the array of products 
+                // to delete and remove product from the product variations array.
+                deletedProducts.push(product)
+                return false
+            });
+
+            // Execute callback function's code if callbackOnDelete property is function
+            if (props.callbackOnDelete instanceof Function) {
+                let callbackArg;
+                // if there are keys that should be passed into the each object
+                if (props.keysForCallback?.length > 0) {
+                    // then return an array of objects with the specified properties.
+                    callbackArg = deletedProducts.map((deletedProduct) => {
+                        // Create a new object to store the desired fields
+                        let objToReturn = {};
+
+                        // Iterate through the specified keys
+                        for (const key of props.keysForCallback) {
+                            // Check if the key exists in the original object
+                            if (key in deletedProduct) {
+                                // Add the key-value pair to the new object
+                                objToReturn[key] = deletedProduct[key];
+                            }
+                        }
+                        return objToReturn;
+                    });
+                } else {
+                    // Otherwise, use an array of the whole objects as callback argument
+                    callbackArg = deletedProducts;
+                }
+                // execute function's code with callback argument
+                props.callbackOnDelete(callbackArg);
+            }
+
             if (filteredPrevValues.length === 0) {
                 props.setProductVariationFields({});
             }
@@ -313,13 +367,13 @@ export default function ProductVariationList(props) {
                                         {props.editMode && (
                                             <TableCell>
                                                 <Button
-                                                 component={Link} 
-                                                 to={`/products/${productVariation._id}/edit`} 
-                                                 variant="text" 
-                                                 color="primary" 
-                                                 size="small"
-                                                 disabled={!productVariation._id}
-                                                 >
+                                                    component={Link}
+                                                    to={`/products/${productVariation._id}/edit`}
+                                                    variant="text"
+                                                    color="primary"
+                                                    size="small"
+                                                    disabled={!productVariation._id}
+                                                >
                                                     Edit
                                                 </Button>
                                             </TableCell>

@@ -20,9 +20,9 @@ import { encodeImages } from "../utils/ImageServices";
 import ObjectValueExtractor from "../utils/objectValueExtractor";
 
 export default function CreateProductPage() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // State of page loading.
 
-  const [submitLoading, setSubmitLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false); // loading state for form submission
 
   const [currentMenu, setCurrentMenu] = useState(0); // index of current product menu (See productMenuNavigationItems in the utils/consts)
 
@@ -176,15 +176,14 @@ export default function CreateProductPage() {
       let encodedImages = await encodeImages(images);
       body.images = encodedImages;
     }
-
-    console.log(body);
+    
     try {
       setSubmitLoading(true);
       // send a request to create products
       let response = await api.post('/admin/products/create', body, { timeout: 25 * 1000 });
       console.log(await response.data);
       setSubmitLoading(false);
-      navigate("/products")
+      navigate("/products");
 
     } catch (err) {
       console.log(err.response.data);
