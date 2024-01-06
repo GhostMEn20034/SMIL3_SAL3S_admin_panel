@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import useAxios from "../utils/useAxios";
-import { Box, Typography, CircularProgress, Button } from "@mui/material";
+import { Box, Typography, CircularProgress, Button, Alert } from "@mui/material";
 import { facetsToAttrs, getArrayElems } from "../utils/Services";
 import SelectValueRadioGroup from "../components/SelectValueRadioGroup";
-import SelectValue from "../components/SelectValue";
 import ProductAttrs from "../components/CreateProduct/ProductAttrs";
 import AdditionalProductAttrs from "../components/CreateProduct/AdditionalProductAttrs";
 import { extraAttr, productImages, productMenuNavigationItems } from "../utils/consts";
@@ -14,6 +13,7 @@ import ProductVariationList from "../components/CreateProduct/ProductVariations/
 import { baseAttrs } from "../utils/consts";
 import BaseAttrsForm from "../components/CreateProduct/BaseAttrsForm";
 import { ModifyNameDialog } from "../components/CreateProduct/ModifyNameDialog";
+import ChooseVarThemeForm from "../components/CreateProduct/ChooseVarThemeForm";
 import AddProductImages from "../components/CreateProduct/AddProductImages";
 import SubmitMenu from "../components/CreateProduct/SubmitMenu";
 import { encodeImages } from "../utils/ImageServices";
@@ -32,7 +32,7 @@ export default function CreateProductPage() {
 
   const [hasVariations, setHasVariations] = useState(false); // Determines whether product has variations
   const [isFilterable, setIsFilterable] = useState(false); // Determines whether product's attributes can be used in filters
-  const [variationTheme, setVariationTheme] = useState(null); // Chosen variation theme ID
+  const [variationTheme, setVariationTheme] = useState(null); // variation theme
   const [variationThemeFields, setVariationThemeFields] = useState([]); // Chosen variation theme fields
 
   const [productVariationFields, setProductVariationFields] = useState({}); // Values of fields for product variations
@@ -48,6 +48,7 @@ export default function CreateProductPage() {
   const [extraAttrs, setExtraAttrs] = useState([extraAttr]) // attributes to provide additional information about product 
 
   const [openDialog, setOpenDialog] = useState(false); // Determines whether dialog window to modify product name opened
+
   const [errorHandler, setErrorHandler] = useState(new ObjectValueExtractor({}, false));
 
   const api = useAxios('products');
@@ -99,18 +100,29 @@ export default function CreateProductPage() {
   const handleChangeVariationTheme = (newVariationTheme) => {
     // newVariationTheme - new variation theme value
 
+    setProductVariations([]);
+    setProductVariationFields({});
+
     if (!newVariationTheme) {
+      
       setVariationTheme(null);
       setVariationThemeFields([]);
+      setCurrentMenu(0);
       return;
     }
 
-    let variationThemeData = formData.variation_themes.find(varTheme => varTheme._id === newVariationTheme);
+    let fieldCodes = getArrayElems(newVariationTheme.options, "field_codes");
 
-    setProductVariations([]);
-    setVariationTheme(newVariationTheme);
-    setVariationThemeFields(getArrayElems(variationThemeData.filters, "field_codes"));
+    if (fieldCodes.length > 0) {
+        setVariationThemeFields(fieldCodes);
+        setVariationTheme(newVariationTheme);
+        setCurrentMenu(0);
+        return;
+    }
 
+    setVariationThemeFields([]);
+    setVariationTheme(null);
+    setCurrentMenu(0);
   };
 
 
@@ -176,17 +188,16 @@ export default function CreateProductPage() {
       let encodedImages = await encodeImages(images);
       body.images = encodedImages;
     }
-    
+
     try {
       setSubmitLoading(true);
       // send a request to create products
-      let response = await api.post('/admin/products/create', body, { timeout: 25 * 1000 });
-      console.log(await response.data);
+      await api.post('/admin/products/create', body, { timeout: 25 * 1000 });
       setSubmitLoading(false);
       navigate("/products");
+      console.log(body);
 
     } catch (err) {
-      console.log(err.response.data);
       setSubmitLoading(false);
       // Is errors are basic (errors related with length of fields) ?
       let baseErrors = err.response.data?.base_errors;
@@ -204,7 +215,7 @@ export default function CreateProductPage() {
           prevObj.serializedKeys = false;
           return prevObj;
         }
-      })
+      });
     }
 
   };
@@ -232,7 +243,7 @@ export default function CreateProductPage() {
           Create product
         </Typography>
         <Box sx={{ ml: 20 }}>
-          <ProductNavigation value={currentMenu} setValue={setCurrentMenu} labels={productMenuNavigationItems} disabledButtonIndexes={[hasVariations && variationTheme ? null : 1]} />
+          <ProductNavigation value={currentMenu} setValue={setCurrentMenu} labels={productMenuNavigationItems} disabledButtonIndexes={[hasVariations ? null : 1, hasVariations && variationTheme ? null : 2]} />
         </Box>
       </Box>
       {/* Choosen category */}
@@ -289,15 +300,10 @@ export default function CreateProductPage() {
               ]} valueType={"boolean"} />
             </Box>
             {hasVariations && (
-              <Box sx={{ mb: 2, ml: "13.5%", width: "325px" }}>
-                <Typography variant="body1">
-                  Variation theme
-                </Typography>
-                <SelectValue value={variationTheme ? variationTheme : ""}
-                  setValue={(newValue) => handleChangeVariationTheme(newValue)}
-                  menuItems={formData.variation_themes} objectKey={"_id"}
-                  otherProps={{ minWidth: 300 }}
-                />
+              <Box sx={{ mb: 2, ml: "13.5%", width: variationTheme ? "325px": "450px" }}>
+                <Alert severity={variationTheme ? "info" : "warning"}>
+                  {variationTheme ? `Chosen variation: ${variationTheme.name}` : 'Please, choose variation theme at "Variation Theme" section'}
+                </Alert>
               </Box>
             )}
             <Box sx={{ ml: "13.5%", mb: 1 }}>
@@ -309,7 +315,7 @@ export default function CreateProductPage() {
                 errorHandler={errorHandler}
                 errorBasePath={["base_attrs",]}
               />
-              <Box sx={{mt: 1}}>
+              <Box sx={{ mt: 1 }}>
                 <SelectValueRadioGroup
                   label={"Is the product is filterable?"}
                   value={isFilterable}
@@ -363,8 +369,17 @@ export default function CreateProductPage() {
         )}
 
         {currentMenu === 1 && hasVariations && (
+          <ChooseVarThemeForm
+            variationTheme={variationTheme}
+            variationThemes={formData.variation_themes}
+            facets={formData.facets}
+            handleSubmit={handleChangeVariationTheme}
+          />
+        )}
 
-          <Box sx={{ width: 1000 }}>
+        {currentMenu === 2 && hasVariations && (
+
+          <Box sx={{ width: 1150 }}>
             <Box>
               <AddProductVariations facets={variationThemeFields.map((varThemeField) => formData.facets.find(facet => facet.code === varThemeField))}
                 productVariationFields={productVariationFields}
@@ -374,7 +389,7 @@ export default function CreateProductPage() {
                 groups={formData?.category.groups}
               />
             </Box>
-            <Box sx={{ mt: 2 }}>
+            <Box sx={{ mt: 2,  }}>
               <ProductVariationList
                 productVariations={productVariations}
                 setProductVariations={setProductVariations}
@@ -389,7 +404,7 @@ export default function CreateProductPage() {
 
         )}
 
-        {currentMenu === 2 && (
+        {currentMenu === 3 && (
           <Box sx={{ width: 1200 }}>
             <AddProductImages productVariations={productVariations}
               setProductVariations={setProductVariations}
@@ -404,7 +419,7 @@ export default function CreateProductPage() {
             />
           </Box>
         )}
-        {currentMenu === 3 && (
+        {currentMenu === 4 && (
           <Box sx={{ width: 1200 }}>
             <SubmitMenu
               hasVariations={hasVariations}

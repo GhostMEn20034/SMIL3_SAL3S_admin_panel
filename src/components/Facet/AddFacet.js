@@ -72,7 +72,12 @@ export default function AddFacet() {
             await api.post("/admin/facets/", bodyData);
             navigate(-1);
         } catch (error) {
-            setErrors(error.response.data.errors);
+            if (error.response.data?.base_errors) {
+                setErrors(error.response.data.errors);
+            } else {
+                setErrors(error.response.data.detail);
+            }
+            
         }
     };
 
@@ -87,7 +92,7 @@ export default function AddFacet() {
     };
 
     const fields = [
-        { value: code, setValue: null, label: "Code", disabled: true, error: errors.code !== undefined, helperText: errors.name ? errors.name : "" },
+        { value: code, setValue: null, label: "Code", disabled: true, error: errors.code !== undefined, helperText: errors.code ? errors.code : "" },
         { value: name, setValue: handleChangeName, label: "Name", disabled: false, error: errors.name !== undefined, helperText: errors.name ? errors.name : "" }
     ];
 

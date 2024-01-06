@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import useAxios from "../utils/useAxios";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Box, CircularProgress, Typography, Button } from "@mui/material";
@@ -16,6 +16,7 @@ import ProductVariationList from "../components/CreateProduct/ProductVariations/
 import UpdateProductImages from "../components/UpdateProduct/UpdateProductImages";
 import SubmitMenu from "../components/UpdateProduct/SubmitMenu";
 import { encodeManyImages, encodeImages, encodeOneImage } from "../utils/ImageServices";
+import ObjectValueExtractor from "../utils/objectValueExtractor";
 
 export default function UpdateProductPage() {
     const [submitLoading, setSubmitLoading] = useState(false); // loading state for form submission
@@ -35,6 +36,7 @@ export default function UpdateProductPage() {
     const [productVariations, setProductVariations] = useState(null); // Product variations
     const [productVariationFields, setProductVariationFields] = useState({}); // Values of product variation fields that included to variation theme
     const [variationsToDelete, setVariationsToDelete] = useState([]); // List of the product variations that the server must delete
+    const [variationsLength, setVariationsLength] = useState(0); // Initial length of variations array
 
     const [attrs, setAttrs] = useState([]); // Product specs
     const [extraAttrs, setExtraAttrs] = useState([]); // attributes to provide additional information about product
@@ -46,6 +48,7 @@ export default function UpdateProductPage() {
     const [facetTypes, setFacetTypes] = useState(null); // List of facet types
 
     const [openDialog, setOpenDialog] = useState(null); // Name of the opened dialog
+    const [errorHandler, setErrorHandler] = useState(new ObjectValueExtractor({}, false));
 
     const api = useAxios('products'); // Axios instance
     const navigate = useNavigate();
@@ -91,6 +94,11 @@ export default function UpdateProductPage() {
          */
         // Remove objects that have no "_id" property
         productObjs = productObjs.filter(obj => obj.hasOwnProperty("_id"));
+
+        // Set variations length to prevValue - count of deleted old variations
+        setVariationsLength((prevValue) => prevValue - productObjs.length);
+        // Reset errors
+        setErrorHandler(new ObjectValueExtractor({}, false));
         // Modify variationsToDelete array
         setVariationsToDelete((prevValues) => {
             // Create an array from the previous values and new product Ids
@@ -126,6 +134,11 @@ export default function UpdateProductPage() {
             // set product's base attributes and product's variations
             setProduct(item);
             setProductVariations(variations);
+            // if there are product variations, then set length of secondary images
+            if (variations?.length > 0) {
+                setVariationsLength(variations.length);
+            }
+
 
             // generate variation fields 
             // if there are product variation and there are field codes in variation theme
@@ -188,6 +201,7 @@ export default function UpdateProductPage() {
                 price: product.price,
                 discount_rate: product.discount_rate,
                 stock: product.stock,
+                max_order_qty: product.max_order_qty,
                 tax_rate: product.tax_rate,
                 sku: product.sku,
                 external_id: product.external_id,
@@ -217,26 +231,30 @@ export default function UpdateProductPage() {
                 // if a variation has "_id" field, it means that it is already existed variation
                 // So we add variation to the result
                 if (variation.hasOwnProperty("_id")) {
-                    // remove images from the old product variation, 
+                    // remove images and attrs from the old product variation, 
                     // since backend don't need it when user edits a product parent
+                    delete variation.attrs;
                     delete variation.images;
                     return true;
                 }
 
-                // If product and its variations have the same images
-                if (product.same_images) {
-                    // then remove images from the product variation
-                    delete variation.images;
-                } else {
-                    encodeImages(variation.images).then((encodedImages) => {
-                        variation.images = encodedImages;
-                    });
-                }
                 // if a variation has no "_id" property, it means that it's a new variation
                 // So we add a variation to newVariations array
                 newVariations.push(variation);
                 return false;
             });
+
+            newVariations = await Promise.all(newVariations.map(async variation => {
+                // If product and its variations have the same images
+                if (product.same_images) {
+                    // then remove images from the product variation
+                    delete variation.images;
+                } else {
+                    variation.images = await encodeImages(variation.images);
+                }
+                return variation
+            }));
+
             // Add new and old variations to the request body
             body.new_variations = newVariations;
             body.old_variations = oldVariations;
@@ -255,17 +273,67 @@ export default function UpdateProductPage() {
         // then encode these replacements
         if (encodedImageOps.replace.secondaryImages?.length > 0) {
             encodedImageOps.replace.secondaryImages = await Promise.all(encodedImageOps.replace.secondaryImages.map(async (img) => {
-                img.to = await encodeOneImage(img.to);
+                img.newImg = await encodeOneImage(img.newImg);
                 return img;
             }));
         }
-        
-
 
         // add encoded image to the request body
         body.image_ops = encodedImageOps;
 
         console.log(body);
+        
+        try {
+            setSubmitLoading(true);
+            await api.put(`/admin/products/${id}`, body, { timeout: 25 * 1000 });
+            setSubmitLoading(false);
+        } catch (err) {
+            console.log(err.response.data);
+            setSubmitLoading(false);
+            // Is errors are basic (errors related with length of fields) ?
+            let baseErrors = err.response.data?.base_errors;
+            setErrorHandler((prevObj) => {
+                if (baseErrors) {
+                    // assign errors that came from the server 
+                    prevObj.obj = err.response.data.errors;
+                    // set serializedKeys to true since base errors have serialized keys
+                    prevObj.serializedKeys = true;
+                    return prevObj;
+                } else {
+                    // assign errors that came from the server
+                    prevObj.obj = err.response.data.detail;
+                    // set serializedKeys to false since regular errors doesn't have serialized keys
+                    prevObj.serializedKeys = false;
+                    return prevObj;
+                }
+            });
+        }
+    };
+
+    const getVariationErrors = (isNewVariation, ...path) => {
+        /**
+         * Return errors by the specified path
+         * @param isNewVariation - Do function need to find an error for new variation or for the old one
+         * @param path - Path to the variation error 
+         */
+        let variationType = isNewVariation ? "new_variations" : "old_variations";
+
+        return errorHandler.getObjectValue(variationType, ...path);
+    };
+
+    const isVariationErrorExists = (isNewVariation, ...path) => {
+        /**
+         * Check whether error exists by the specified path
+         * @param isNewVariation - Do function need to find an error for new variation or for the old one
+         * @param path - Path to the variation error 
+         */
+        let variationType = isNewVariation ? "new_variations" : "old_variations";
+
+        return errorHandler.isValueExist(variationType, ...path);
+    }
+
+    const resetErrors = () => {
+        setErrorHandler(new ObjectValueExtractor({}, false));
     };
 
     if (loading) {
@@ -282,8 +350,8 @@ export default function UpdateProductPage() {
                 <Typography variant="h4">
                     Product information
                 </Typography>
-                <Box sx={{ ml: 20 }}>
-                    <ProductNavigation value={currentMenu} setValue={setCurrentMenu} labels={productMenuNavigationItems} disabledButtonIndexes={[product.parent && variationTheme ? null : 1]} />
+                <Box sx={{ ml: 10 }}>
+                    <ProductNavigation value={currentMenu} setValue={setCurrentMenu} labels={productMenuNavigationItems} disabledButtonIndexes={[product.parent && variationTheme ? null : 2, 1]} />
                 </Box>
             </Box>
             <Box px={2}>
@@ -296,6 +364,13 @@ export default function UpdateProductPage() {
                     Go back
                 </Button>
             </Box>
+            {JSON.stringify(errorHandler.obj) !== JSON.stringify({}) && (
+                <Box px={2} mb={1}>
+                    <Button variant="contained" color="error" onClick={resetErrors}>
+                        Reset Errors
+                    </Button>
+                </Box>
+            )}
             <Box display="flex" justifyContent="center" alignItems="center">
                 {currentMenu === 0 && (
                     <Box>
@@ -334,6 +409,8 @@ export default function UpdateProductPage() {
                                 setBaseAttrs={setProduct}
                                 openDialog={openDialog}
                                 setOpenDialog={setOpenDialog}
+                                errorHandler={errorHandler}
+                                errorBasePath={["base_attrs",]}
                             />
                             <Typography variant="body1" display={"flex"} sx={{ mt: 2 }}>
                                 Is product is the parent:&nbsp;<span style={{ color: "#098ed6" }}>{product.parent ? "Yes" : "No"}</span>
@@ -364,10 +441,10 @@ export default function UpdateProductPage() {
                         <Box>
                             <Box sx={{ maxWidth: "1000px", ml: "13.5%" }}>
                                 <ProductAttrs
-                                    attrs={attrs}
-                                    facets={facets}
-                                    setAttrs={setAttrs}
-                                    groups={category.groups}
+                                    attrs={attrs} facets={facets}
+                                    setAttrs={setAttrs} groups={category.groups}
+                                    errorHandler={errorHandler} displayErrors={true}
+                                    baseErrorPath={["attrs",]}
                                 />
                             </Box>
 
@@ -382,13 +459,16 @@ export default function UpdateProductPage() {
                                     additionalAttrs={extraAttrs}
                                     setAdditionalAttrs={setExtraAttrs}
                                     facetTypes={facetTypes}
+                                    errorHandler={errorHandler}
+                                    displayErrors={true}
+                                    baseErrorPath={["extra_attrs",]}
                                 />
                             </Box>
                         </Box>
                     </Box>
                 )}
 
-                {currentMenu === 1 && productVariations && product.parent && (
+                {currentMenu === 2 && productVariations && product.parent && (
                     <Box sx={{ width: 1000 }}>
                         <Box>
                             <AddProductVariations
@@ -413,11 +493,15 @@ export default function UpdateProductPage() {
                                 attrs={attrs}
                                 callbackOnDelete={onVariationsRemoval}
                                 keysForCallback={["_id", "name"]}
+                                errorHandler={errorHandler}
+                                getVariationErrors={getVariationErrors}
+                                isVariationErrorExists={isVariationErrorExists}
+                                variationsInitialLength={variationsLength}
                             />
                         </Box>
                     </Box>
                 )}
-                {currentMenu === 2 && (
+                {currentMenu === 3 && (
                     <Box maxWidth={1200}>
                         <UpdateProductImages
                             productVariations={productVariations}
@@ -431,10 +515,14 @@ export default function UpdateProductPage() {
                             _id={product._id}
                             secondaryImagesLength={secondaryImagesLength}
                             setSecondaryImagesLength={setSecondaryImagesLength}
+                            errorHandler={errorHandler}
+                            displayErrors={true}
+                            baseErrorPath={!product.parent || product.same_images ? ["image_ops",] : ["images"]}
+                            variationsInitialLength={variationsLength}
                         />
                     </Box>
                 )}
-                {currentMenu === 3 && (
+                {currentMenu === 4 && (
                     <Box sx={{ width: 1200 }}>
                         <SubmitMenu
                             parent={product.parent}

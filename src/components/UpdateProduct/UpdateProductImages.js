@@ -131,8 +131,8 @@ function ImageListOneProduct(props) {
                                 if (secondaryImgReplacement) {
                                     // then, get index of replacement
                                     let secondaryImgReplacementIndex = secondaryImgReplacementArray.indexOf(secondaryImgReplacement);
-                                    // set a new image for "to" property in the replacement
-                                    secondaryImgReplacement.to = newSecondaryImg;
+                                    // set a new image for "newImg" property in the replacement
+                                    secondaryImgReplacement.newImg = newSecondaryImg;
                                     // set a new replacement on the specified index
                                     secondaryImgReplacementArray[secondaryImgReplacementIndex] = secondaryImgReplacement;
 
@@ -147,8 +147,8 @@ function ImageListOneProduct(props) {
 
                                 // initialize a new image replacement
                                 let newSecondaryImgReplace = {
-                                    from: oldSecondaryImage, // from - URL of the old image
-                                    to: newSecondaryImg, // to - A new image
+                                    source: oldSecondaryImage, // source - URL of the old image
+                                    newImg: newSecondaryImg, // newImg - A new image
                                     index: secondaryImageToReplace, // image index
                                 };
 
@@ -163,8 +163,8 @@ function ImageListOneProduct(props) {
 
                             // initialize a new image replacement
                             let newSecondaryImgReplace = {
-                                from: oldSecondaryImage, // from - Index of the image to replace
-                                to: newSecondaryImg, // to - A new image
+                                source: oldSecondaryImage, // source - URL of the image to replace
+                                newImg: newSecondaryImg, // newImg - A new image
                                 index: secondaryImageToReplace, // image index
                             };
 
@@ -295,7 +295,7 @@ function ImageListOneProduct(props) {
                     });
 
                     // Add image at the specified index to the images that need to be deleted
-                    modifiedImageOps.delete = [...modifiedImageOps.delete, imgReplacement.from];
+                    modifiedImageOps.delete = [...modifiedImageOps.delete, imgReplacement.source];
 
                     return modifiedImageOps;
                 });
@@ -361,7 +361,7 @@ function ImageListOneProduct(props) {
                 </Box>
                 {(props.displayErrors && props.errorHandler) && (
                     <>
-                        {props.findErrors(...(props.baseErrorPath ? props.baseErrorPath : props.baseErrorPath), "main").map((errMsg, index) => (
+                        {props.findErrors(...(props.baseErrorPath ? props.baseErrorPath : props.baseErrorPath),"replace", "main").map((errMsg, index) => (
                             <Alert icon={false} severity="error" key={index}>
                                 {errMsg}
                             </Alert>
@@ -403,9 +403,14 @@ function ImageListOneProduct(props) {
                 </Paper>
                 {(props.displayErrors && props.errorHandler) && (
                     <>
-                        {Object.keys(props.findErrors(...(props.baseErrorPath ? props.baseErrorPath : props.baseErrorPath), "secondaryImages")).map((errKey, index) => (
+                        {Object.keys(props.findErrors(...(props.baseErrorPath ? props.baseErrorPath : []), "replace", "secondaryImages")).map((errKey, index) => (
                             <Alert icon={false} severity="error" key={index} sx={{ mb: 1 }}>
-                                Secondary image №{index + 1} - {props.findErrors(...(props.baseErrorPath ? props.baseErrorPath : props.baseErrorPath), "secondaryImages", errKey).join(", ")}
+                                Secondary image №{Number(errKey) + 1 } - {props.findErrors(...(props.baseErrorPath ? props.baseErrorPath : []), "replace", "secondaryImages", errKey).join(", ")}
+                            </Alert>
+                        ))}
+                        {Object.keys(props.findErrors(...(props.baseErrorPath ? props.baseErrorPath : []), "add")).map((errKey, index) => (
+                            <Alert icon={false} severity="error" key={index} sx={{ mb: 1 }}>
+                                Secondary image №{Number(errKey) + 1 + props.secondaryImagesLength} - {props.findErrors(...(props.baseErrorPath ? props.baseErrorPath : []), "add", errKey).join(", ")}
                             </Alert>
                         ))}
                     </>
@@ -419,6 +424,22 @@ function ImageListOneProduct(props) {
 
 
 export default function UpdateProductImages(props) {
+    const findErrors = (...path) => {
+        /**
+         * Finds errors and return them if they find, otherwise returns an empty array
+         */
+
+        if (!props.displayErrors || !props.errorHandler) {
+            return [];
+        }
+
+        if (!props?.errorHandler?.isValueExist(...path)) {
+            return [];
+        }
+
+        return props.errorHandler?.getObjectValue(...path);
+    };
+
     return (
         <Box sx={{ padding: 2, mt: 4 }}>
             {!props.parent || props.sameImages ? (
@@ -430,20 +451,21 @@ export default function UpdateProductImages(props) {
                     setImageOps={props.setImageOps}
                     secondaryImagesLength={props.secondaryImagesLength}
                     setSecondaryImagesLength={props.setSecondaryImagesLength}
-                // errorHandler={props.errorHandler}
-                // displayErrors={props.displayErrors}
-                // baseErrorPath={props.baseErrorPath}
-                // findErrors={findErrors}
+                    errorHandler={props.errorHandler}
+                    displayErrors={props.displayErrors}
+                    baseErrorPath={props.baseErrorPath}
+                    findErrors={findErrors}
                 />
             ) : (
                 <ImageListMultipleProducts
                     productVariations={props.productVariations}
                     setProductVariations={props.setProductVariations}
                     _id={props._id}
-                // errorHandler={props.errorHandler}
-                // displayErrors={props.displayErrors}
-                // baseErrorPath={props.baseErrorPath}
-                // findErrors={findErrors}
+                    errorHandler={props.errorHandler}
+                    displayErrors={props.displayErrors}
+                    baseErrorPath={["new_variations", ]}
+                    findErrors={findErrors}
+                    variationsInitialLength={props.variationsInitialLength}
                 />
             )}
         </Box>

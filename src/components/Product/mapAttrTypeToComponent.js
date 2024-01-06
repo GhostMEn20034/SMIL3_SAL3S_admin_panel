@@ -154,7 +154,7 @@ export default function AttrInput(props) {
             );
         case "bivariate":
             return (
-                <Stack direction="row">
+                <Stack direction="row" alignItems="baseline">
                     <NumericFormat
                         decimalScale={2}
                         decimalSeparator="."
@@ -191,7 +191,7 @@ export default function AttrInput(props) {
             );
         case "trivariate":
             return (
-                <Stack direction="row">
+                <Stack direction="row" alignItems="baseline">
                     <NumericFormat
                         decimalScale={2}
                         decimalSeparator="."

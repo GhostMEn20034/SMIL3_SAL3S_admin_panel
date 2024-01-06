@@ -57,7 +57,6 @@ export default function FacetEdit({ facet, categories }) {
             });
             navigate(-1);
         } catch (error) {
-            console.log(error);
             setErrors(error.response.data.errors);
         }
     };

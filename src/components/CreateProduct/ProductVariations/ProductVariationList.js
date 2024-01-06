@@ -40,6 +40,8 @@ export default function ProductVariationList(props) {
 
     let variationLength = props.productVariations?.length;
 
+    let variationsInitialLength = props.variationsInitialLength ? props.variationsInitialLength : 0;
+
     // Returns true if object has non-null values
     const hasNonNullValues = (obj) => {
         return Object.values(obj).some(value => value !== null);
@@ -195,6 +197,24 @@ export default function ProductVariationList(props) {
         });
     };
 
+    const getErrors = (isNewVariation, ...path) => {
+        if (props.editMode) {
+            return props?.getVariationErrors(isNewVariation, ...path);
+        }
+
+        return props.errorHandler?.getObjectValue("variations", ...path);
+    };
+
+    const findErrors = (isNewVariation, ...path) => {
+        if (props.editMode) {
+            return props?.isVariationErrorExists(isNewVariation, ...path);
+        }
+
+        return props.errorHandler?.isValueExist("variations", ...path);
+    };
+
+    
+
     return (
         <Box sx={{ mb: 2 }}>
             {openDialog && (
@@ -259,6 +279,9 @@ export default function ProductVariationList(props) {
                                     </TableCell>
                                     <TableCell align="center">
                                         <b>Stock</b>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <b>Max order quantity</b>
                                     </TableCell>
                                     <TableCell align="center">
                                         <b>SKU</b>
@@ -352,6 +375,18 @@ export default function ProductVariationList(props) {
                                             label={"Stock"}
                                             name={"stock"} />
                                     </TableCell>
+                                    <TableCell align="center">
+                                        <NumericFormat
+                                            value={newProdValues.max_order_qty ? newProdValues.max_order_qty : 0}
+                                            onChange={(e) => handleChangeNewProdValues(e.target.name, Number(e.target.value))}
+                                            decimalScale={0}
+                                            // Use customInput prop to pass TextField component
+                                            customInput={TextField}
+                                            sx={{ minWidth: 75 }}
+                                            size="small"
+                                            label={"Max order quantity"}
+                                            name={"max_order_qty"} />
+                                    </TableCell>
                                     <TableCell>
 
                                     </TableCell>
@@ -394,8 +429,14 @@ export default function ProductVariationList(props) {
                                                     sx={{ minWidth: 400 }}
                                                     size="small"
                                                     label={"Product name"} name={"name"}
-                                                    error={props.errorHandler?.isValueExist("variations", index, "name")}
-                                                    helperText={props.errorHandler?.getObjectValue("variations", index, "name")}
+                                                    error={findErrors(
+                                                        !productVariation._id ? true : false, 
+                                                        index - (!productVariation._id ? variationsInitialLength : 0), "name"
+                                                        )}
+                                                    helperText={getErrors(
+                                                        !productVariation._id ? true : false, 
+                                                        index - (!productVariation._id ? variationsInitialLength : 0), "name"
+                                                        )}
                                                 />
                                             </Box>
                                         </TableCell>
@@ -412,8 +453,14 @@ export default function ProductVariationList(props) {
                                                 size="small"
                                                 label={"Price"}
                                                 name={"price"}
-                                                error={props.errorHandler?.isValueExist("variations", index, "price")}
-                                                helperText={props.errorHandler?.getObjectValue("variations", index, "price")}
+                                                error={findErrors(
+                                                    !productVariation._id ? true : false, 
+                                                    index - (!productVariation._id ? variationsInitialLength : 0), "price"
+                                                    )}
+                                                helperText={getErrors(
+                                                    !productVariation._id ? true : false, 
+                                                    index - (!productVariation._id ? variationsInitialLength : 0), "price"
+                                                    )}
                                             />
                                         </TableCell>
                                         <TableCell align="center">
@@ -428,8 +475,14 @@ export default function ProductVariationList(props) {
                                                 size="small"
                                                 label={"Discount rate"}
                                                 name={"discount_rate"}
-                                                error={props.errorHandler?.isValueExist("variations", index, "discount_rate")}
-                                                helperText={props.errorHandler?.getObjectValue("variations", index, "discount_rate")}
+                                                error={findErrors(
+                                                    !productVariation._id ? true : false, 
+                                                    index - (!productVariation._id ? variationsInitialLength : 0), "discount_rate"
+                                                    )}
+                                                helperText={getErrors(
+                                                    !productVariation._id ? true : false, 
+                                                    index - (!productVariation._id ? variationsInitialLength : 0), "discount_rate"
+                                                    )}
                                             />
                                         </TableCell>
                                         <TableCell align="center">
@@ -444,8 +497,14 @@ export default function ProductVariationList(props) {
                                                 size="small"
                                                 label={"Tax rate"}
                                                 name={"tax_rate"}
-                                                error={props.errorHandler?.isValueExist("variations", index, "tax_rate")}
-                                                helperText={props.errorHandler?.getObjectValue("variations", index, "tax_rate")}
+                                                error={findErrors(
+                                                    !productVariation._id ? true : false, 
+                                                    index - (!productVariation._id ? variationsInitialLength : 0), "tax_rate"
+                                                    )}
+                                                helperText={getErrors(
+                                                    !productVariation._id ? true : false, 
+                                                    index - (!productVariation._id ? variationsInitialLength : 0), "tax_rate"
+                                                    )}
                                             />
                                         </TableCell>
                                         <TableCell align="center">
@@ -459,8 +518,35 @@ export default function ProductVariationList(props) {
                                                 size="small"
                                                 label={"Stock"}
                                                 name={"stock"}
-                                                error={props.errorHandler?.isValueExist("variations", index, "stock")}
-                                                helperText={props.errorHandler?.getObjectValue("variations", index, "stock")}
+                                                error={findErrors(
+                                                    !productVariation._id ? true : false, 
+                                                    index - (!productVariation._id ? variationsInitialLength  : 0), "stock"
+                                                    )}
+                                                helperText={getErrors(
+                                                    !productVariation._id ? true : false, 
+                                                    index - (!productVariation._id ? variationsInitialLength  : 0), "stock"
+                                                    )}
+                                            />
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <NumericFormat
+                                                value={productVariation.max_order_qty ? productVariation.max_order_qty : 0}
+                                                onChange={(e) => handleChangeProductVariations(e.target.name, Number(e.target.value), index)}
+                                                decimalScale={0}
+                                                // Use customInput prop to pass TextField component
+                                                customInput={TextField}
+                                                sx={{ minWidth: 75 }}
+                                                size="small"
+                                                label={"Max order quantity"}
+                                                name={"max_order_qty"}
+                                                error={findErrors(
+                                                    !productVariation._id ? true : false, 
+                                                    index - (!productVariation._id ? variationsInitialLength  : 0), "max_order_qty"
+                                                    )}
+                                                helperText={getErrors(
+                                                    !productVariation._id ? true : false, 
+                                                    index - (!productVariation._id ? variationsInitialLength  : 0), "max_order_qty"
+                                                    )}
                                             />
                                         </TableCell>
                                         <TableCell align="center">
@@ -471,8 +557,14 @@ export default function ProductVariationList(props) {
                                                 size="small"
                                                 label={"SKU"}
                                                 name={"sku"}
-                                                error={props.errorHandler?.isValueExist("variations", index, "sku")}
-                                                helperText={props.errorHandler?.getObjectValue("variations", index, "sku")}
+                                                error={findErrors(
+                                                    !productVariation._id ? true : false, 
+                                                    index - (!productVariation._id ? variationsInitialLength : 0), "sku"
+                                                    )}
+                                                helperText={getErrors(
+                                                    !productVariation._id ? true : false, 
+                                                    index - (!productVariation._id ? variationsInitialLength : 0), "sku"
+                                                    )}
                                             />
                                         </TableCell>
                                         <TableCell align="center">
@@ -483,8 +575,14 @@ export default function ProductVariationList(props) {
                                                 size="small"
                                                 label={"External product id"}
                                                 name={"external_id"}
-                                                error={props.errorHandler?.isValueExist("variations", index, "external_id")}
-                                                helperText={props.errorHandler?.getObjectValue("variations", index, "external_id")}
+                                                error={findErrors(
+                                                    !productVariation._id ? true : false, 
+                                                    index - (!productVariation._id ? variationsInitialLength : 0), "external_id"
+                                                    )}
+                                                helperText={getErrors(
+                                                    !productVariation._id ? true : false, 
+                                                    index - (!productVariation._id ? variationsInitialLength : 0), "external_id"
+                                                    )}
                                             />
                                         </TableCell>
                                     </TableRow>

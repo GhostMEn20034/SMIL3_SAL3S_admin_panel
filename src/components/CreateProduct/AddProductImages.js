@@ -187,9 +187,8 @@ export function ImageListMultipleProducts(props) {
                                     </Box>
                                     {(props.displayErrors && props.errorHandler) && (
                                         <Box sx={{ mb: 2 }}>
-                                            {props.findErrors("variations", index, "images", "main").map((errMsg, index) => (
-
-                                                <Alert icon={false} severity="error" key={index}>
+                                            {props.findErrors(...(props.baseErrorPath ? props.baseErrorPath : []), index - (props.variationsInitialLength ? props.variationsInitialLength : 0), "images", "main").map((errMsg, index) => (
+                                                <Alert icon={false} severity="error" key={index} sx={{mb: 1}}>
                                                     {errMsg}
                                                 </Alert>
                                             ))}
@@ -225,9 +224,9 @@ export function ImageListMultipleProducts(props) {
                                     </Paper>
                                     {(props.displayErrors && props.errorHandler) && (
                                         <Box sx={{ mt: 2 }}>
-                                            {Object.keys(props.findErrors("variations", index, "images", "secondaryImages")).map((errKey, errIndex) => (
+                                            {Object.keys(props.findErrors(...(props.baseErrorPath ? props.baseErrorPath : []), index - (props.variationsInitialLength ? props.variationsInitialLength : 0), "images", "secondaryImages")).map((errKey, errIndex) => (
                                                 <Alert icon={false} severity="error" key={errIndex} sx={{ mb: 1 }}>
-                                                    Secondary image №{Number(errKey) + 1} - {props.findErrors("variations", index, "images", "secondaryImages", errKey).join(", ")}
+                                                    Secondary image №{Number(errKey) + 1} - {props.findErrors(...(props.baseErrorPath ? props.baseErrorPath : []), index - (props.variationsInitialLength ? props.variationsInitialLength : 0), "images", "secondaryImages", errKey).join(", ")}
                                                 </Alert>
                                             ))}
                                         </Box>
@@ -236,7 +235,7 @@ export function ImageListMultipleProducts(props) {
                             </>
                         ) : (
                             <Box sx={{ mb: 2 }}>
-                                <Typography component={Link} to={`/products/${productVariation._id}/edit?menuIndex=2`} variant="body1">
+                                <Typography component={Link} to={`/products/${productVariation._id}/edit?menuIndex=3`} variant="body1">
                                     Edit {productVariation.name}
                                 </Typography>
                             </Box>
@@ -376,7 +375,7 @@ function ImageListOneProduct(props) {
                 </Box>
                 {(props.displayErrors && props.errorHandler) && (
                     <>
-                        {props.findErrors(...(props.baseErrorPath ? props.baseErrorPath : props.baseErrorPath), "main").map((errMsg, index) => (
+                        {props.findErrors(...(props.baseErrorPath ? props.baseErrorPath : []), "main").map((errMsg, index) => (
                             <Alert icon={false} severity="error" key={index}>
                                 {errMsg}
                             </Alert>
@@ -413,7 +412,7 @@ function ImageListOneProduct(props) {
                 </Paper>
                 {(props.displayErrors && props.errorHandler) && (
                     <>
-                        {Object.keys(props.findErrors(...(props.baseErrorPath ? props.baseErrorPath : props.baseErrorPath), "secondaryImages")).map((errKey, index) => (
+                        {Object.keys(props.findErrors(...(props.baseErrorPath ? props.baseErrorPath : []), "secondaryImages")).map((errKey, index) => (
                             <Alert icon={false} severity="error" key={index} sx={{ mb: 1 }}>
                                 Secondary image №{index + 1} - {props.findErrors(...(props.baseErrorPath ? props.baseErrorPath : props.baseErrorPath), "secondaryImages", errKey).join(", ")}
                             </Alert>
@@ -487,7 +486,7 @@ export default function AddProductImages(props) {
                     setProductVariations={props.setProductVariations}
                     errorHandler={props.errorHandler}
                     displayErrors={props.displayErrors}
-                    baseErrorPath={props.baseErrorPath}
+                    baseErrorPath={["variations", ]}
                     findErrors={findErrors}
                 />
             )}

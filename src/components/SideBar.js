@@ -42,7 +42,7 @@ export default function SideMenu({ open, setOpen, user }) {
         <CategoryOutlinedIcon sx={{ color: iconColor }} />
     ]
 
-    const menuItems = ['Products', 'Facets', 'Variation themes', 'Categories']
+    const menuItems = ['Products', 'Facets', 'Variation Theme Templates', 'Categories']
 
     const list = () => ( // use a single list component for the drawer content
         <Box

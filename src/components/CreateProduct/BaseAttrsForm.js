@@ -105,6 +105,22 @@ export default function BaseAttrsForm(props) {
                     />
             </Box>
             <Box sx={{ mb: 2 }}>
+                <NumericFormat
+                    value={props.baseAttrs.max_order_qty ? props.baseAttrs.max_order_qty : 0}
+                    onChange={(e) => handleChange(e.target.name, Number(e.target.value))}
+                    decimalScale={0}
+                    allowNegative={false}
+                    // Use customInput prop to pass TextField component
+                    customInput={TextField}
+                    sx={{ minWidth: 325 }}
+                    size="small"
+                    label={"Max order quantity"}
+                    name={"max_order_qty"}
+                    error={props.errorHandler?.isValueExist("base_attrs", "max_order_qty")}
+                    helperText={props.errorHandler?.getObjectValue("base_attrs", "max_order_qty")?.[0]}
+                    />
+            </Box>
+            <Box sx={{ mb: 2 }}>
                 <TextField
                     value={props.baseAttrs.sku ? props.baseAttrs.sku : ""}
                     onChange={(e) => handleChange(e.target.name, e.target.value)}
