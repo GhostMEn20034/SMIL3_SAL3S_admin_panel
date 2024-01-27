@@ -1,6 +1,6 @@
 export const extraAttr = { code: "", name: "", value: "", type: "string", optional: true, unit: null, group: null };
 export const productMenuNavigationItems = ["Product attributes", "Variation Theme", "Product Variations", "Images", "Submit"];
-export const productImages = {main: null, secondaryImages: null};
+export const productImages = {main: null, secondaryImages: null, sourceProductId: null};
 export const baseAttrs = {name: "",
                           images: productImages,
                           price: 0, discount_rate: null, 

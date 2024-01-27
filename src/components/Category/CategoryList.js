@@ -46,7 +46,7 @@ export default function CategoryList({ categories }) {
                             <TableCell align='center'>{category.name}</TableCell>
                             <TableCell align='center'>{category.level}</TableCell>
                             <TableCell align='center'>{category.tree_id}</TableCell>
-                            <TableCell align='center'>{category.parent_id ? categories.find(categoryObj => categoryObj._id === category.parent_id).name : "No parent"}</TableCell>
+                            <TableCell align='center'>{category.parent_name}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

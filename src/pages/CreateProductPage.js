@@ -14,7 +14,7 @@ import { baseAttrs } from "../utils/consts";
 import BaseAttrsForm from "../components/CreateProduct/BaseAttrsForm";
 import { ModifyNameDialog } from "../components/CreateProduct/ModifyNameDialog";
 import ChooseVarThemeForm from "../components/CreateProduct/ChooseVarThemeForm";
-import AddProductImages from "../components/CreateProduct/AddProductImages";
+import AddProductImages from "../components/CreateProduct/AddProductImages/AddProductImages";
 import SubmitMenu from "../components/CreateProduct/SubmitMenu";
 import { encodeImages } from "../utils/ImageServices";
 import ObjectValueExtractor from "../utils/objectValueExtractor";
@@ -50,6 +50,8 @@ export default function CreateProductPage() {
   const [openDialog, setOpenDialog] = useState(false); // Determines whether dialog window to modify product name opened
 
   const [errorHandler, setErrorHandler] = useState(new ObjectValueExtractor({}, false));
+
+  const [imageSourceMenuItems, setImageSourceMenuItems] = useState([]);
 
   const api = useAxios('products');
   const navigate = useNavigate();
@@ -104,7 +106,7 @@ export default function CreateProductPage() {
     setProductVariationFields({});
 
     if (!newVariationTheme) {
-      
+
       setVariationTheme(null);
       setVariationThemeFields([]);
       setCurrentMenu(0);
@@ -114,10 +116,10 @@ export default function CreateProductPage() {
     let fieldCodes = getArrayElems(newVariationTheme.options, "field_codes");
 
     if (fieldCodes.length > 0) {
-        setVariationThemeFields(fieldCodes);
-        setVariationTheme(newVariationTheme);
-        setCurrentMenu(0);
-        return;
+      setVariationThemeFields(fieldCodes);
+      setVariationTheme(newVariationTheme);
+      setCurrentMenu(0);
+      return;
     }
 
     setVariationThemeFields([]);
@@ -125,7 +127,57 @@ export default function CreateProductPage() {
     setCurrentMenu(0);
   };
 
+  const handleChangeImageSource = (variationIndex, sourceIndex) => {
+    /**
+     * Handles change of the Product's image source
+     * Params:
+     * @param variationIndex - Index of the product where function sets source of the images
+     * @param sourceIndex - index of the product which will be source of the images.
+    */
+    setProductVariations((prevValues) => {
+      // Make a copy of product variations and map it
+      let newProductVariations = prevValues.map((variation, i) => {
+        // if index of the current variation is equal to the variation index passed to the function
+        if (i === variationIndex) {
+          return {
+            ...variation, images: {
+              ...variation.images,
+              sourceProductId: sourceIndex
+            }
+          }
+        }
+        // Otherwise return original variation
+        return variation;
+      });
 
+      return newProductVariations;
+
+    });
+  };
+
+  // Create an array of options for choosing image source
+  const makeImageSourceItems = () => {
+    return productVariations.map((variation, i) => {
+      // If (there is a main image OR there are secondary images) AND there is no image source
+      if ((variation.images.main ||
+        (variation.images.secondaryImages && variation.images.secondaryImages?.length > 0)) &&
+        !variation.images.sourceProductId) {
+        // then append product to the result
+        return { index: i, name: variation.name };
+      }
+      // Otherwise, do not append product to the result
+      return undefined;
+    }).filter(Boolean);
+  };
+
+  useEffect(() => {
+    setImageSourceMenuItems(
+      [
+        { index: null, name: "No image source" },
+        ...makeImageSourceItems()
+      ]
+    );
+  }, [productVariations]);
 
   const handleSubmit = async () => {
     // Request body
@@ -170,11 +222,14 @@ export default function CreateProductPage() {
 
         // Convert each image from File object to base64 string
         let products = await Promise.all(clonedProducts.map(async (product) => {
-          // use the await keyword to wait for the encodeImages function to resolve
-          let encodedImages = await encodeImages(product.images);
+          if (typeof product.images.sourceProductId !== 'number') {
+            // use the await keyword to wait for the encodeImages function to resolve
+            let encodedImages = await encodeImages(product.images);
+            // replace File objects on base64 encoded images 
+            product.images = {...encodedImages, sourceProductId: null};
+            // Set image source to null
+          }
 
-          // replace File objects on base64 encoded images 
-          product.images = encodedImages;
           return product;
         }));
 
@@ -195,8 +250,6 @@ export default function CreateProductPage() {
       await api.post('/admin/products/create', body, { timeout: 25 * 1000 });
       setSubmitLoading(false);
       navigate("/products");
-      console.log(body);
-
     } catch (err) {
       setSubmitLoading(false);
       // Is errors are basic (errors related with length of fields) ?
@@ -300,7 +353,7 @@ export default function CreateProductPage() {
               ]} valueType={"boolean"} />
             </Box>
             {hasVariations && (
-              <Box sx={{ mb: 2, ml: "13.5%", width: variationTheme ? "325px": "450px" }}>
+              <Box sx={{ mb: 2, ml: "13.5%", width: variationTheme ? "325px" : "450px" }}>
                 <Alert severity={variationTheme ? "info" : "warning"}>
                   {variationTheme ? `Chosen variation: ${variationTheme.name}` : 'Please, choose variation theme at "Variation Theme" section'}
                 </Alert>
@@ -358,6 +411,7 @@ export default function CreateProductPage() {
                     errorHandler={errorHandler}
                     displayErrors={true}
                     baseErrorPath={["extra_attrs",]}
+
                   />
                 </Box>
 
@@ -374,6 +428,7 @@ export default function CreateProductPage() {
             variationThemes={formData.variation_themes}
             facets={formData.facets}
             handleSubmit={handleChangeVariationTheme}
+            errorHandler={errorHandler}
           />
         )}
 
@@ -389,7 +444,7 @@ export default function CreateProductPage() {
                 groups={formData?.category.groups}
               />
             </Box>
-            <Box sx={{ mt: 2,  }}>
+            <Box sx={{ mt: 2, }}>
               <ProductVariationList
                 productVariations={productVariations}
                 setProductVariations={setProductVariations}
@@ -416,6 +471,8 @@ export default function CreateProductPage() {
               errorHandler={errorHandler}
               displayErrors={true}
               baseErrorPath={["images",]}
+              imageSourceMenuItems={imageSourceMenuItems}
+              handleChangeImageSource={handleChangeImageSource}
             />
           </Box>
         )}

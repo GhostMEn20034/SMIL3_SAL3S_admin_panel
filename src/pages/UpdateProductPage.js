@@ -1,7 +1,8 @@
-import { useEffect, useState, memo } from "react";
+import { useEffect, useState } from "react";
 import useAxios from "../utils/useAxios";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Box, CircularProgress, Typography, Button } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import SelectValueRadioGroup from "../components/SelectValueRadioGroup";
 import { extraAttr } from "../utils/consts";
@@ -13,10 +14,11 @@ import ProductAttrs from "../components/CreateProduct/ProductAttrs";
 import AdditionalProductAttrs from "../components/CreateProduct/AdditionalProductAttrs";
 import AddProductVariations from "../components/CreateProduct/ProductVariations/AddProductVariations";
 import ProductVariationList from "../components/CreateProduct/ProductVariations/ProductVariationList";
-import UpdateProductImages from "../components/UpdateProduct/UpdateProductImages";
+import UpdateProductImages from "../components/UpdateProduct/UpdateProductImages/UpdateProductImages";
 import SubmitMenu from "../components/UpdateProduct/SubmitMenu";
 import { encodeManyImages, encodeImages, encodeOneImage } from "../utils/ImageServices";
 import ObjectValueExtractor from "../utils/objectValueExtractor";
+import DeleteProductDialog from "../components/UpdateProduct/DeleteProductDialog";
 
 export default function UpdateProductPage() {
     const [submitLoading, setSubmitLoading] = useState(false); // loading state for form submission
@@ -47,7 +49,11 @@ export default function UpdateProductPage() {
     const [facets, setFacets] = useState([]); // List of facets, used to form product attributes
     const [facetTypes, setFacetTypes] = useState(null); // List of facet types
 
-    const [openDialog, setOpenDialog] = useState(null); // Name of the opened dialog
+    const [openModifyNameDialog, setOpenModifyNameDialog] = useState(false); // Is Modify Name Dialog is opened?
+    const [openDeleteProductDialog, setOpenDeleteProductDialog] = useState(false); // Is Delete Product Dialog is opened?
+
+    const [imageSourceMenuItems, setImageSourceMenuItems] = useState([]);
+
     const [errorHandler, setErrorHandler] = useState(new ObjectValueExtractor({}, false));
 
     const api = useAxios('products'); // Axios instance
@@ -115,6 +121,60 @@ export default function UpdateProductPage() {
         ));
     };
 
+    const handleChangeImageSource = (variationIndex, sourceIndex) => {
+        /**
+         * Handles change of the Product's image source
+         * Params:
+         * @param variationIndex - Index of the product where function sets source of the images
+         * @param sourceIndex - index or objectID of the product which will be source of the images.
+        */
+        setProductVariations((prevValues) => {
+            // Make a copy of product variations and map it
+            let newProductVariations = prevValues.map((variation, i) => {
+                // if index of the current variation is equal to the variation index passed to the function
+                if (i === variationIndex) {
+                    return {
+                        ...variation, images: {
+                            ...variation.images,
+                            sourceProductId: sourceIndex
+                        }
+                    }
+                }
+                // Otherwise return original variation
+                return variation;
+            });
+
+            return newProductVariations;
+
+        });
+    };
+
+
+    // Create an array of options for choosing image source
+    const makeImageSourceItems = () => {
+        return productVariations.map((variation, i) => {
+            // If (there is a main image OR there are secondary images) AND there is no image source
+            if ((variation.images.main ||
+                (variation.images.secondaryImages && variation.images.secondaryImages?.length > 0)) &&
+                !variation.images.sourceProductId) {
+                // then append product to the result
+                return { index: i, name: variation.name };
+            }
+            // Otherwise, do not append product to the result
+            return undefined;
+        }).filter(Boolean);
+    };
+
+    useEffect(() => {
+        setImageSourceMenuItems(
+            [
+                { index: null, name: "No image source" },
+                ...(productVariations ? makeImageSourceItems() : [])
+            ]
+        );
+    }, [productVariations]);
+
+
     const getProduct = async () => {
         setLoading(true);
         try {
@@ -134,12 +194,10 @@ export default function UpdateProductPage() {
             // set product's base attributes and product's variations
             setProduct(item);
             setProductVariations(variations);
-            // if there are product variations, then set length of secondary images
+            // if there are product variations, then set length of variations array
             if (variations?.length > 0) {
                 setVariationsLength(variations.length);
             }
-
-
             // generate variation fields 
             // if there are product variation and there are field codes in variation theme
             if (data.variation_theme?.field_codes.length > 0 && variations?.length > 0) {
@@ -168,10 +226,8 @@ export default function UpdateProductPage() {
 
             // set loading state to false
             setLoading(false);
-            console.log(data);
 
         } catch (err) {
-            console.log(err);
             setLoading(false);
         }
     };
@@ -206,17 +262,10 @@ export default function UpdateProductPage() {
                 sku: product.sku,
                 external_id: product.external_id,
             },
-            // Is product for sale
-            for_sale: product.for_sale,
-            // Whether product's specs used in filters
-            is_filterable: product.is_filterable,
             // product's specs
             attrs: attrs,
             // If extra attrs data are filled, then add extra attrs to the request body
-            // additional product's specs
             extra_attrs: !(extraAttrs.length === 1 && JSON.stringify(extraAttrs) === JSON.stringify([extraAttr,])) ? extraAttrs : [],
-            // List of the variations that server must delete
-            variations_to_delete: variationsToDelete.map(varToDelete => varToDelete._id),
         };
 
         // If a product is a parent
@@ -237,7 +286,18 @@ export default function UpdateProductPage() {
                     delete variation.images;
                     return true;
                 }
-
+                // If new variation has sourceProductId (Not equal to null)
+                if (typeof variation.images.sourceProductId === "number") {
+                    // Then get variation at sourceProductIndex
+                    let sourceProduct = productVariations[variation.images.sourceProductId];
+                    // And if it's old variation
+                    if (sourceProduct.hasOwnProperty("_id")) {
+                        // Then copy image urls from the this variation, and set sourceProductId to variation's id
+                        variation.images = { ...sourceProduct.images, sourceProductId: sourceProduct._id };
+                    } else {
+                        variation.images = { ...variation.images, sourceProductId: variation.images.sourceProductId - variationsLength }
+                    }
+                }
                 // if a variation has no "_id" property, it means that it's a new variation
                 // So we add a variation to newVariations array
                 newVariations.push(variation);
@@ -249,8 +309,11 @@ export default function UpdateProductPage() {
                 if (product.same_images) {
                     // then remove images from the product variation
                     delete variation.images;
-                } else {
-                    variation.images = await encodeImages(variation.images);
+                    // Otherwise, check whether variation images have sourceProductId
+                } else if (!variation.images.sourceProductId) {
+                    // If not, then try to encode images, and save them in variation
+                    let encodedImages = await encodeImages(variation.images);
+                    variation.images = { ...encodedImages, sourceProductId: variation.images.sourceProductId };
                 }
                 return variation
             }));
@@ -258,6 +321,12 @@ export default function UpdateProductPage() {
             // Add new and old variations to the request body
             body.new_variations = newVariations;
             body.old_variations = oldVariations;
+            body.variations_to_delete = variationsToDelete.map(varToDelete => varToDelete._id);
+        } else {
+            // Is product for sale
+            body.for_sale = product.for_sale;
+            // Whether product's specs used in filters
+            body.is_filterable = product.is_filterable;
         }
 
         // create a deep copy of image operations to avoid mutation of original objects
@@ -278,15 +347,15 @@ export default function UpdateProductPage() {
             }));
         }
 
-        // add encoded image to the request body
-        body.image_ops = encodedImageOps;
-
-        console.log(body);
-        
+        if (product.same_images || !product.parent) {
+            // add encoded image to the request body
+            body.image_ops = encodedImageOps;
+        }
         try {
             setSubmitLoading(true);
             await api.put(`/admin/products/${id}`, body, { timeout: 25 * 1000 });
             setSubmitLoading(false);
+            navigate("/products");
         } catch (err) {
             console.log(err.response.data);
             setSubmitLoading(false);
@@ -307,6 +376,16 @@ export default function UpdateProductPage() {
                     return prevObj;
                 }
             });
+        }
+    };
+
+    const handleSubmitDeletion = async () => {
+        try {
+            // Request a removal of the product
+            await api.delete(`/admin/products/${id}`);
+            navigate("/products");
+        } catch (e) {
+            console.log(e.response.data)
         }
     };
 
@@ -351,7 +430,12 @@ export default function UpdateProductPage() {
                     Product information
                 </Typography>
                 <Box sx={{ ml: 10 }}>
-                    <ProductNavigation value={currentMenu} setValue={setCurrentMenu} labels={productMenuNavigationItems} disabledButtonIndexes={[product.parent && variationTheme ? null : 2, 1]} />
+                    <ProductNavigation value={currentMenu} setValue={setCurrentMenu} labels={productMenuNavigationItems}
+                        disabledButtonIndexes={[
+                            1,
+                            product.parent && variationTheme ? null : 2,
+                            product.same_images && !product.parent ? 3 : null
+                        ]} />
                 </Box>
             </Box>
             <Box px={2}>
@@ -364,6 +448,17 @@ export default function UpdateProductPage() {
                     Go back
                 </Button>
             </Box>
+            <Box px={2} mt={1} mb={1}>
+                <Button
+                    variant="contained"
+                    color="error"
+                    onClick={
+                        () => setOpenDeleteProductDialog(true)
+                    }
+                >
+                    Delete Product
+                </Button>
+            </Box>
             {JSON.stringify(errorHandler.obj) !== JSON.stringify({}) && (
                 <Box px={2} mb={1}>
                     <Button variant="contained" color="error" onClick={resetErrors}>
@@ -371,13 +466,22 @@ export default function UpdateProductPage() {
                     </Button>
                 </Box>
             )}
+            {openDeleteProductDialog && (
+                <DeleteProductDialog
+                    open={openDeleteProductDialog}
+                    setOpen={setOpenDeleteProductDialog}
+                    parent={product.parent}
+                    name={product.name}
+                    handleSubmit={handleSubmitDeletion}
+                />
+            )}
             <Box display="flex" justifyContent="center" alignItems="center">
                 {currentMenu === 0 && (
                     <Box>
-                        {openDialog && (
+                        {openModifyNameDialog && (
                             <ModifyNameDialog
-                                open={openDialog} // boolean value that determines is modal window opened
-                                setOpen={setOpenDialog} // react setState function to set is modal window opened
+                                open={openModifyNameDialog} // boolean value that determines is modal window opened
+                                setOpen={setOpenModifyNameDialog} // react setState function to set is modal window opened
                                 attrs={attrs} // array of the attributes
                                 nameValue={product.name ? product.name : ""} // value of the name property of newProdValues obj
                                 changeName={(newValue) => {
@@ -407,8 +511,8 @@ export default function UpdateProductPage() {
                             <BaseAttrsForm
                                 baseAttrs={product}
                                 setBaseAttrs={setProduct}
-                                openDialog={openDialog}
-                                setOpenDialog={setOpenDialog}
+                                openDialog={openModifyNameDialog}
+                                setOpenDialog={setOpenModifyNameDialog}
                                 errorHandler={errorHandler}
                                 errorBasePath={["base_attrs",]}
                             />
@@ -519,6 +623,8 @@ export default function UpdateProductPage() {
                             displayErrors={true}
                             baseErrorPath={!product.parent || product.same_images ? ["image_ops",] : ["images"]}
                             variationsInitialLength={variationsLength}
+                            imageSourceMenuItems={imageSourceMenuItems}
+                            handleChangeImageSource={handleChangeImageSource}
                         />
                     </Box>
                 )}
@@ -530,7 +636,7 @@ export default function UpdateProductPage() {
                             variationsToDelete={variationsToDelete}
                             handleSubmit={handleSubmit}
                             loading={submitLoading}
-                        // errorHandler={errorHandler}
+                            errorHandler={errorHandler}
                         />
                     </Box>
                 )}

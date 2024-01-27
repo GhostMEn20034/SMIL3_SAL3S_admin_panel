@@ -1,13 +1,10 @@
 import { Paper, Box, IconButton, Button, Alert } from "@mui/material";
 import HighlightOffRoundedIcon from '@mui/icons-material/HighlightOffRounded';
 import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined';
-import { VisuallyHiddenInput } from "../HiddenInput";
-import { ImageListMultipleProducts } from "../CreateProduct/AddProductImages";
-import { range, isValidHttpUrl } from "../../utils/Services";
+import { VisuallyHiddenInput } from "../../HiddenInput";
+import { range, isValidHttpUrl } from "../../../utils/Services";
 
-
-
-function ImageListOneProduct(props) {
+export default function ImageListOneProduct(props) {
     /**
     * Renders form to upload images for product that has no variations.
     * List of props:
@@ -352,7 +349,11 @@ function ImageListOneProduct(props) {
                                     {getImage(props.images.main, "main")}
                                 </Box>
                             )}
-                            <Button component="label" variant="contained" size="small" sx={{ fontSize: 12 }} onChange={(e) => handleChange(e)}>
+                            <Button component="label" 
+                            variant="contained" 
+                            size="small" sx={{ fontSize: 12 }}
+                            disabled={props.images.sourceProductId} 
+                            onChange={(e) => handleChange(e)}>
                                 Upload Main Image
                                 <VisuallyHiddenInput name="main" type="file" accept="image/jpeg" />
                             </Button>
@@ -372,7 +373,7 @@ function ImageListOneProduct(props) {
             <Box sx={{ ml: 4 }}>
                 <Paper elevation={3} sx={{ height: "175px", minWidth: "400px", px: 2, mb: 2 }}>
                     <Box sx={{ height: "40%", width: "100%", display: "flex", justifyContent: "center", alignItems: "end" }}>
-                        <Button component="label" variant="contained" size="small">
+                        <Button component="label" variant="contained" size="small" disabled={props.images.sourceProductId}>
                             Upload New Secondary Images
                             <VisuallyHiddenInput name="secondary" type="file" accept="image/jpeg" multiple onChange={(e) => handleChange(e)} />
                         </Button>
@@ -385,13 +386,13 @@ function ImageListOneProduct(props) {
                                         {getImage(secImage, "secondaryImage")}
                                     </Box>
                                     <Box sx={{ ml: 1 }}>
-                                        <IconButton component="label" sx={{ top: -17, right: 5, position: "absolute", padding: 0 }} size="small">
+                                        <IconButton component="label" sx={{ top: -17, right: 5, position: "absolute", padding: 0 }} size="small" disabled={props.images.sourceProductId}>
                                             <CachedOutlinedIcon />
                                             <VisuallyHiddenInput name="secondary" type="file" accept="image/jpeg" onChange={(e) => handleChange(e, secImageIndex)} />
                                         </IconButton>
                                     </Box>
                                     <Box sx={{ ml: 1 }}>
-                                        <IconButton sx={{ top: -17, right: -17, position: "absolute", padding: 0 }} size="small"
+                                        <IconButton sx={{ top: -17, right: -17, position: "absolute", padding: 0 }} size="small" disabled={props.images.sourceProductId}
                                             onClick={() => removeImage(secImageIndex)}>
                                             <HighlightOffRoundedIcon />
                                         </IconButton>
@@ -416,58 +417,6 @@ function ImageListOneProduct(props) {
                     </>
                 )}
             </Box>
-        </Box>
-    )
-}
-
-
-
-
-export default function UpdateProductImages(props) {
-    const findErrors = (...path) => {
-        /**
-         * Finds errors and return them if they find, otherwise returns an empty array
-         */
-
-        if (!props.displayErrors || !props.errorHandler) {
-            return [];
-        }
-
-        if (!props?.errorHandler?.isValueExist(...path)) {
-            return [];
-        }
-
-        return props.errorHandler?.getObjectValue(...path);
-    };
-
-    return (
-        <Box sx={{ padding: 2, mt: 4 }}>
-            {!props.parent || props.sameImages ? (
-                <ImageListOneProduct
-                    images={props.images}
-                    setImages={props.setImages}
-                    _id={props._id}
-                    imageOps={props.imageOps}
-                    setImageOps={props.setImageOps}
-                    secondaryImagesLength={props.secondaryImagesLength}
-                    setSecondaryImagesLength={props.setSecondaryImagesLength}
-                    errorHandler={props.errorHandler}
-                    displayErrors={props.displayErrors}
-                    baseErrorPath={props.baseErrorPath}
-                    findErrors={findErrors}
-                />
-            ) : (
-                <ImageListMultipleProducts
-                    productVariations={props.productVariations}
-                    setProductVariations={props.setProductVariations}
-                    _id={props._id}
-                    errorHandler={props.errorHandler}
-                    displayErrors={props.displayErrors}
-                    baseErrorPath={["new_variations", ]}
-                    findErrors={findErrors}
-                    variationsInitialLength={props.variationsInitialLength}
-                />
-            )}
         </Box>
     )
 }

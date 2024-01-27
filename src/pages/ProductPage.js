@@ -1,16 +1,22 @@
 import { useState, useEffect } from "react";
 import { Box, Typography, Pagination, Button } from "@mui/material";
 import { useNavigate, createSearchParams, useLocation, Link } from "react-router-dom";
+
 import useAxios from "../utils/useAxios";
 import ProductList from "../components/Product/ProductList";
+import DeleteManyProductsDialog from "../components/Product/DeleteManyProductsDialog";
 
 
 export default function ProductPage() {
     const [pageCount, setPageCount] = useState(1);
     const [products, setProducts] = useState([]);
     const [checked, setChecked] = useState([]);
+    const [checkedLength, setCheckedLength] = useState(0); // How many products with checked flag set to true
+    const [openedDialog, setOpenedDialog] = useState(null); // What dialog is opened now?
 
     const api = useAxios('products');
+
+    const hasCheckedItems = checkedLength < 1;
 
     const location = useLocation();
 
@@ -26,6 +32,19 @@ export default function ProductPage() {
             page: page
         }
         navigate({ pathname: "/products", search: createSearchParams(params).toString() });
+    };
+
+    const handleChangeCheckedLength = (checkedArray) => {
+        // Count checked products (including variations)
+        let checkedCount = checkedArray.reduce((count, product) => {
+            count += product.checked ? 1 : 0;
+            if (product.variations) {
+                count += product.variations.filter((variation) => variation.checked).length;
+            }
+            return count;
+        }, 0);
+
+        setCheckedLength(checkedCount);
     };
 
     // Changes array with checked products
@@ -58,19 +77,18 @@ export default function ProductPage() {
                             return checkedVariation;
                         });
                     }
-
+                    handleChangeCheckedLength(checkedCopy);
                     return checkedCopy;
                 }
                 // Otherwise change value for the "checked" property in the variation
                 if (!checkedProduct.checked) {
                     // Assign the opposite value for the "checked" property in the variation
-                    checkedProduct.variations[variationIndex].checked = 
-                    !checkedProduct.variations[variationIndex].checked;
+                    checkedProduct.variations[variationIndex].checked =
+                        !checkedProduct.variations[variationIndex].checked;
                 }
-                
+                handleChangeCheckedLength(checkedCopy);
                 return checkedCopy;
             }
-
             return prevValues;
         });
 
@@ -113,23 +131,77 @@ export default function ProductPage() {
         }
     };
 
+    const handleSubmitDeletion = async () => {
+        // If there are no checked products, then just close delete product dialog
+        if (checkedLength === 0) {
+            setOpenedDialog(null);
+            return;
+        }
+
+        let productIdsToDelete = [];
+        // Add all checked products to the productIdsToDelete array
+        for (let value of checked) {
+            if (value.checked) {
+                productIdsToDelete.push(value._id);
+              // if there are variations, then add all checked variations
+            } else if (value.variations) {
+                for (let variation of value.variations) {
+                    if (variation.checked) {
+                        productIdsToDelete.push(variation._id);
+                    }
+                }
+            }
+        };
+
+        try {
+            await api.delete(`/admin/products/`, {data: {
+                product_ids: productIdsToDelete
+            }});
+            setCheckedLength(0);
+            getProducts();
+        } catch (e) {
+            console.log(e.response.data);
+        }
+        setOpenedDialog(null);
+    };
+
+
     useEffect(() => {
         getProducts();
     }, [page]);
 
     return (
         <>
+            {openedDialog === "deleteProducts" && (
+                <DeleteManyProductsDialog
+                    open={openedDialog === "deleteProducts"}
+                    setOpen={setOpenedDialog}
+                    handleSubmit={handleSubmitDeletion}
+                />
+            )}
             <Box sx={{ mb: 2, mt: 2, ml: 3 }}>
                 <Typography variant="h4">
                     Product List
                 </Typography>
             </Box>
-            <Box sx={{ ml: 3, mb: 3 }}>
-                <Link to={"add/choose-category"} style={{ color: 'inherit', textDecoration: 'inherit' }}>
-                    <Button variant="contained">
+            <Box sx={{ ml: 3, mb: 3 }} display="flex" alignItems="center">
+                <Link to={"/product-classify"} style={{ color: 'inherit', textDecoration: 'inherit' }}>
+                    <Button variant="contained" size="small">
                         Add new product
                     </Button>
                 </Link>
+                <Button sx={{ ml: 2 }} variant="contained"
+                    color="error" size="small"
+                    disabled={hasCheckedItems}
+                    onClick={() => setOpenedDialog("deleteProducts")}
+                >
+                    Delete Products
+                </Button>
+                {checkedLength > 0 && (
+                    <Typography variant="body1" sx={{ ml: 2 }}>
+                        Products Selected: {checkedLength}
+                    </Typography>
+                )}
             </Box>
             <Box sx={{ px: 3 }}>
                 <ProductList products={products} checked={checked} handleChangeChecked={handleChangeChecked} />
@@ -138,5 +210,5 @@ export default function ProductPage() {
                 <Pagination count={pageCount} page={page} onChange={handlePageChange} color="primary" />
             </Box>
         </>
-    )
+    );
 }

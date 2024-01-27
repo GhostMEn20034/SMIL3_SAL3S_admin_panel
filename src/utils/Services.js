@@ -71,8 +71,6 @@ const mapValueToFacetType = (facet) => {
 
 export const facetsToAttrs = (facets) => {
 
-    console.log(facets)
-
     let attrs = facets.map(facet => ({
         code: facet.code,
         name: facet.name,

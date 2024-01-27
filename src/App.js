@@ -83,7 +83,7 @@ function App() {
                 <ProductPage />
               </PrivateRoute>
             } />
-            <Route path='/products/add/choose-category' element={
+            <Route path='/product-classify' element={
               <PrivateRoute>
                 <AddProductPageChooseCategory />
               </PrivateRoute>

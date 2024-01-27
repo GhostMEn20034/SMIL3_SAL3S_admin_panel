@@ -131,7 +131,7 @@ export default function AddFacet() {
                             Add new facet value
                         </Button>
                     </Box>
-                    <Box sx={{ mt: 2 }}>
+                    <Box sx={{ mt: 2, maxWidth: "500px" }}>
                         <ChipsArray array={facetValues} removeValue={(index) => removeItemFromChipsArray(index, setFacetValues)} />
                     </Box>
                 </Box>

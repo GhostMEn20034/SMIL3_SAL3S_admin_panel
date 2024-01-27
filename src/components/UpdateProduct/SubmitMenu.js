@@ -34,11 +34,16 @@ export default function SubmitMenu(props) {
                     </Box>
                 </Box>
             )}
-            {/* {JSON.stringify(props.errorHandler.obj) !== JSON.stringify({}) && (
+            {JSON.stringify(props.errorHandler.obj) !== JSON.stringify({}) && (
                 <Alert severity="error" sx={{mb: 2, width: "50%"}}>
-                    An Error Happen 
+                    Errors Are Happen 
                 </Alert>
-            )} */}
+            )}
+            {props.errorHandler?.isValueExist("existed_skus") && (
+                <Alert severity="error" sx={{mb: 2, width: "50%"}}>
+                    {props.errorHandler?.getObjectValue("existed_skus")}
+                </Alert>
+            )}
             <LoadingButton loading={props.loading} variant="contained" size="small" onClick={props.handleSubmit}>
                 Update Product
             </LoadingButton>
