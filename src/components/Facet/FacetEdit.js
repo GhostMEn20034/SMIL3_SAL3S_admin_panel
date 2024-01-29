@@ -6,6 +6,7 @@ import MultipleSelect from "../MultipleSelectValue";
 import ChipsArray from "../ChipsArray";
 import { useNavigate } from "react-router-dom";
 import { addItemToChipsArray, removeItemFromChipsArray } from "../../utils/Services";
+import Textarea from "../TextArea";
 
 export default function FacetEdit({ facet, categories }) {
     const [facetTypes, setFacetTypes] = useState([]);
@@ -25,6 +26,7 @@ export default function FacetEdit({ facet, categories }) {
     const [unitsIsNull, setUnitsIsNull] = useState(facet.units === null);
 
     const [chosenCategories, setChosenCategories] = useState(facet.categories);
+    const [explanation, setExplanation] = useState(facet.explanation ? facet.explanation : "");
 
     const [errors, setErrors] = useState({});
 
@@ -52,6 +54,7 @@ export default function FacetEdit({ facet, categories }) {
                 optional: optional,
                 show_in_filters: showInFilters,
                 categories: chosenCategories.length > 0 ? chosenCategories : "*",
+                explanation: explanation.trim().length < 1 ? null : explanation,
                 values: facetValues.length > 0 ? facetValues : null,
                 units: !unitsIsNull && units.length > 0 ? units : null,
             });
@@ -141,6 +144,11 @@ export default function FacetEdit({ facet, categories }) {
                         </Box>
                     </Box>
                 )}
+                <Box sx={{ mt: 2 }}>
+                    <Textarea value={explanation} setValue={setExplanation}
+                        placeholder={"Add a facet explanation... (Optional)"} minRows={5}
+                        sx={{ width: 450 }} />
+                </Box>
                 <Box sx={{ mt: 2, mb: 2 }}>
                     <Button variant="contained" size="large" color="primary"
                         onClick={updateFacet}

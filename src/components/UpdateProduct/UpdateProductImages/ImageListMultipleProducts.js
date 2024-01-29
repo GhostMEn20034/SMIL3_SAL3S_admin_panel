@@ -344,7 +344,7 @@ export default function ImageListMultipleProducts(props) {
                             </>
                         ) : (
                             <Box sx={{ mb: 2 }}>
-                                <Typography component={Link} to={`/products/${productVariation._id}/edit?menuIndex=3`} variant="body1">
+                                <Typography component={Link} to={`/products/${productVariation._id}/edit?menuIndex=2`} variant="body1">
                                     Edit {productVariation.name}
                                 </Typography>
                             </Box>

@@ -54,7 +54,7 @@ export default function AttrInput(props) {
                             {`Add new ${props.attr.name}`}
                         </Button>
                     </Box>
-                    <Box sx={{ mt: 1 }}>
+                    <Box>
                         <ChipsArray array={props.attr.value} removeValue={
                             (listValueIndex) => {
                                 props.setAttrs(

@@ -1,23 +1,27 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Fragment } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import useAxios from "../utils/useAxios";
 import { Box, Typography, CircularProgress, Button, Alert } from "@mui/material";
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { facetsToAttrs, getArrayElems } from "../utils/Services";
 import SelectValueRadioGroup from "../components/SelectValueRadioGroup";
 import ProductAttrs from "../components/CreateProduct/ProductAttrs";
 import AdditionalProductAttrs from "../components/CreateProduct/AdditionalProductAttrs";
-import { extraAttr, productImages, productMenuNavigationItems } from "../utils/consts";
+import { extraAttr, productImages, createProductMenuItems, baseAttrs } from "../utils/consts";
 import ProductNavigation from "../components/CreateProduct/ProductMenusNavigation";
 import AddProductVariations from "../components/CreateProduct/ProductVariations/AddProductVariations";
 import ProductVariationList from "../components/CreateProduct/ProductVariations/ProductVariationList";
-import { baseAttrs } from "../utils/consts";
 import BaseAttrsForm from "../components/CreateProduct/BaseAttrsForm";
 import { ModifyNameDialog } from "../components/CreateProduct/ModifyNameDialog";
 import ChooseVarThemeForm from "../components/CreateProduct/ChooseVarThemeForm";
 import AddProductImages from "../components/CreateProduct/AddProductImages/AddProductImages";
 import SubmitMenu from "../components/CreateProduct/SubmitMenu";
+import KeywordsSection from "../components/CreateProduct/KeywordsSection";
 import { encodeImages } from "../utils/ImageServices";
 import ObjectValueExtractor from "../utils/objectValueExtractor";
+import HtmlTooltip from "../components/HtmlTooltip";
+
+
 
 export default function CreateProductPage() {
   const [loading, setLoading] = useState(false); // State of page loading.
@@ -41,7 +45,9 @@ export default function CreateProductPage() {
   const [baseAttributes, setBaseAttributes] = useState({ ...baseAttrs }); // Base attributes such as product name, price, sku etc
 
   const [images, setImages] = useState(productImages); // Product images
-  const [sameImages, setSameImages] = useState(false); // Determines whether user wants to upload the same photos to all variations 
+  const [sameImages, setSameImages] = useState(false); // Determines whether user wants to upload the same photos to all variations
+
+  const [searchTerms, setSearchTerms] = useState([]); // List of keywords to improve the accuracy of product searching
 
   const [attrs, setAttrs] = useState([]); // Product specs, for example: screen size, CPU, storage size etc
 
@@ -188,7 +194,8 @@ export default function CreateProductPage() {
       has_variations: hasVariations,
       same_images: sameImages,
       variation_theme: variationTheme,
-      category: formData.category._id
+      category: formData.category._id,
+      search_terms: searchTerms,
     };
 
     delete body.base_attrs.images;
@@ -226,7 +233,7 @@ export default function CreateProductPage() {
             // use the await keyword to wait for the encodeImages function to resolve
             let encodedImages = await encodeImages(product.images);
             // replace File objects on base64 encoded images 
-            product.images = {...encodedImages, sourceProductId: null};
+            product.images = { ...encodedImages, sourceProductId: null };
             // Set image source to null
           }
 
@@ -295,8 +302,11 @@ export default function CreateProductPage() {
         <Typography variant="h4">
           Create product
         </Typography>
-        <Box sx={{ ml: 20 }}>
-          <ProductNavigation value={currentMenu} setValue={setCurrentMenu} labels={productMenuNavigationItems} disabledButtonIndexes={[hasVariations ? null : 1, hasVariations && variationTheme ? null : 2]} />
+        <Box sx={{ ml: 8 }}>
+          <ProductNavigation value={currentMenu}
+            setValue={setCurrentMenu}
+            labels={createProductMenuItems}
+            disabledButtonIndexes={[hasVariations ? null : 1, hasVariations && variationTheme ? null : 2]} />
         </Box>
       </Box>
       {/* Choosen category */}
@@ -396,10 +406,20 @@ export default function CreateProductPage() {
                   />
                 </Box>
 
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant="h6">
+                <Box sx={{ mb: 2 }} display="flex" alignItems="center">
+                  <Typography variant="h6" sx={{mr: 1}}>
                     Additional attributes
                   </Typography>
+                  <HtmlTooltip title={
+                    <Fragment>
+                      <Typography color="inherit"><b>Additional attributes</b></Typography>
+                      <Typography variant="body2">
+                        Attributes to provide additional information about the product
+                      </Typography>
+                    </Fragment>
+                  }>
+                    <HelpOutlineIcon />
+                  </HtmlTooltip>
                 </Box>
 
                 {/* Dynamic forms for additional product attributes */}
@@ -477,6 +497,11 @@ export default function CreateProductPage() {
           </Box>
         )}
         {currentMenu === 4 && (
+          <Box sx={{ width: 1000, mt: 3 }}>
+            <KeywordsSection searchTerms={searchTerms} setSearchTerms={setSearchTerms} />
+          </Box>
+        )}
+        {currentMenu === 5 && (
           <Box sx={{ width: 1200 }}>
             <SubmitMenu
               hasVariations={hasVariations}

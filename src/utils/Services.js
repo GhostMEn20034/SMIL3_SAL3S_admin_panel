@@ -78,7 +78,8 @@ export const facetsToAttrs = (facets) => {
         value: mapValueToFacetType(facet),
         optional: facet.optional,
         unit: facet.units ? facet.units[0] : null,
-        group: null
+        group: null,
+        explanation: facet.explanation,
     }));
 
     return attrs;

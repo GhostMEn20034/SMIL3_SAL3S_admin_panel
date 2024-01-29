@@ -1,11 +1,13 @@
 import { Box, TextField, Button, Checkbox, FormControlLabel, Typography } from "@mui/material";
+import slugify from "voca/slugify";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Textarea from "../TextArea";
+
+import useAxios from "../../utils/useAxios";
 import SelectValue from "../SelectValue";
 import MultipleSelect from "../MultipleSelectValue";
-import { useState, useEffect } from "react";
-import useAxios from "../../utils/useAxios";
-import { useNavigate } from "react-router-dom";
 import ChipsArray from "../ChipsArray";
-import slugify from "voca/slugify";
 import { removeItemFromChipsArray, addItemToChipsArray } from "../../utils/Services";
 
 
@@ -22,6 +24,7 @@ export default function AddFacet() {
     const [unitsIsNull, setUnitsIsNull] = useState(true);
 
     const [chosenCategories, setChosenCategories] = useState([]);
+    const [explanation, setExplanation] = useState("");
 
     const [optional, setOptional] = useState(false);
     const [showInFilters, setShowInFilters] = useState(true);
@@ -57,19 +60,21 @@ export default function AddFacet() {
 
     const addFacet = async () => {
         setErrors({});
-        let bodyData = {
+        // Request Body
+        let body = {
             name: name,
             code: code,
             type: type,
             optional: optional,
             show_in_filters: showInFilters,
             categories: chosenCategories.length > 0 ? chosenCategories : "*",
+            explanation: explanation.trim().length < 1 ? null : explanation,
             values: facetValues.length > 0 ? facetValues : null,
             units: !unitsIsNull && units.length > 0 ? units : null,
         };
 
         try {
-            await api.post("/admin/facets/", bodyData);
+            await api.post("/admin/facets/", body);
             navigate(-1);
         } catch (error) {
             if (error.response.data?.base_errors) {
@@ -95,6 +100,8 @@ export default function AddFacet() {
         { value: code, setValue: null, label: "Code", disabled: true, error: errors.code !== undefined, helperText: errors.code ? errors.code : "" },
         { value: name, setValue: handleChangeName, label: "Name", disabled: false, error: errors.name !== undefined, helperText: errors.name ? errors.name : "" }
     ];
+
+    console.log(explanation);
 
     return (
         <Box>
@@ -162,6 +169,11 @@ export default function AddFacet() {
                     </Box>
                 </Box>
             )}
+            <Box sx={{mt: 2}}>
+                <Textarea value={explanation} setValue={setExplanation} 
+                placeholder={"Add a facet explanation... (Optional)"} minRows={5} 
+                sx={{width: 450}}/>
+            </Box>
             <Box sx={{ mt: 2 }}>
                 <SelectValue value={optional} setValue={setOptional} menuItems={[
                     { "value": true, "name": "Yes" },
@@ -174,7 +186,7 @@ export default function AddFacet() {
                     { "value": false, "name": "No" }
                 ]} label={"Show in filters"} />
             </Box>
-            <Box sx={{ mt: 2 }}>
+            <Box sx={{ mt: 2, mb: 2 }}>
                 <Button variant="contained" onClick={() => addFacet()}>
                     Submit
                 </Button>

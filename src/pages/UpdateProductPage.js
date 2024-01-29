@@ -1,12 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Fragment } from "react";
 import useAxios from "../utils/useAxios";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Box, CircularProgress, Typography, Button } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
-
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import SelectValueRadioGroup from "../components/SelectValueRadioGroup";
-import { extraAttr } from "../utils/consts";
-import { productMenuNavigationItems } from "../utils/consts";
+import { updateProductMenuItems, extraAttr } from "../utils/consts";
 import ProductNavigation from "../components/CreateProduct/ProductMenusNavigation";
 import { ModifyNameDialog } from "../components/CreateProduct/ModifyNameDialog";
 import BaseAttrsForm from "../components/CreateProduct/BaseAttrsForm";
@@ -19,12 +17,14 @@ import SubmitMenu from "../components/UpdateProduct/SubmitMenu";
 import { encodeManyImages, encodeImages, encodeOneImage } from "../utils/ImageServices";
 import ObjectValueExtractor from "../utils/objectValueExtractor";
 import DeleteProductDialog from "../components/UpdateProduct/DeleteProductDialog";
+import KeywordsSection from "../components/CreateProduct/KeywordsSection";
+import HtmlTooltip from "../components/HtmlTooltip";
 
 export default function UpdateProductPage() {
     const [submitLoading, setSubmitLoading] = useState(false); // loading state for form submission
     const [loading, setLoading] = useState(false); // State of page loading.
 
-    const [currentMenu, setCurrentMenu] = useState(0); // index of current product menu (See productMenuNavigationItems in the utils/consts)
+    const [currentMenu, setCurrentMenu] = useState(0); // index of current product menu (See updateProductMenuItems in the utils/consts)
 
     const [product, setProduct] = useState({}); // Product's properties
     const [images, setImages] = useState(null); // Product images
@@ -39,6 +39,8 @@ export default function UpdateProductPage() {
     const [productVariationFields, setProductVariationFields] = useState({}); // Values of product variation fields that included to variation theme
     const [variationsToDelete, setVariationsToDelete] = useState([]); // List of the product variations that the server must delete
     const [variationsLength, setVariationsLength] = useState(0); // Initial length of variations array
+
+    const [searchTerms, setSearchTerms] = useState([]); // List of keywords to improve the accuracy of product searching
 
     const [attrs, setAttrs] = useState([]); // Product specs
     const [extraAttrs, setExtraAttrs] = useState([]); // attributes to provide additional information about product
@@ -183,10 +185,13 @@ export default function UpdateProductPage() {
             // get data from response.
             let data = await response.data;
 
+            console.log(data);
+
             let {
                 images: prodImages,
                 extra_attrs: additionalAttrs,
                 attrs: attributes,
+                search_terms,
                 variations,
                 ...item
             } = data.product;
@@ -209,7 +214,7 @@ export default function UpdateProductPage() {
             if (prodImages.secondaryImages) {
                 setSecondaryImagesLength(prodImages.secondaryImages.length);
             }
-
+            setSearchTerms(search_terms);
             // set attributes
             setAttrs(attributes);
             // set extra attributes to the server response if extra attributes length is gt 0.
@@ -266,6 +271,7 @@ export default function UpdateProductPage() {
             attrs: attrs,
             // If extra attrs data are filled, then add extra attrs to the request body
             extra_attrs: !(extraAttrs.length === 1 && JSON.stringify(extraAttrs) === JSON.stringify([extraAttr,])) ? extraAttrs : [],
+            search_terms: searchTerms,
         };
 
         // If a product is a parent
@@ -430,11 +436,10 @@ export default function UpdateProductPage() {
                     Product information
                 </Typography>
                 <Box sx={{ ml: 10 }}>
-                    <ProductNavigation value={currentMenu} setValue={setCurrentMenu} labels={productMenuNavigationItems}
+                    <ProductNavigation value={currentMenu} setValue={setCurrentMenu} labels={updateProductMenuItems}
                         disabledButtonIndexes={[
-                            1,
-                            product.parent && variationTheme ? null : 2,
-                            product.same_images && !product.parent ? 3 : null
+                            product.parent && variationTheme ? null : 1,
+                            product.same_images && !product.parent ? 2 : null
                         ]} />
                 </Box>
             </Box>
@@ -552,10 +557,20 @@ export default function UpdateProductPage() {
                                 />
                             </Box>
 
-                            <Box sx={{ mb: 2 }}>
-                                <Typography variant="h6">
+                            <Box sx={{ mb: 2 }} display="flex" alignItems="center">
+                                <Typography variant="h6" sx={{mr: 0.5}}>
                                     Additional attributes
                                 </Typography>
+                                <HtmlTooltip title={
+                                    <Fragment>
+                                        <Typography color="inherit"><b>Additional attributes</b></Typography>
+                                        <Typography variant="body2">
+                                            Attributes to provide additional information about the product
+                                        </Typography>
+                                    </Fragment>
+                                }>
+                                    <HelpOutlineIcon />
+                                </HtmlTooltip>
                             </Box>
 
                             <Box sx={{ maxWidth: "1000px" }}>
@@ -572,7 +587,7 @@ export default function UpdateProductPage() {
                     </Box>
                 )}
 
-                {currentMenu === 2 && productVariations && product.parent && (
+                {currentMenu === 1 && productVariations && product.parent && (
                     <Box sx={{ width: 1000 }}>
                         <Box>
                             <AddProductVariations
@@ -605,7 +620,7 @@ export default function UpdateProductPage() {
                         </Box>
                     </Box>
                 )}
-                {currentMenu === 3 && (
+                {currentMenu === 2 && (
                     <Box maxWidth={1200}>
                         <UpdateProductImages
                             productVariations={productVariations}
@@ -626,6 +641,11 @@ export default function UpdateProductPage() {
                             imageSourceMenuItems={imageSourceMenuItems}
                             handleChangeImageSource={handleChangeImageSource}
                         />
+                    </Box>
+                )}
+                {currentMenu === 3 && (
+                    <Box sx={{ width: 1200, mt: 3 }}>
+                        <KeywordsSection searchTerms={searchTerms} setSearchTerms={setSearchTerms} />
                     </Box>
                 )}
                 {currentMenu === 4 && (
