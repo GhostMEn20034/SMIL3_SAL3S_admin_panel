@@ -1,6 +1,6 @@
 import { Box, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import AddVariationTheme from "../components/VariationTheme/AddVariationTheme";
+import AddVariationTheme from "../../components/VariationTheme/AddVariationTheme";
 
 export default function AddVariationThemePage() {
 

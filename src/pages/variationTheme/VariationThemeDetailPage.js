@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import useAxios from "../utils/useAxios";
+import useAxios from "../../utils/useAxios";
 import { useNavigate, useParams } from "react-router-dom";
 import { Box, Button } from "@mui/material";
-import VariationThemeDetail from "../components/VariationTheme/VariationThemeDetail";
-import VariationThemeEdit from "../components/VariationTheme/VariationThemeEdit";
-import VariationThemeDelete from "../components/VariationTheme/VariationThemeDelete";
+import VariationThemeDetail from "../../components/VariationTheme/VariationThemeDetail";
+import VariationThemeEdit from "../../components/VariationTheme/VariationThemeEdit";
+import VariationThemeDelete from "../../components/VariationTheme/VariationThemeDelete";
 
 export default function VariationThemeDetailPage() {
     const [variationTheme, setVariationTheme] = useState({});

@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { Box, Typography, Pagination, Button } from "@mui/material";
 import { useNavigate, createSearchParams, useLocation, Link } from "react-router-dom";
 
-import useAxios from "../utils/useAxios";
-import ProductList from "../components/Product/ProductList";
-import DeleteManyProductsDialog from "../components/Product/DeleteManyProductsDialog";
+import useAxios from "../../utils/useAxios";
+import ProductList from "../../components/Product/ProductList";
+import DeleteManyProductsDialog from "../../components/Product/DeleteManyProductsDialog";
 
 
 export default function ProductPage() {

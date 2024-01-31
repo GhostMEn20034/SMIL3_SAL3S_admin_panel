@@ -1,10 +1,10 @@
 import { Box, Button } from "@mui/material";
-import useAxios from "../utils/useAxios";
+import useAxios from "../../utils/useAxios";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import FacetDetail from "../components/Facet/FacetDetail";
-import FacetEdit from "../components/Facet/FacetEdit";
-import FacetDelete from "../components/Facet/FacetDelete";
+import FacetDetail from "../../components/Facet/FacetDetail";
+import FacetEdit from "../../components/Facet/FacetEdit";
+import FacetDelete from "../../components/Facet/FacetDelete";
 
 export default function FacetDetailPage() {
 

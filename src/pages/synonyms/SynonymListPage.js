@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { Box, Typography, Pagination, Button } from "@mui/material";
 import { useNavigate, createSearchParams, useLocation, Link } from "react-router-dom";
-import useAxios from "../utils/useAxios";
-import VariationThemeList from "../components/VariationTheme/VariationThemeList";
+import useAxios from "../../utils/useAxios";
+import SynonymsList from "../../components/Synonyms/SynonymsList";
 
 
-export default function VariationThemePage() {
-    const [variationThemes, setVariationThemes] = useState([]);
+export default function SynonymsListPage() {
+    const [synonyms, setSynonyms] = useState([]);
     const [pageCount, setPageCount] = useState(1);
 
     const api = useAxios('products');
@@ -24,18 +24,18 @@ export default function VariationThemePage() {
         let params = {
             page: page
         }
-        navigate({ pathname: "/variation-themes", search: createSearchParams(params).toString() });
+        navigate({ pathname: "/synonyms", search: createSearchParams(params).toString() });
     };
 
-    const getVariationThemes = async () => {
+    const getSynonyms = async () => {
         try {
-            let response = await api.get("/admin/variation-themes/", {
+            let response = await api.get("/admin/synonyms/", {
                 params: {
                     page: page
                 }
             });
             let data = await response.data;
-            setVariationThemes(data.result);
+            setSynonyms(data.synonyms);
             setPageCount(data.page_count);
         } catch (error) {
             console.log("Something went wrong");
@@ -43,25 +43,25 @@ export default function VariationThemePage() {
     };
 
     useEffect(() => {
-        getVariationThemes();
+        getSynonyms();
     }, [page]);
 
     return (
         <>
             <Box sx={{ mb: 2, mt: 2, ml: 3 }}>
                 <Typography variant="h4">
-                    Variation theme List
+                    Synonyms List
                 </Typography>
             </Box>
             <Box sx={{ ml: 3, mb: 3 }}>
                 <Link to={"add"} style={{ color: 'inherit', textDecoration: 'inherit' }}>
                     <Button variant="contained">
-                        Add new variation theme
+                        Add new synonyms
                     </Button>
                 </Link>
             </Box>
             <Box sx={{ px: 3 }}>
-                <VariationThemeList variationThemes={variationThemes} />
+                <SynonymsList synonyms={synonyms} />
             </Box>
             <Box sx={{ mt: 2, ml: 3, mb: 2 }}>
                 <Pagination count={pageCount} page={page} onChange={handlePageChange} color="primary" />

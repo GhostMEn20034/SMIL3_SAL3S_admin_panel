@@ -36,8 +36,6 @@ export default function EditableList(props) {
         });
     };
 
-    console.log(props.values);
-
     return (
         <Box>
             {/* List of text boxes */}

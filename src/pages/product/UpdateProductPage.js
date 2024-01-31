@@ -1,24 +1,24 @@
 import { useEffect, useState, Fragment } from "react";
-import useAxios from "../utils/useAxios";
+import useAxios from "../../utils/useAxios";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Box, CircularProgress, Typography, Button } from "@mui/material";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import SelectValueRadioGroup from "../components/SelectValueRadioGroup";
-import { updateProductMenuItems, extraAttr } from "../utils/consts";
-import ProductNavigation from "../components/CreateProduct/ProductMenusNavigation";
-import { ModifyNameDialog } from "../components/CreateProduct/ModifyNameDialog";
-import BaseAttrsForm from "../components/CreateProduct/BaseAttrsForm";
-import ProductAttrs from "../components/CreateProduct/ProductAttrs";
-import AdditionalProductAttrs from "../components/CreateProduct/AdditionalProductAttrs";
-import AddProductVariations from "../components/CreateProduct/ProductVariations/AddProductVariations";
-import ProductVariationList from "../components/CreateProduct/ProductVariations/ProductVariationList";
-import UpdateProductImages from "../components/UpdateProduct/UpdateProductImages/UpdateProductImages";
-import SubmitMenu from "../components/UpdateProduct/SubmitMenu";
-import { encodeManyImages, encodeImages, encodeOneImage } from "../utils/ImageServices";
-import ObjectValueExtractor from "../utils/objectValueExtractor";
-import DeleteProductDialog from "../components/UpdateProduct/DeleteProductDialog";
-import KeywordsSection from "../components/CreateProduct/KeywordsSection";
-import HtmlTooltip from "../components/HtmlTooltip";
+import SelectValueRadioGroup from "../../components/SelectValueRadioGroup";
+import { updateProductMenuItems, extraAttr } from "../../utils/consts";
+import ProductNavigation from "../../components/CreateProduct/ProductMenusNavigation";
+import { ModifyNameDialog } from "../../components/CreateProduct/ModifyNameDialog";
+import BaseAttrsForm from "../../components/CreateProduct/BaseAttrsForm";
+import ProductAttrs from "../../components/CreateProduct/ProductAttrs";
+import AdditionalProductAttrs from "../../components/CreateProduct/AdditionalProductAttrs";
+import AddProductVariations from "../../components/CreateProduct/ProductVariations/AddProductVariations";
+import ProductVariationList from "../../components/CreateProduct/ProductVariations/ProductVariationList";
+import UpdateProductImages from "../../components/UpdateProduct/UpdateProductImages/UpdateProductImages";
+import SubmitMenu from "../../components/UpdateProduct/SubmitMenu";
+import { encodeManyImages, encodeImages, encodeOneImage } from "../../utils/ImageServices";
+import ObjectValueExtractor from "../../utils/objectValueExtractor";
+import DeleteProductDialog from "../../components/UpdateProduct/DeleteProductDialog";
+import KeywordsSection from "../../components/CreateProduct/KeywordsSection";
+import HtmlTooltip from "../../components/HtmlTooltip";
 
 export default function UpdateProductPage() {
     const [submitLoading, setSubmitLoading] = useState(false); // loading state for form submission
@@ -367,19 +367,12 @@ export default function UpdateProductPage() {
             setSubmitLoading(false);
             // Is errors are basic (errors related with length of fields) ?
             let baseErrors = err.response.data?.base_errors;
-            setErrorHandler((prevObj) => {
+            setErrorHandler(() => {
+
                 if (baseErrors) {
-                    // assign errors that came from the server 
-                    prevObj.obj = err.response.data.errors;
-                    // set serializedKeys to true since base errors have serialized keys
-                    prevObj.serializedKeys = true;
-                    return prevObj;
+                    return new ObjectValueExtractor(err.response.data.errors, true);
                 } else {
-                    // assign errors that came from the server
-                    prevObj.obj = err.response.data.detail;
-                    // set serializedKeys to false since regular errors doesn't have serialized keys
-                    prevObj.serializedKeys = false;
-                    return prevObj;
+                    return new ObjectValueExtractor(err.response.data.detail, false);
                 }
             });
         }
@@ -558,7 +551,7 @@ export default function UpdateProductPage() {
                             </Box>
 
                             <Box sx={{ mb: 2 }} display="flex" alignItems="center">
-                                <Typography variant="h6" sx={{mr: 0.5}}>
+                                <Typography variant="h6" sx={{ mr: 0.5 }}>
                                     Additional attributes
                                 </Typography>
                                 <HtmlTooltip title={

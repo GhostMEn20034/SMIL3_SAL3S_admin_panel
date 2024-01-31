@@ -1,10 +1,10 @@
 import { Box, Button, Typography } from "@mui/material";
-import useAxios from "../utils/useAxios";
+import useAxios from "../../utils/useAxios";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import CategoryDetail from "../components/Category/CategoryDetail";
-import CategoryEdit from "../components/Category/CategoryEdit";
-import CategoryDelete from "../components/Category/CategoryDelete";
+import CategoryDetail from "../../components/Category/CategoryDetail";
+import CategoryEdit from "../../components/Category/CategoryEdit";
+import CategoryDelete from "../../components/Category/CategoryDelete";
 
 export default function CategoryDetailPage() {
 

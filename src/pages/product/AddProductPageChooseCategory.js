@@ -6,8 +6,8 @@ import {
     Typography,
 } from "@mui/material";
 
-import useAxios from "../utils/useAxios";
-import ChooseProductCategory from "../components/Product/ChooseProductCategory";
+import useAxios from "../../utils/useAxios";
+import ChooseProductCategory from "../../components/Product/ChooseProductCategory";
 
 export default function AddProductPageChooseCategory() {
     const [chosenCategory, setChosenCategory] = useState(null);

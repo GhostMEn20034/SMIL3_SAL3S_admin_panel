@@ -1,25 +1,25 @@
 import { useEffect, useState, Fragment } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import useAxios from "../utils/useAxios";
+import useAxios from "../../utils/useAxios";
 import { Box, Typography, CircularProgress, Button, Alert } from "@mui/material";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { facetsToAttrs, getArrayElems } from "../utils/Services";
-import SelectValueRadioGroup from "../components/SelectValueRadioGroup";
-import ProductAttrs from "../components/CreateProduct/ProductAttrs";
-import AdditionalProductAttrs from "../components/CreateProduct/AdditionalProductAttrs";
-import { extraAttr, productImages, createProductMenuItems, baseAttrs } from "../utils/consts";
-import ProductNavigation from "../components/CreateProduct/ProductMenusNavigation";
-import AddProductVariations from "../components/CreateProduct/ProductVariations/AddProductVariations";
-import ProductVariationList from "../components/CreateProduct/ProductVariations/ProductVariationList";
-import BaseAttrsForm from "../components/CreateProduct/BaseAttrsForm";
-import { ModifyNameDialog } from "../components/CreateProduct/ModifyNameDialog";
-import ChooseVarThemeForm from "../components/CreateProduct/ChooseVarThemeForm";
-import AddProductImages from "../components/CreateProduct/AddProductImages/AddProductImages";
-import SubmitMenu from "../components/CreateProduct/SubmitMenu";
-import KeywordsSection from "../components/CreateProduct/KeywordsSection";
-import { encodeImages } from "../utils/ImageServices";
-import ObjectValueExtractor from "../utils/objectValueExtractor";
-import HtmlTooltip from "../components/HtmlTooltip";
+import { facetsToAttrs, getArrayElems } from "../../utils/Services";
+import SelectValueRadioGroup from "../../components/SelectValueRadioGroup";
+import ProductAttrs from "../../components/CreateProduct/ProductAttrs";
+import AdditionalProductAttrs from "../../components/CreateProduct/AdditionalProductAttrs";
+import { extraAttr, productImages, createProductMenuItems, baseAttrs } from "../../utils/consts";
+import ProductNavigation from "../../components/CreateProduct/ProductMenusNavigation";
+import AddProductVariations from "../../components/CreateProduct/ProductVariations/AddProductVariations";
+import ProductVariationList from "../../components/CreateProduct/ProductVariations/ProductVariationList";
+import BaseAttrsForm from "../../components/CreateProduct/BaseAttrsForm";
+import { ModifyNameDialog } from "../../components/CreateProduct/ModifyNameDialog";
+import ChooseVarThemeForm from "../../components/CreateProduct/ChooseVarThemeForm";
+import AddProductImages from "../../components/CreateProduct/AddProductImages/AddProductImages";
+import SubmitMenu from "../../components/CreateProduct/SubmitMenu";
+import KeywordsSection from "../../components/CreateProduct/KeywordsSection";
+import { encodeImages } from "../../utils/ImageServices";
+import ObjectValueExtractor from "../../utils/objectValueExtractor";
+import HtmlTooltip from "../../components/HtmlTooltip";
 
 
 
@@ -259,21 +259,14 @@ export default function CreateProductPage() {
       navigate("/products");
     } catch (err) {
       setSubmitLoading(false);
-      // Is errors are basic (errors related with length of fields) ?
+      // Is errors are basic (errors related with length of fields etc.) ?
       let baseErrors = err.response.data?.base_errors;
-      setErrorHandler((prevObj) => {
+      setErrorHandler(() => {
+
         if (baseErrors) {
-          // assign errors that came from the server 
-          prevObj.obj = err.response.data.errors;
-          // set serializedKeys to true since base errors have serialized keys
-          prevObj.serializedKeys = true;
-          return prevObj;
+          return new ObjectValueExtractor(err.response.data.errors, true);
         } else {
-          // assign errors that came from the server
-          prevObj.obj = err.response.data.detail;
-          // set serializedKeys to false since regular errors doesn't have serialized keys
-          prevObj.serializedKeys = false;
-          return prevObj;
+          return new ObjectValueExtractor(err.response.data.detail, false);
         }
       });
     }
@@ -407,7 +400,7 @@ export default function CreateProductPage() {
                 </Box>
 
                 <Box sx={{ mb: 2 }} display="flex" alignItems="center">
-                  <Typography variant="h6" sx={{mr: 1}}>
+                  <Typography variant="h6" sx={{ mr: 1 }}>
                     Additional attributes
                   </Typography>
                   <HtmlTooltip title={

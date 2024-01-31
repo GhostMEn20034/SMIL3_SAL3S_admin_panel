@@ -4,19 +4,22 @@ import { UserProvider } from './context/UserContext';
 import PrivateRoute from './utils/PrivateRoute';
 import AppBarMenu from './components/AppBar';
 import Login from './pages/LoginPage';
-import FacetPage from './pages/FacetPage';
-import FacetDetailPage from './pages/FacetDetailPage';
-import AddFacetPage from './pages/AddFacetPage';
-import VariationThemePage from './pages/VariationThemePage';
-import VariationThemeDetailPage from './pages/VariationThemeDetailPage';
-import AddVariationThemePage from './pages/AddVariationThemePage';
-import CategoryPage from './pages/CategoryPage';
-import CategoryDetailPage from './pages/CategoryDetailPage';
-import AddCategoryPage from './pages/AddCategoryPage';
-import ProductPage from './pages/ProductPage';
-import AddProductPageChooseCategory from './pages/AddProductPageChooseCategory';
-import CreateProductPage from './pages/CreateProductPage';
-import UpdateProductPage from './pages/UpdateProductPage';
+import FacetPage from './pages/facet/FacetPage';
+import FacetDetailPage from './pages/facet/FacetDetailPage';
+import AddFacetPage from './pages/facet/AddFacetPage';
+import VariationThemePage from './pages/variationTheme/VariationThemePage';
+import VariationThemeDetailPage from './pages/variationTheme/VariationThemeDetailPage';
+import AddVariationThemePage from './pages/variationTheme/AddVariationThemePage';
+import CategoryPage from './pages/category/CategoryPage';
+import CategoryDetailPage from './pages/category/CategoryDetailPage';
+import AddCategoryPage from './pages/category/AddCategoryPage';
+import ProductPage from './pages/product/ProductPage';
+import AddProductPageChooseCategory from './pages/product/AddProductPageChooseCategory';
+import CreateProductPage from './pages/product/CreateProductPage';
+import UpdateProductPage from './pages/product/UpdateProductPage';
+import SynonymsListPage from './pages/synonyms/SynonymListPage';
+import AddSynonymsPage from './pages/synonyms/AddSynonymsPage';
+import UpdateSynonymsPage from './pages/synonyms/UpdateSynonymsPage';
 
 
 
@@ -96,6 +99,21 @@ function App() {
             <Route path='/products/:id/edit' element={
               <PrivateRoute>
                 <UpdateProductPage />
+              </PrivateRoute>
+            } />
+            <Route path='/synonyms' element={
+              <PrivateRoute>
+                <SynonymsListPage />
+              </PrivateRoute>
+            } />
+            <Route path='/synonyms/add' element={
+              <PrivateRoute>
+                <AddSynonymsPage />
+              </PrivateRoute>
+            } />
+            <Route path='/synonyms/:id' element={
+              <PrivateRoute>
+                <UpdateSynonymsPage />
               </PrivateRoute>
             } />
           </Routes>
