@@ -12,6 +12,7 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import SellIcon from '@mui/icons-material/Sell';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
+import EventAvailableOutlinedIcon from '@mui/icons-material/EventAvailableOutlined';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import { Typography, Avatar } from '@mui/material';
 import { Link } from 'react-router-dom';
@@ -34,6 +35,7 @@ export default function SideMenu({ open, setOpen, user }) {
         '/facets',
         '/variation-themes',
         '/categories',
+        '/events',
         '/synonyms'
     ];
 
@@ -42,10 +44,12 @@ export default function SideMenu({ open, setOpen, user }) {
         <SellIcon sx={{ color: iconColor }} />,
         <FilterAltOutlinedIcon sx={{ color: iconColor }} />,
         <CategoryOutlinedIcon sx={{ color: iconColor }} />,
+        <EventAvailableOutlinedIcon sx={{ color: iconColor }} />,
         <CompareArrowsIcon sx={{color: iconColor}} />
     ];
 
-    const menuItems = ['Products', 'Facets', 'Variation Theme Templates', 'Categories', 'Synonyms'];
+    const menuItems = ['Products', 'Facets', 'Variation Theme Templates',
+                         'Categories', 'Events', 'Synonyms'];
 
     const list = () => ( // use a single list component for the drawer content
         <Box

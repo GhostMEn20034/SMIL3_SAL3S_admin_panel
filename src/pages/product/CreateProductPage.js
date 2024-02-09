@@ -8,7 +8,7 @@ import SelectValueRadioGroup from "../../components/SelectValueRadioGroup";
 import ProductAttrs from "../../components/CreateProduct/ProductAttrs";
 import AdditionalProductAttrs from "../../components/CreateProduct/AdditionalProductAttrs";
 import { extraAttr, productImages, createProductMenuItems, baseAttrs } from "../../utils/consts";
-import ProductNavigation from "../../components/CreateProduct/ProductMenusNavigation";
+import ProductNavigation from "../../components/CreateProduct/MenusNavigation";
 import AddProductVariations from "../../components/CreateProduct/ProductVariations/AddProductVariations";
 import ProductVariationList from "../../components/CreateProduct/ProductVariations/ProductVariationList";
 import BaseAttrsForm from "../../components/CreateProduct/BaseAttrsForm";
@@ -259,7 +259,6 @@ export default function CreateProductPage() {
       navigate("/products");
     } catch (err) {
       setSubmitLoading(false);
-      // Is errors are basic (errors related with length of fields etc.) ?
       let baseErrors = err.response.data?.base_errors;
       setErrorHandler(() => {
 

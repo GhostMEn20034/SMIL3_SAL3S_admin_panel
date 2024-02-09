@@ -20,7 +20,9 @@ import UpdateProductPage from './pages/product/UpdateProductPage';
 import SynonymsListPage from './pages/synonyms/SynonymListPage';
 import AddSynonymsPage from './pages/synonyms/AddSynonymsPage';
 import UpdateSynonymsPage from './pages/synonyms/UpdateSynonymsPage';
-
+import EventListPage from './pages/event/EventListPage';
+import AddEventPage from './pages/event/AddEventPage';
+import UpdateEventPage from './pages/event/UpdateEventPage';
 
 
 function App() {
@@ -116,6 +118,22 @@ function App() {
                 <UpdateSynonymsPage />
               </PrivateRoute>
             } />
+            <Route path='/events' element={
+              <PrivateRoute>
+                <EventListPage />
+              </PrivateRoute>
+            } />
+            <Route path='/events/add' element={
+              <PrivateRoute>
+                <AddEventPage />
+              </PrivateRoute>
+            } />
+            <Route path='/events/:id' element={
+              <PrivateRoute>
+                <UpdateEventPage />
+              </PrivateRoute>
+            } />
+
           </Routes>
         </UserProvider>
       </AuthProvider>

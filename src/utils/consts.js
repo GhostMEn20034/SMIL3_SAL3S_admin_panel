@@ -10,6 +10,8 @@ export const createProductMenuItems = ["Product attributes", "Variation Theme",
 // Navigation menu items on Update product page
 export const updateProductMenuItems = ["Product attributes", "Product Variations",
     "Images", "Keywords", "Submit"];
+
+export const eventMenuItems = ["Event Data", "Product discounts", "Product Search"]
 export const productImages = { main: null, secondaryImages: null, sourceProductId: null };
 export const baseAttrs = {
     name: "",

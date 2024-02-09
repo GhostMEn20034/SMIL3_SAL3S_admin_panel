@@ -72,7 +72,7 @@ export default function ProductVariationList(props) {
             setChecked([]); // clear the checked array
         } else {
             // Otherwise
-            setChecked(props.productVariations.map((obj, i) => i)); // fill the checked array with all indexes
+            setChecked(props.productVariations.map((_, i) => i)); // fill the checked array with all indexes
         }
     };
 

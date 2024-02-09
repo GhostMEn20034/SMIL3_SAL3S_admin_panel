@@ -11,11 +11,10 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function DeleteProductDialog(props) {
-
+export default function DeleteEventDialog(props) {
 
   const handleClose = () => {
-    props.setOpen(false);
+    props.setOpen(null);
   };
 
   return (
@@ -27,14 +26,11 @@ export default function DeleteProductDialog(props) {
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle>{"Delete Product"}</DialogTitle>
+        <DialogTitle>{"Delete Event"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-            This action will delete the product "{props.name}". <br />
+            This action will delete the event "{props.name}". <br />
             Please verify your intent before continuing.<br />
-            {props.parent && (
-                <b>Note: Deleting the product "{props.name}" also deletes all its child products, forever!</b>
-            )}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

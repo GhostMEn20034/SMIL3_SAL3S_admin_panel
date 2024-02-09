@@ -5,7 +5,7 @@ import { Box, CircularProgress, Typography, Button } from "@mui/material";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import SelectValueRadioGroup from "../../components/SelectValueRadioGroup";
 import { updateProductMenuItems, extraAttr } from "../../utils/consts";
-import ProductNavigation from "../../components/CreateProduct/ProductMenusNavigation";
+import ProductNavigation from "../../components/CreateProduct/MenusNavigation";
 import { ModifyNameDialog } from "../../components/CreateProduct/ModifyNameDialog";
 import BaseAttrsForm from "../../components/CreateProduct/BaseAttrsForm";
 import ProductAttrs from "../../components/CreateProduct/ProductAttrs";
@@ -298,7 +298,7 @@ export default function UpdateProductPage() {
                     let sourceProduct = productVariations[variation.images.sourceProductId];
                     // And if it's old variation
                     if (sourceProduct.hasOwnProperty("_id")) {
-                        // Then copy image urls from the this variation, and set sourceProductId to variation's id
+                        // Then copy image urls from this variation, and set sourceProductId to variation's id
                         variation.images = { ...sourceProduct.images, sourceProductId: sourceProduct._id };
                     } else {
                         variation.images = { ...variation.images, sourceProductId: variation.images.sourceProductId - variationsLength }

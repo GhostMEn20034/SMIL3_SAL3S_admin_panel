@@ -4,7 +4,7 @@ import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 
 
-export default function ProductMenusNavigation(props) {
+export default function MenusNavigation(props) {
 
   const handleChange = (event, newValue) => {
     props.setValue(newValue);
