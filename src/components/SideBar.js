@@ -15,11 +15,12 @@ import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import EventAvailableOutlinedIcon from '@mui/icons-material/EventAvailableOutlined';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
-import { Typography, Avatar } from '@mui/material';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { Typography, Avatar, Tooltip } from '@mui/material';
 import { Link } from 'react-router-dom';
 
 
-export default function SideMenu({ open, setOpen, user }) {
+export default function SideMenu({ open, setOpen, user, logoutUser }) {
 
     const toggleDrawer = (open) => (event) => { // use a single function for toggling the drawer
         if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -47,12 +48,12 @@ export default function SideMenu({ open, setOpen, user }) {
         <FilterAltOutlinedIcon sx={{ color: iconColor }} />,
         <CategoryOutlinedIcon sx={{ color: iconColor }} />,
         <EventAvailableOutlinedIcon sx={{ color: iconColor }} />,
-        <CompareArrowsIcon sx={{color: iconColor}} />,
+        <CompareArrowsIcon sx={{ color: iconColor }} />,
         <SellIcon sx={{ color: iconColor }} />
     ];
 
     const menuItems = ['Products', 'Facets', 'Variation Theme Templates',
-                         'Categories', 'Events', 'Synonyms', "Deals", ];
+        'Categories', 'Events', 'Synonyms', "Deals",];
 
     const list = () => ( // use a single list component for the drawer content
         <Box
@@ -63,8 +64,8 @@ export default function SideMenu({ open, setOpen, user }) {
         >
             <List>
                 {menuItems.map((text, index) => (
-                    <Link key={text} to={menuLinks[index]} style={{ color: 'inherit', textDecoration: 'inherit'}}>
-                        <ListItem  disablePadding>
+                    <Link key={text} to={menuLinks[index]} style={{ color: 'inherit', textDecoration: 'inherit' }}>
+                        <ListItem disablePadding>
                             <ListItemButton>
                                 <ListItemIcon>
                                     {menuIcons[index]}
@@ -105,6 +106,13 @@ export default function SideMenu({ open, setOpen, user }) {
                         <Typography variant='caption'>
                             {`${user.email}`}
                         </Typography>
+                    </Box>
+                    <Box sx={{ ml: 2 }}>
+                        <Tooltip title="Logout">
+                            <IconButton sx={{ color: "#D5D507" }} onClick={logoutUser}>
+                                <LogoutIcon />
+                            </IconButton>
+                        </Tooltip>
                     </Box>
                 </Box>
                 {list()}

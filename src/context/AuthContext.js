@@ -19,7 +19,6 @@ export const AuthProvider = ({ children }) => {
     const baseURL = process.env.REACT_APP_BASE_URL_USERS;
 
     let loginUser = async (email, password) => {
-
         try {
             let response = await axios.post(
                 `${baseURL}/api/auth/token/`,
@@ -40,26 +39,13 @@ export const AuthProvider = ({ children }) => {
                 setAuthTokens(response_data);
                 setUser(jwt_decode(response_data.access));
                 localStorage.setItem("authTokens", JSON.stringify(response_data));
-                navigate("/");
+                navigate("/products");
             }
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 setError("Incorrect password or email");
             }
-
-            if (error.response.status === 400) {
-                let token = await error.response.data.token;
-                sessionStorage.setItem("token", token);
-                await navigate({
-                    pathname: '/confirm-signup'
-                },
-                {
-                    state: {email: email}
-                }
-                );
-            }
         }
-
     };
 
     let logoutUser = () => {
@@ -81,7 +67,7 @@ export const AuthProvider = ({ children }) => {
             setAuthTokens(null);
             setUser(null);
             localStorage.removeItem('authTokens');
-            navigate('/');
+            navigate('/signin');
         } catch (error) {
             console.log("Unable to logout");
         }

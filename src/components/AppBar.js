@@ -8,13 +8,16 @@ import MenuIcon from '@mui/icons-material/Menu';
 import SideMenu from './SideBar';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useUserInfo from '../utils/useUserInfo';
+import AuthContext from '../context/AuthContext';
 
 
 export default function AppBarMenu() {
 
     const [openSideBar, setOpenSideBar] = React.useState(false);
 
-    const {userInfo} = useUserInfo();
+    const { userInfo } = useUserInfo();
+
+    let { logoutUser } = React.useContext(AuthContext);
 
     const theme = createTheme({
         palette: {
@@ -27,33 +30,37 @@ export default function AppBarMenu() {
 
     return (
         <>
-        <ThemeProvider theme={theme}>
-            <Box sx={{ flexGrow: 1 }}>
-                <AppBar position="static">
-                    <Toolbar>
-                        <IconButton
-                            size="large"
-                            edge="start"
-                            color="inherit"
-                            aria-label="menu"
-                            sx={{ mr: 2 }}
-                            onClick={() => setOpenSideBar(true)}
-                        >
-                            <MenuIcon sx={{color: "#D5D507"}}/>
-                        </IconButton>
-                        <Box sx={{ mr: 3 }}>
-                            <img style={{ height: "70px", width: "120px" }} src="/smile_sales_logo_dark_theme.svg" alt="Logo" />
-                        </Box>
-                        <Typography variant="h6" color={"#D5D507"} component="div" sx={{ flexGrow: 1 }}>
-                            Smile Sales Admin Menu
-                        </Typography>
-                    </Toolbar>
-                </AppBar>
-                {userInfo && (
-                    <SideMenu open={openSideBar} setOpen={setOpenSideBar} user={userInfo} />
-                )}
-            </Box>
-        </ThemeProvider>
+            <ThemeProvider theme={theme}>
+                <Box sx={{ flexGrow: 1 }}>
+                    <AppBar position="static">
+                        <Toolbar>
+                            <IconButton
+                                size="large"
+                                edge="start"
+                                color="inherit"
+                                aria-label="menu"
+                                sx={{ mr: 2 }}
+                                onClick={() => setOpenSideBar(true)}
+                            >
+                                <MenuIcon sx={{ color: "#D5D507" }} />
+                            </IconButton>
+                            <Box sx={{ mr: 3 }}>
+                                <img style={{ height: "70px", width: "120px" }} src="/smile_sales_logo_dark_theme.svg" alt="Logo" />
+                            </Box>
+                            <Typography variant="h6" color={"#D5D507"} component="div" sx={{ flexGrow: 1 }}>
+                                Smile Sales Admin Menu
+                            </Typography>
+                        </Toolbar>
+                    </AppBar>
+                    {userInfo && (
+                        <SideMenu
+                            open={openSideBar}
+                            setOpen={setOpenSideBar}
+                            user={userInfo}
+                            logoutUser={logoutUser} />
+                    )}
+                </Box>
+            </ThemeProvider>
         </>
     );
 }
