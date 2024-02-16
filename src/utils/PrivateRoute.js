@@ -3,8 +3,8 @@ import { useContext } from "react";
 import AuthContext from "../context/AuthContext";
 
 function PrivateRoute({ children }) {
-  let {user} = useContext(AuthContext)
-    return user ? <>{children}</> : <Navigate to="/signin" />;
-  }
+  let {user} = useContext(AuthContext);
+  return user ? <>{children}</> : <Navigate to="/signin" />;
+}
 
-export default PrivateRoute
+export default PrivateRoute;

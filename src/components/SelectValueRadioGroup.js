@@ -35,7 +35,7 @@ export default function SelectValueRadioGroup(props) {
         onChange={handleChange}
       >
         {props.menuItems.map((menuItem, index) => (
-          <FormControlLabel key={index} value={menuItem["value"]} control={<Radio />} label={menuItem["name"]} />
+          <FormControlLabel disabled={props.disabledIndexes?.includes(index)} key={index} value={menuItem["value"]} control={<Radio />} label={menuItem["name"]} />
         ))}
       </RadioGroup>
     </FormControl>

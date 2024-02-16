@@ -11,7 +11,9 @@ export const createProductMenuItems = ["Product attributes", "Variation Theme",
 export const updateProductMenuItems = ["Product attributes", "Product Variations",
     "Images", "Keywords", "Submit"];
 
-export const eventMenuItems = ["Event Data", "Product discounts", "Product Search"]
+export const eventMenuItems = ["Event Data", "Product discounts", "Product Search"];
+export const dealCreateMenuItems = ["Deal Data", "Other Filters"];
+
 export const productImages = { main: null, secondaryImages: null, sourceProductId: null };
 export const baseAttrs = {
     name: "",

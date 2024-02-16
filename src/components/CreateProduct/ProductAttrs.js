@@ -20,7 +20,7 @@ export default function ProductAttrs(props) {
                     <Stack key={index}>
                         <AttrInput attr={attr} facet={props.facets.find(facet => facet.code === attr.code)} index={index}
                             setAttrs={props.setAttrs} errorHandler={props.errorHandler} displayErrors={props.displayErrors}
-                            baseErrorPath={props.baseErrorPath}
+                            baseErrorPath={[...(props.baseErrorPath ? props.baseErrorPath : [])]}
                         />
                     </Stack>
                     <Stack sx={{ ml: 1 }}>

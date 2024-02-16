@@ -357,7 +357,7 @@ export default function CreateProductPage() {
             {hasVariations && (
               <Box sx={{ mb: 2, ml: "13.5%", width: variationTheme ? "325px" : "450px" }}>
                 <Alert severity={variationTheme ? "info" : "warning"}>
-                  {variationTheme ? `Chosen variation: ${variationTheme.name}` : 'Please, choose variation theme at "Variation Theme" section'}
+                  {variationTheme ? `Chosen variation theme: ${variationTheme.name}` : 'Please, choose variation theme at "Variation Theme" section'}
                 </Alert>
               </Box>
             )}

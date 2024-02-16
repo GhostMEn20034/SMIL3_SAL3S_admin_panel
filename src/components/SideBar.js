@@ -14,6 +14,7 @@ import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import EventAvailableOutlinedIcon from '@mui/icons-material/EventAvailableOutlined';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 import { Typography, Avatar } from '@mui/material';
 import { Link } from 'react-router-dom';
 
@@ -36,20 +37,22 @@ export default function SideMenu({ open, setOpen, user }) {
         '/variation-themes',
         '/categories',
         '/events',
-        '/synonyms'
+        '/synonyms',
+        '/deals',
     ];
 
     const menuIcons = [
         <InventoryIcon sx={{ color: iconColor }} />,
-        <SellIcon sx={{ color: iconColor }} />,
+        <GridViewRoundedIcon sx={{ color: iconColor }} />,
         <FilterAltOutlinedIcon sx={{ color: iconColor }} />,
         <CategoryOutlinedIcon sx={{ color: iconColor }} />,
         <EventAvailableOutlinedIcon sx={{ color: iconColor }} />,
-        <CompareArrowsIcon sx={{color: iconColor}} />
+        <CompareArrowsIcon sx={{color: iconColor}} />,
+        <SellIcon sx={{ color: iconColor }} />
     ];
 
     const menuItems = ['Products', 'Facets', 'Variation Theme Templates',
-                         'Categories', 'Events', 'Synonyms'];
+                         'Categories', 'Events', 'Synonyms', "Deals", ];
 
     const list = () => ( // use a single list component for the drawer content
         <Box
@@ -83,7 +86,7 @@ export default function SideMenu({ open, setOpen, user }) {
             >
                 <Box sx={{ px: 2, pt: 1 }} display="flex">
                     <Box sx={{ flexGrow: 1 }}>
-                        <img style={{ height: "70px", width: "120px" }} src="/smile_sales_logo_dark_theme.svg" alt="image" />
+                        <img style={{ height: "70px", width: "120px" }} src="/smile_sales_logo_dark_theme.svg" alt="Smile Sales Icon" />
                     </Box>
                     <Box display={'flex'} alignItems={"center"} justifyContent={"center"}>
                         <IconButton onClick={toggleDrawer(false)}>

@@ -20,7 +20,7 @@ export default function AttrInput(props) {
             return {};
         }
 
-        if (!props?.errorHandler?.isValueExist(...(props?.baseErrorPath ? props?.baseErrorPath : ""), code)) {
+        if (!props.errorHandler?.isValueExist(...(props.baseErrorPath ? props.baseErrorPath : ""), code)) {
             return {};
         }
 

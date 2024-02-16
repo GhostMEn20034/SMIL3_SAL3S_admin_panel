@@ -32,7 +32,8 @@ export default function DeleteManyProductsDialog(props) {
                 <DialogContent>
                     <DialogContentText id="alert-dialog-slide-description">
                             Confirmation required: <br />
-                            This action will delete selected products and all its child products. <br />
+                            This action will delete selected products and 
+                            if product is a parent all its child products will be deleted. <br />
                             Please verify your intent before continuing.<br />
                     </DialogContentText>
                 </DialogContent>
