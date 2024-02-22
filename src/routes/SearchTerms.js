@@ -1,26 +1,27 @@
 import { Route, Routes } from "react-router-dom";
 
 import PrivateRoute from "../utils/PrivateRoute";
-import DealListPage from "../pages/deal/DealListPage";
-import CreateDealPage from "../pages/deal/CreateDealPage";
-import UpdateDealPage from "../pages/deal/UpdateDealPage";
+import SearchTermsPage from "../pages/searchTerm/SearchTermListPage";
+import AddSearchTermPage from "../pages/searchTerm/AddSearchTermPage";
+import UpdateSearchTermPage from "../pages/searchTerm/UpdateSearchTermPage";
 
-export default function DealRoutes() {
+
+export default function SearchTermsRoutes() {
     return (
         <Routes>
             <Route path='' element={
                 <PrivateRoute>
-                    <DealListPage />
+                    <SearchTermsPage />
                 </PrivateRoute>
             } />
             <Route path='/add' element={
                 <PrivateRoute>
-                    <CreateDealPage />
+                    <AddSearchTermPage />
                 </PrivateRoute>
             } />
             <Route path='/:id' element={
                 <PrivateRoute>
-                    <UpdateDealPage />
+                    <UpdateSearchTermPage />
                 </PrivateRoute>
             } />
         </Routes>

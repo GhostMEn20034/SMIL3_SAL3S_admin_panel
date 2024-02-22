@@ -99,6 +99,8 @@ export const AuthProvider = ({ children }) => {
                 setUser(null);
                 localStorage.removeItem('authTokens');
             }
+        } else {
+            navigate('/signin');
         }
         setLoading(false);
 

@@ -12,6 +12,7 @@ import ProductRoutes from './routes/Products';
 import SynonymRoutes from './routes/Synonyms';
 import EventRoutes from './routes/Events';
 import DealRoutes from './routes/Deals';
+import SearchTermsRoutes from './routes/SearchTerms';
 
 function App() {
 
@@ -38,6 +39,7 @@ function App() {
             <Route path='/synonyms/*' element={<SynonymRoutes/>}/>
             <Route path='/events/*' element={<EventRoutes/>}/>
             <Route path='/deals/*' element={<DealRoutes/>}/>
+            <Route path='/search-terms/*' element={<SearchTermsRoutes />}/>
           </Routes>
         </UserProvider>
       </AuthProvider>

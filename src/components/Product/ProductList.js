@@ -59,6 +59,7 @@ export default function ProductList(props) {
                             <TableRow key={product._id}>
                                 <TableCell sx={{backgroundColor: "#edf4ff"}} align='center' width={"5%"}>
                                     <Checkbox
+                                        size='small'
                                         checked={props.checked[index].checked === true}
                                         onChange={() => props.handleChangeChecked(index)}
                                     />
@@ -88,6 +89,7 @@ export default function ProductList(props) {
                                             <TableRow key={variation._id}>
                                                 <TableCell align='center' width={"5%"}>
                                                     <Checkbox
+                                                        size='small'
                                                         checked={props.checked[index].variations[variationIndex].checked === true}
                                                         onChange={() => props.handleChangeChecked(index, variationIndex)}
                                                     />

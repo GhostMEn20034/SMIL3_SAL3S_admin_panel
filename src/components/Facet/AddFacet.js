@@ -101,8 +101,6 @@ export default function AddFacet() {
         { value: name, setValue: handleChangeName, label: "Name", disabled: false, error: errors.name !== undefined, helperText: errors.name ? errors.name : "" }
     ];
 
-    console.log(explanation);
-
     return (
         <Box>
             {fields.map((field, index) => (

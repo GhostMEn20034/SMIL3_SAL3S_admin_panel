@@ -26,6 +26,7 @@ export default function ControlledDateTimePicker(props) {
         <DateTimePicker
           label={props.label}
           value={props.value}
+          disabled={props.disabled}
           onChange={(newValue) => props.setValue(newValue)}
           viewRenderers={{
             hours: renderTimeViewClock,
