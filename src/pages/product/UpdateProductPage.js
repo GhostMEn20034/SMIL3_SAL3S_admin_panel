@@ -185,8 +185,6 @@ export default function UpdateProductPage() {
             // get data from response.
             let data = await response.data;
 
-            console.log(data);
-
             let {
                 images: prodImages,
                 extra_attrs: additionalAttrs,

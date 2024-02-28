@@ -38,22 +38,15 @@ const useAxios = (microserviceBaseURL="") => {
         if (!user) {
             return req;
         }
-
-        let date = new Date()
-        let current_date = new Date(date.toUTCString()).getTime()
+        
         let isExpired = dayjs.unix(user.exp).diff(dayjs()) < 1;
         if(!isExpired) {
             req.headers.Authorization = `Bearer ${authTokens?.access}`;
             return req
         } 
-        console.log(new Date(user.exp * 1000) > current_date)
-        console.log(user.exp)
-        console.log(`Now ---- ${current_date}`);
-        console.log(`User exp ---- ${new Date(user.exp * 1000)}`)
-        console.log("Expired")
 
         try {
-            let response = await axios.post(`${process.env.REACT_APP_BASE_URL_USERS}/api/auth/token/refresh/`, {
+            let response = await axios.post(`${process.env.REACT_APP_BASE_URL_USERS}/api/auth/staff-token/refresh/`, {
                 refresh: authTokens.refresh,
             });
         

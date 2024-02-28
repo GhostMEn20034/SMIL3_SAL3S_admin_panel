@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
     let loginUser = async (email, password) => {
         try {
             let response = await axios.post(
-                `${baseURL}/api/auth/token/`,
+                `${baseURL}/api/auth/staff-token/`,
                 {
                     email: email,
                     password: password
@@ -44,6 +44,8 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 setError("Incorrect password or email");
+            } else if (error.response?.status === 403) {
+                setError("What Are You Doing here ?");
             }
         }
     };
