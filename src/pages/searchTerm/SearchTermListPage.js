@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { Box, Typography, Pagination, Button } from "@mui/material";
+import { Box, Typography, Pagination, Button, Autocomplete, TextField } from "@mui/material";
 import { useNavigate, createSearchParams, useLocation, Link } from "react-router-dom";
 import useAxios from "../../utils/useAxios";
 import SearchTermsList from "../../components/SearchTerm/SearchTermList";
 import DeleteManySearchTermsDialog from "../../components/SearchTerm/DeleteManySearchTermsDialog";
 
 export default function SearchTermsPage() {
+    const [searchTermInputValue, setSearhTermInputValue] = useState('');
     const [searchTerms, setSearchTerms] = useState([]);
     const [checked, setChecked] = useState([]);
 
@@ -56,11 +57,17 @@ export default function SearchTermsPage() {
     };
 
     const getSearchTerms = async () => {
+        let params = {
+            page: page
+        }
+
+        if (searchTermInputValue.length > 0) {
+            params.name = searchTermInputValue;
+        }
+
         try {
             let response = await api.get("/admin/search-terms/", {
-                params: {
-                    page: page
-                }
+                params: params,
             });
             let data = await response.data;
             setSearchTerms(data.result);
@@ -104,7 +111,7 @@ export default function SearchTermsPage() {
                     Search Terms List
                 </Typography>
             </Box>
-            <Box display="flex" sx={{ ml: 3, mb: 3 }}>
+            <Box display="flex" alignItems={"center"} sx={{ ml: 3, mb: 3 }}>
                 <Box>
                     <Link to={"add"} style={{ color: 'inherit', textDecoration: 'inherit' }}>
                         <Button variant="contained" size="small">
@@ -130,6 +137,40 @@ export default function SearchTermsPage() {
                         </Typography>
                     </Box>
                 )}
+                <Box display={"flex"} sx={{ ml: 2 }}>
+                    <Autocomplete
+                        sx={{ minWidth: 325 }}
+                        size="small"
+                        freeSolo
+                        id="free-solo-2-demo"
+                        disableClearable
+                        inputValue={searchTermInputValue}
+                        onInputChange={(_, newInputValue) => {
+                            setSearhTermInputValue(newInputValue);
+                        }}
+                        options={[].map((option) => option)}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Find Search Terms"
+                                InputProps={{
+                                    ...params.InputProps,
+                                    type: 'search',
+                                }}
+                            />
+                        )}
+                    />
+                </Box>
+                <Box sx={{ml: 2}}>
+                    <Button
+                        size="small"
+                        variant="contained"
+                        onClick={getSearchTerms}
+                        sx={{ maxWidth: 50 }}
+                    >
+                        Search
+                    </Button>
+                </Box>
             </Box>
             <Box sx={{ px: 3 }}>
                 <SearchTermsList searchTerms={searchTerms} checked={checked} handleCheck={handleCheck} checkAll={handleCheckAll} />

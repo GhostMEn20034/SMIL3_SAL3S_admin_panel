@@ -16,7 +16,7 @@ import { ModifyNameDialog } from "../../components/CreateProduct/ModifyNameDialo
 import ChooseVarThemeForm from "../../components/CreateProduct/ChooseVarThemeForm";
 import AddProductImages from "../../components/CreateProduct/AddProductImages/AddProductImages";
 import SubmitMenu from "../../components/CreateProduct/SubmitMenu";
-import KeywordsSection from "../../components/CreateProduct/KeywordsSection";
+import KeywordsSection from "../../components/Product/KeywordsSection";
 import { encodeImages } from "../../utils/ImageServices";
 import ObjectValueExtractor from "../../utils/objectValueExtractor";
 import HtmlTooltip from "../../components/HtmlTooltip";

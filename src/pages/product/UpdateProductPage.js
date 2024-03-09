@@ -17,7 +17,7 @@ import SubmitMenu from "../../components/UpdateProduct/SubmitMenu";
 import { encodeManyImages, encodeImages, encodeOneImage } from "../../utils/ImageServices";
 import ObjectValueExtractor from "../../utils/objectValueExtractor";
 import DeleteProductDialog from "../../components/UpdateProduct/DeleteProductDialog";
-import KeywordsSection from "../../components/CreateProduct/KeywordsSection";
+import KeywordsSection from "../../components/Product/KeywordsSection";
 import HtmlTooltip from "../../components/HtmlTooltip";
 
 export default function UpdateProductPage() {
