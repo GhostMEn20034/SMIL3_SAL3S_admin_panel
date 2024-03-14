@@ -116,9 +116,6 @@ export default function CreateDealPage() {
         getDealCreationEssentials();
     }, [dealData.category_id]);
 
-    console.log(dealData);
-    console.log(otherFilters);
-
     if (loading) {
         return (
             <Box sx={{ display: 'flex', justifyContent: "center", alignItems: "center", height: "100vh" }}>

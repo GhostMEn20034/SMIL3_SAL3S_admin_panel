@@ -57,10 +57,10 @@ const mapValueToFacetType = (facet) => {
             value = 0;
             break;
         case "bivariate":
-            value = [0, 0];
+            value = {"x": 0, "y": 0, };
             break;
         case "trivariate":
-            value = [0, 0, 0];
+            value = {"x": 0, "y": 0, "z": 0, };
             break;
         default:
             value = ""
@@ -86,7 +86,7 @@ export const facetsToAttrs = (facets) => {
 }
 
 
-export const handleChangeAttrs = (index, newValue, setAttrs, valueIndex) => {
+export const handleChangeAttrs = (index, newValue, setAttrs, objectKey) => {
     // index - index of product attribute.
     // newValue - new attribute value.
     // setAttrs - setState function
@@ -101,14 +101,10 @@ export const handleChangeAttrs = (index, newValue, setAttrs, valueIndex) => {
                 ...prevAttrs[index],
                 // If valueIndex is defined, use it to update the value array at the given index
                 // Otherwise, use newValue as the value
-                value: valueIndex !== undefined ? [
-                    // Copy the elements before the valueIndex
-                    ...prevAttrs[index].value.slice(0, valueIndex),
-                    // Use newValue as the new element at the valueIndex
-                    newValue,
-                    // Copy the elements after the valueIndex
-                    ...prevAttrs[index].value.slice(valueIndex + 1),
-                ] : newValue,
+                value: objectKey !== undefined ? {
+                    ...prevAttrs[index].value,
+                    [objectKey]: newValue,
+                } : newValue,
             },
             // Copy the elements after the index
             ...prevAttrs.slice(index + 1),
@@ -295,7 +291,7 @@ export const getAttrString = (attrs, separator) => {
 
         // if attribute type is bivariate or trivariate
         if (["bivariate", "trivariate"].includes(attr.type)) {
-            value = value.join(" x ");
+            value = Object.values(value).join(" x ");
         }
 
         // If the unit is null, return only the value and name

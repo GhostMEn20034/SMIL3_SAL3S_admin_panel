@@ -160,10 +160,10 @@ export default function AttrInput(props) {
                         decimalSeparator="."
                         // Use customInput prop to pass TextField component
                         customInput={TextField}
-                        value={props.attr.value[0]}
+                        value={props.attr.value["x"]}
                         label={props.attr.name}
                         size="small"
-                        onChange={(e) => handleChangeAttrs(props.index, Number(e.target.value), props.setAttrs, 0)}
+                        onChange={(e) => handleChangeAttrs(props.index, Number(e.target.value), props.setAttrs, "x")}
                         {...findError(props.attr.code)}
                     />
                     <Box display="flex" justifyContent="center" alignItems="center" sx={{ mx: 1 }}>
@@ -176,10 +176,10 @@ export default function AttrInput(props) {
                         decimalSeparator="."
                         // Use customInput prop to pass TextField component
                         customInput={TextField}
-                        value={props.attr.value[1]}
+                        value={props.attr.value["y"]}
                         label={props.attr.name}
                         size="small"
-                        onChange={(e) => handleChangeAttrs(props.index, Number(e.target.value), props.setAttrs, 1)}
+                        onChange={(e) => handleChangeAttrs(props.index, Number(e.target.value), props.setAttrs, "y")}
                         {...findError(props.attr.code)}
                     />
                     {props.facet?.units && (
@@ -197,10 +197,10 @@ export default function AttrInput(props) {
                         decimalSeparator="."
                         // Use customInput prop to pass TextField component
                         customInput={TextField}
-                        value={props.attr.value[0]}
+                        value={props.attr.value["x"]}
                         label={props.attr.name}
                         size="small"
-                        onChange={(e) => handleChangeAttrs(props.index, Number(e.target.value), props.setAttrs, 0)}
+                        onChange={(e) => handleChangeAttrs(props.index, Number(e.target.value), props.setAttrs, "x")}
                         {...findError(props.attr.code)}
                     />
                     <Box display="flex" justifyContent="center" alignItems="center" sx={{ mx: 1 }}>
@@ -213,10 +213,10 @@ export default function AttrInput(props) {
                         decimalSeparator="."
                         // Use customInput prop to pass TextField component
                         customInput={TextField}
-                        value={props.attr.value[1]}
+                        value={props.attr.value["y"]}
                         label={props.attr.name}
                         size="small"
-                        onChange={(e) => handleChangeAttrs(props.index, Number(e.target.value), props.setAttrs, 1)}
+                        onChange={(e) => handleChangeAttrs(props.index, Number(e.target.value), props.setAttrs, "y")}
                         {...findError(props.attr.code)}
                     />
                     <Box display="flex" justifyContent="center" alignItems="center" sx={{ mx: 1 }}>
@@ -229,10 +229,10 @@ export default function AttrInput(props) {
                         decimalSeparator="."
                         // Use customInput prop to pass TextField component
                         customInput={TextField}
-                        value={props.attr.value[2]}
+                        value={props.attr.value["z"]}
                         label={props.attr.name}
                         size="small"
-                        onChange={(e) => handleChangeAttrs(props.index, Number(e.target.value), props.setAttrs, 2)}
+                        onChange={(e) => handleChangeAttrs(props.index, Number(e.target.value), props.setAttrs, "z")}
                         {...findError(props.attr.code)}
                     />
                     {props.facet?.units && (

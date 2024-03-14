@@ -254,7 +254,7 @@ export default function CreateProductPage() {
     try {
       setSubmitLoading(true);
       // send a request to create products
-      await api.post('/admin/products/create', body, { timeout: 25 * 1000 });
+      await api.post('/admin/products/create', body, { timeout: 60 * 1000 });
       setSubmitLoading(false);
       navigate("/products");
     } catch (err) {

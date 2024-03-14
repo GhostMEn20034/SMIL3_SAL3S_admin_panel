@@ -357,7 +357,7 @@ export default function UpdateProductPage() {
         }
         try {
             setSubmitLoading(true);
-            await api.put(`/admin/products/${id}`, body, { timeout: 25 * 1000 });
+            await api.put(`/admin/products/${id}`, body, { timeout: 60 * 1000 });
             setSubmitLoading(false);
             navigate("/products");
         } catch (err) {

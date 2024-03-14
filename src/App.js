@@ -18,7 +18,7 @@ function App() {
 
   const location = useLocation();
 
-  const authRoutes = ['/signin', '/reset-password', '/reset-password/confirm'];
+  const authRoutes = ['/signin', ];
 
   return (
     <>
