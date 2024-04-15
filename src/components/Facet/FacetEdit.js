@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
-import useAxios from "../../utils/useAxios";
 import { Box, Button, TextField, FormControlLabel, Checkbox, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+
 import SelectValue from "../SelectValue";
 import MultipleSelect from "../MultipleSelectValue";
 import ChipsArray from "../ChipsArray";
-import { useNavigate } from "react-router-dom";
 import { addItemToChipsArray, removeItemFromChipsArray } from "../../utils/Services";
+import { changeRangeValue, addRangeValue, removeRangeValue, generateDisplayNameForRangeValues } from "../../utils/facetUtils/rangeValues";
+import useAxios from "../../utils/useAxios";
 import Textarea from "../TextArea";
+import RangeValuesEdit from "./RangeValuesEdit";
+import ObjectValueExtractor from "../../utils/objectValueExtractor";
 
 export default function FacetEdit({ facet, categories }) {
     const [facetTypes, setFacetTypes] = useState([]);
@@ -28,7 +32,10 @@ export default function FacetEdit({ facet, categories }) {
     const [chosenCategories, setChosenCategories] = useState(facet.categories);
     const [explanation, setExplanation] = useState(facet.explanation ? facet.explanation : "");
 
-    const [errors, setErrors] = useState({});
+    const [isRange, setIsRange] = useState(facet.is_range);
+    const [rangeValues, setRangeValues] = useState(facet.range_values);
+
+    const [errorHandler, setErrorHandler] = useState(new ObjectValueExtractor({}, false));
 
     const api = useAxios('products');
     const navigate = useNavigate();
@@ -57,11 +64,50 @@ export default function FacetEdit({ facet, categories }) {
                 explanation: explanation.trim().length < 1 ? null : explanation,
                 values: facetValues.length > 0 ? facetValues : null,
                 units: !unitsIsNull && units.length > 0 ? units : null,
+                is_range: isRange,
+                range_values: isRange ? rangeValues : null,
             });
             navigate(-1);
-        } catch (error) {
-            setErrors(error.response.data.errors);
+        } catch (err) {
+            let baseErrors = err.response.data?.base_errors;
+            setErrorHandler(() => {
+                if (baseErrors) {
+                    return new ObjectValueExtractor(err.response.data.errors, true);
+                } else {
+                    return new ObjectValueExtractor(err.response.data.detail, false);
+                }
+            });
         }
+    };
+
+    const handleChangeRangeValue = (index, key, value) => {
+        setRangeValues((prevValues) => {
+            return changeRangeValue(prevValues, index, key, value);
+        });
+    };
+
+    const handleAddRangeValue = (gteq, ltn, displayName) => {
+        setRangeValues((prevValues) => {
+            return addRangeValue(prevValues, gteq, ltn, displayName);
+        });
+    };
+
+    const handleRemoveRangeValue = (index) => {
+        setRangeValues((prevValues) => {
+            let newValues = removeRangeValue(prevValues, index);
+            if (newValues.length > 0) {
+                return newValues;
+            }
+            return null;
+        });
+    };
+
+    const generateRangeValueDisplayName = () => {
+        setRangeValues((prevValues) => {
+            return generateDisplayNameForRangeValues(
+                prevValues, units.length > 0 ? units[0] : null
+            );
+        });
     };
 
     return (
@@ -71,10 +117,22 @@ export default function FacetEdit({ facet, categories }) {
                     <TextField value={code} label="Code" size="small" disabled />
                 </Box>
                 <Box sx={{ mt: 2 }}>
-                    <TextField value={name} onChange={(e) => setName(e.target.value)} label="Name" size="small" error={errors.name !== undefined} helperText={errors.name ? errors.name : ""} />
+                    <TextField 
+                        value={name} 
+                        onChange={(e) => setName(e.target.value)} 
+                        label="Name" size="small" 
+                        error={errorHandler.isValueExist("name")} 
+                        helperText={errorHandler.getObjectValue("name")} 
+                    />
                 </Box>
                 <Box sx={{ mt: 2 }}>
-                    <SelectValue value={type} setValue={setType} menuItems={facetTypes} label={"Type"} disabled={true} />
+                    <SelectValue 
+                        value={type} 
+                        setValue={setType} 
+                        menuItems={facetTypes} 
+                        label={"Type"} 
+                        disabled={true} 
+                    />
                 </Box>
                 <Box sx={{ mt: 2 }}>
                     <SelectValue value={optional} setValue={setOptional} menuItems={[
@@ -102,8 +160,8 @@ export default function FacetEdit({ facet, categories }) {
                                 onChange={(e) => setNewFacetValue(e.target.value)}
                                 label="New facet value"
                                 size="small"
-                                error={errors.values !== undefined}
-                                helperText={errors.values ? errors.values : ""}
+                                error={errorHandler.isValueExist("values")}
+                                helperText={errorHandler.getObjectValue("values")}
                                 sx={{ mr: 2 }}
                             />
                             <Button size="small" color="primary" variant="contained" sx={{ maxHeight: "40px" }}
@@ -148,6 +206,19 @@ export default function FacetEdit({ facet, categories }) {
                     <Textarea value={explanation} setValue={setExplanation}
                         placeholder={"Add a facet explanation... (Optional)"} minRows={5}
                         sx={{ width: 450 }} />
+                </Box>
+                <Box sx={{ mt: 2 }}>
+                    <RangeValuesEdit
+                        isRange={isRange}
+                        setIsRange={setIsRange}
+                        type={type}
+                        rangeValues={rangeValues}
+                        setRangeValues={handleChangeRangeValue}
+                        AddRangeValue={handleAddRangeValue}
+                        removeRangeValue={handleRemoveRangeValue}
+                        generateRangeValueDisplayName={generateRangeValueDisplayName}
+                        errorHandler={errorHandler}
+                    />
                 </Box>
                 <Box sx={{ mt: 2, mb: 2 }}>
                     <Button variant="contained" size="large" color="primary"

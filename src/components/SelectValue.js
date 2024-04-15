@@ -24,6 +24,7 @@ export default function SelectValue({ value, setValue, menuItems, label, disable
         value={value}
         label={label}
         onChange={handleChange}
+        size='small'
       >
       {menuItems.map((menuItem, index) => (
         <MenuItem key={index} value={menuItem[menuValue]}>{menuItem[displayName]}</MenuItem>

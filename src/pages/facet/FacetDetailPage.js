@@ -2,14 +2,13 @@ import { Box, Button } from "@mui/material";
 import useAxios from "../../utils/useAxios";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import FacetDetail from "../../components/Facet/FacetDetail";
 import FacetEdit from "../../components/Facet/FacetEdit";
 import FacetDelete from "../../components/Facet/FacetDelete";
 
 export default function FacetDetailPage() {
 
-    const [facet, setFacet] = useState({});
-    const [categories, setCategories] = useState([]);
+    const [facet, setFacet] = useState(null);
+    const [categories, setCategories] = useState(null);
     const [editMode, setEditMode] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
 
@@ -80,12 +79,8 @@ export default function FacetDetailPage() {
                                 <Button variant="contained" color="error" size="small" onClick={() => setOpenDialog(!openDialog)}>Delete Facet</Button>
                             </Box>
                         </Box>
-                        <Box display={"flex"} alignItems={"center"} justifyContent={"center"} sx={{ mt: 4, ml: "30vh", width: "600px" }}>
-                            {editMode ? (
-                                <FacetEdit facet={facet} categories={categories} />
-                            ) : (
-                                <FacetDetail facet={facet} categories={categories} />
-                            )}
+                        <Box display={"flex"} alignItems={"center"} justifyContent={"center"} sx={{ mt: 4, ml: "10vh", width: "990px" }}>
+                            <FacetEdit facet={facet} categories={categories} />
                         </Box>
                     </Box>
                 </>

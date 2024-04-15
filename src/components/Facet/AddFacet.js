@@ -1,14 +1,22 @@
-import { Box, TextField, Button, Checkbox, FormControlLabel, Typography } from "@mui/material";
+import {
+    Box, TextField, Button,
+    Checkbox, FormControlLabel,
+    Typography
+} from "@mui/material";
 import slugify from "voca/slugify";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Textarea from "../TextArea";
 
+import Textarea from "../TextArea";
 import useAxios from "../../utils/useAxios";
 import SelectValue from "../SelectValue";
 import MultipleSelect from "../MultipleSelectValue";
 import ChipsArray from "../ChipsArray";
 import { removeItemFromChipsArray, addItemToChipsArray } from "../../utils/Services";
+import { changeRangeValue, addRangeValue, removeRangeValue, generateDisplayNameForRangeValues } from "../../utils/facetUtils/rangeValues";
+import RangeValuesEdit from "./RangeValuesEdit";
+import ObjectValueExtractor from "../../utils/objectValueExtractor";
+
 
 
 export default function AddFacet() {
@@ -32,7 +40,10 @@ export default function AddFacet() {
     const [facetTypes, setFacetTypes] = useState([]);
     const [categories, setCategories] = useState([]);
 
-    const [errors, setErrors] = useState({});
+    const [isRange, setIsRange] = useState(false);
+    const [rangeValues, setRangeValues] = useState(null);
+
+    const [errorHandler, setErrorHandler] = useState(new ObjectValueExtractor({}, false));
 
     const api = useAxios('products');
     const navigate = useNavigate();
@@ -59,7 +70,6 @@ export default function AddFacet() {
 
 
     const addFacet = async () => {
-        setErrors({});
         // Request Body
         let body = {
             name: name,
@@ -71,20 +81,56 @@ export default function AddFacet() {
             explanation: explanation.trim().length < 1 ? null : explanation,
             values: facetValues.length > 0 ? facetValues : null,
             units: !unitsIsNull && units.length > 0 ? units : null,
+            is_range: isRange,
+            range_values: isRange ? rangeValues : null,
         };
 
         try {
             await api.post("/admin/facets/", body);
             navigate(-1);
-        } catch (error) {
-            if (error.response.data?.base_errors) {
-                setErrors(error.response.data.errors);
-            } else {
-                setErrors(error.response.data.detail);
-            }
-            
+        } catch (err) {
+            let baseErrors = err.response.data?.base_errors;
+            setErrorHandler(() => {
+                if (baseErrors) {
+                    return new ObjectValueExtractor(err.response.data.errors, true);
+                } else {
+                    return new ObjectValueExtractor(err.response.data.detail, false);
+                }
+            });
+
         }
     };
+
+    const handleChangeRangeValue = (index, key, value) => {
+        setRangeValues((prevValues) => {
+            return changeRangeValue(prevValues, index, key, value);
+        });
+    };
+
+    const handleAddRangeValue = (gteq, ltn, displayName) => {
+        setRangeValues((prevValues) => {
+            return addRangeValue(prevValues, gteq, ltn, displayName);
+        });
+    };
+
+    const handleRemoveRangeValue = (index) => {
+        setRangeValues((prevValues) => {
+            let newValues = removeRangeValue(prevValues, index);
+            if (newValues.length > 0) {
+                return newValues;
+            }
+            return null;
+        });
+    };
+
+    const generateRangeValueDisplayName = () => {
+        setRangeValues((prevValues) => {
+            return generateDisplayNameForRangeValues(
+                prevValues, units.length > 0 ? units[0] : null
+            );
+        });
+    };
+
 
     useEffect(() => {
         getCategories();
@@ -97,15 +143,15 @@ export default function AddFacet() {
     };
 
     const fields = [
-        { value: code, setValue: null, label: "Code", disabled: true, error: errors.code !== undefined, helperText: errors.code ? errors.code : "" },
-        { value: name, setValue: handleChangeName, label: "Name", disabled: false, error: errors.name !== undefined, helperText: errors.name ? errors.name : "" }
+        { value: code, setValue: null, label: "Code", disabled: true, error: errorHandler.isValueExist("code"), helperText: errorHandler.getObjectValue("code") },
+        { value: name, setValue: handleChangeName, label: "Name", disabled: false, error: errorHandler.isValueExist("name"), helperText: errorHandler.getObjectValue("name") }
     ];
 
     return (
         <Box>
             {fields.map((field, index) => (
                 <Box sx={{ mt: index !== 0 ? 2 : 0 }} key={index}>
-                    <TextField error={field.error} value={field.value} onChange={field.setValue} label={field.label} disabled={field.disabled} helperText={field.helperText} size="small"/>
+                    <TextField error={field.error} value={field.value} onChange={field.setValue} label={field.label} disabled={field.disabled} helperText={field.helperText} size="small" />
                 </Box>
             ))}
             <Box sx={{ mt: 2 }}>
@@ -113,7 +159,7 @@ export default function AddFacet() {
             </Box>
             <Box sx={{ mt: 2 }}>
                 <MultipleSelect value={chosenCategories === "*" ? [] : chosenCategories} setValue={setChosenCategories}
-                    objectKey={"_id"} objectValue={"name"} menuItems={categories} label={"Categories"} error={errors.categories !== undefined} helperText={errors.categories ? errors.categories : ""} />
+                    objectKey={"_id"} objectValue={"name"} menuItems={categories} label={"Categories"} error={errorHandler.isValueExist("categories")} helperText={errorHandler.getObjectValue("categories")} />
             </Box>
             <Typography sx={{ mt: 1 }} variant="body2">
                 * An empty list of categories means that facet can be used for a product with any category
@@ -122,8 +168,8 @@ export default function AddFacet() {
                 <Box sx={{ mt: 2 }}>
                     <Box display={"flex"}>
                         <TextField value={newFacetValue}
-                            error={errors.values !== undefined}
-                            helperText={errors.values ? errors.values : ""}
+                            error={errorHandler.isValueExist("values")}
+                            helperText={errorHandler.getObjectValue("values")}
                             onChange={(e) => setNewFacetValue(e.target.value)}
                             label="New facet value"
                             size="small"
@@ -167,10 +213,10 @@ export default function AddFacet() {
                     </Box>
                 </Box>
             )}
-            <Box sx={{mt: 2}}>
-                <Textarea value={explanation} setValue={setExplanation} 
-                placeholder={"Add a facet explanation... (Optional)"} minRows={5} 
-                sx={{width: 450}}/>
+            <Box sx={{ mt: 2 }}>
+                <Textarea value={explanation} setValue={setExplanation}
+                    placeholder={"Add a facet explanation... (Optional)"} minRows={5}
+                    sx={{ width: 450 }} />
             </Box>
             <Box sx={{ mt: 2 }}>
                 <SelectValue value={optional} setValue={setOptional} menuItems={[
@@ -184,11 +230,25 @@ export default function AddFacet() {
                     { "value": false, "name": "No" }
                 ]} label={"Show in filters"} />
             </Box>
-            <Box sx={{ mt: 2, mb: 2 }}>
+            <Box sx={{ mt: 2 }}>
+                <RangeValuesEdit
+                    isRange={isRange}
+                    setIsRange={setIsRange}
+                    type={type}
+                    rangeValues={rangeValues}
+                    setRangeValues={handleChangeRangeValue}
+                    AddRangeValue={handleAddRangeValue}
+                    removeRangeValue={handleRemoveRangeValue}
+                    generateRangeValueDisplayName={generateRangeValueDisplayName}
+                    errorHandler={errorHandler}
+                />
+            </Box>
+            <Box sx={{ my: 2 }}>
                 <Button variant="contained" onClick={() => addFacet()}>
                     Submit
                 </Button>
             </Box>
+
         </Box>
     )
 

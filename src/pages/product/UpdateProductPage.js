@@ -227,12 +227,12 @@ export default function UpdateProductPage() {
             setVariationTheme(data.variation_theme);
             setCategory(data.category);
 
-            // set loading state to false
-            setLoading(false);
+            
 
         } catch (err) {
-            setLoading(false);
         }
+        // set loading state to false
+        setLoading(false);
     };
 
     useEffect(() => {
