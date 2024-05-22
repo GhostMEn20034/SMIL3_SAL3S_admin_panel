@@ -15,6 +15,7 @@ import ProductVariationList from "../../components/CreateProduct/ProductVariatio
 import UpdateProductImages from "../../components/UpdateProduct/UpdateProductImages/UpdateProductImages";
 import SubmitMenu from "../../components/UpdateProduct/SubmitMenu";
 import { encodeManyImages, encodeImages, encodeOneImage } from "../../utils/ImageServices";
+import { addAttrIfNotExists } from "../../utils/Services";
 import ObjectValueExtractor from "../../utils/objectValueExtractor";
 import DeleteProductDialog from "../../components/UpdateProduct/DeleteProductDialog";
 import KeywordsSection from "../../components/Product/KeywordsSection";
@@ -248,7 +249,13 @@ export default function UpdateProductPage() {
         navigate(-1);
     };
 
-
+    const addNewProductAttrs = () => {
+        setAttrs((prevValues) => {
+            prevValues = structuredClone(prevValues);
+            addAttrIfNotExists(prevValues, facets);
+            return prevValues;
+        });
+    };
 
     const handleSubmit = async () => {
 
@@ -442,6 +449,11 @@ export default function UpdateProductPage() {
             <Box px={2} mt={1} mb={1}>
                 <Button variant="contained" color="warning" onClick={goBack}>
                     Go back
+                </Button>
+            </Box>
+            <Box px={2} mt={1} mb={1}>
+                <Button variant="contained" onClick={addNewProductAttrs}>
+                    Add new product attributes
                 </Button>
             </Box>
             <Box px={2} mt={1} mb={1}>

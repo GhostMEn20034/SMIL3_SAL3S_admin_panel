@@ -1,10 +1,11 @@
-import { Box, TextField, Paper, Button, Alert, Typography } from "@mui/material";
+import { Box, TextField, Paper, Button, Alert } from "@mui/material";
 import { NumericFormat } from "react-number-format";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 import { VisuallyHiddenInput } from "../../HiddenInput";
 import SelectValueRadioGroup from "../../SelectValueRadioGroup";
 import SelectValue from "../../SelectValue";
+import Textarea from "../../TextArea";
 
 export default function UpdateDealForm(props) {
     const getImageFromUrl = (image) => {
@@ -142,17 +143,36 @@ export default function UpdateDealForm(props) {
                             helperText={props.errorHandler.getObjectValue("price_max")}
                         />
                     </Box>
-                    <Box sx={{ mt: 2}}>
+                    <Box sx={{ mt: 2 }}>
                         <TextField
                             size="small"
                             disabled={true}
                             value={decodeURIComponent(props.dealData?.query_string)}
                             label="Pre calculated query string"
-                            sx={{minWidth: 300}}
+                            sx={{ minWidth: 300 }}
                         />
                     </Box>
                 </>
             )}
+            <Box sx={{ mt: 2 }}>
+                <Textarea
+                    value={props.description ? props.description : ""}
+                    setValue={props.setDescription}
+                    placeholder="Add a deal's description... (Optional)"
+                    sx={{ width: 450 }}
+                />
+            </Box>
+            <Box sx={{ mt: 2 }}>
+                <TextField
+                    size="small"
+                    label="Button text"
+                    value={props.dealData?.button_text ? props.dealData?.button_text : ""}
+                    onChange={(e) => props.handleChangeDealData(e.target.name, e.target.value)}
+                    name="button_text"
+                    error={props.errorHandler.isValueExist("button_text")}
+                    helperText={props.errorHandler.getObjectValue("button_text")}
+                />
+            </Box>
         </Box>
     );
 }

@@ -69,14 +69,14 @@ const mapValueToFacetType = (facet) => {
     return value
 }
 
-export const facetsToAttrs = (facets) => {
+export const facetsToAttrs = (facets, setAllAttrAsOptional=false) => {
 
     let attrs = facets.map(facet => ({
         code: facet.code,
         name: facet.name,
         type: facet.type,
         value: mapValueToFacetType(facet),
-        optional: facet.optional,
+        optional: setAllAttrAsOptional ? true : facet.optional,
         unit: facet.units ? facet.units[0] : null,
         group: null,
         explanation: facet.explanation,
@@ -84,6 +84,24 @@ export const facetsToAttrs = (facets) => {
 
     return attrs;
 }
+
+export const addAttrIfNotExists = (attrs, facets) => {
+    let attrCodes = attrs.map((attr) => attr.code);
+
+    let notIncludedFacets = [];
+
+    for (let facet of facets) {
+        if (!attrCodes.includes(facet.code)) {
+            notIncludedFacets.push(facet);
+        }
+    }
+    if (notIncludedFacets.length > 0) {
+        let newAttrs = facetsToAttrs(notIncludedFacets, true);
+        attrs.push(...newAttrs);
+    }
+    
+    return attrs;
+};
 
 
 export const handleChangeAttrs = (index, newValue, setAttrs, objectKey) => {

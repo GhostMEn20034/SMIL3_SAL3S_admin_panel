@@ -15,6 +15,7 @@ import DeleteDealDialog from "../../components/Deals/DeleteDealDialog";
 export default function UpdateDealPage() {
     const [dealData, setDealData] = useState(null);
     const [isParent, setIsParent] = useState(false);
+    const [description, setDescription] = useState(null);
     const [image, setImage] = useState(null);
     const [otherFilters, setOtherFilters] = useState(null);
     const [creationEssentials, setCreationEssentials] = useState({});
@@ -50,10 +51,11 @@ export default function UpdateDealPage() {
         try {
             let response = await api.get(`/admin/deals/${id}`);
             let data = await response.data;
-            let {is_parent, image, other_filters, ...deal_data} = data.deal;
-            
+            let { is_parent, image, other_filters, description, ...deal_data } = data.deal;
+
             setDealData(deal_data);
             setIsParent(is_parent);
+            setDescription(description);
             setImage(image);
             setOtherFilters(other_filters);
         } catch (e) {
@@ -111,10 +113,12 @@ export default function UpdateDealPage() {
 
             let body = {
                 ...dealData,
+                description: description?.length > 0 ? description : null,
                 is_parent: isParent,
                 image: encodedImage,
                 other_filters: otherFilters,
-            }
+            };
+
             await api.put(`/admin/deals/${id}`, body);
             navigate(-1);
         } catch (err) {
@@ -160,7 +164,7 @@ export default function UpdateDealPage() {
     return (
         <Box>
             {currentDialog === 'deleteDeal' && (
-                <DeleteDealDialog 
+                <DeleteDealDialog
                     open={currentDialog === 'deleteDeal'}
                     setOpen={setCurrentDialog}
                     name={dealData.name}
@@ -177,9 +181,9 @@ export default function UpdateDealPage() {
                     <Button variant="contained" sx={{ mt: 1 }} color="warning" onClick={() => navigate(-1)}>
                         Go back
                     </Button>
-                    <Button 
-                        variant="contained" 
-                        sx={{mt: 1, ml: 2}} 
+                    <Button
+                        variant="contained"
+                        sx={{ mt: 1, ml: 2 }}
                         color="error"
                         onClick={() => setCurrentDialog("deleteDeal")}
                     >
@@ -202,6 +206,8 @@ export default function UpdateDealPage() {
                             <UpdateDealForm
                                 dealData={dealData}
                                 handleChangeDealData={handleChangeDealData}
+                                description={description}
+                                setDescription={(newValue) => setDescription(newValue?.length > 0 ? newValue : null)}
                                 image={image}
                                 setImage={handleChangeImage}
                                 isParent={isParent}

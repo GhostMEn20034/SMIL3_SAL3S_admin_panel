@@ -20,7 +20,9 @@ export default function CreateDealPage() {
         price_min: null,
         price_max: null,
         category_id: null,
+        button_text: null,
     });
+    const [description, setDescription] = useState(null);
     const [isParent, setIsParent] = useState(false);
     const [image, setImage] = useState(null);
     const [otherFilters, setOtherFilters] = useState(null);
@@ -91,6 +93,7 @@ export default function CreateDealPage() {
 
             let body = {
                 ...dealData,
+                description: description?.length > 0 ? description : null,
                 is_parent: isParent,
                 image: encodedImage,
                 other_filters: otherFilters,
@@ -150,6 +153,8 @@ export default function CreateDealPage() {
                         <>
                             <AddDealForm
                                 dealData={dealData}
+                                description={description}
+                                setDescription={(newValue) => setDescription(newValue?.length > 0 ? newValue : null)}
                                 handleChangeDealData={handleChangeDealData}
                                 image={image}
                                 setImage={handleChangeImage}
