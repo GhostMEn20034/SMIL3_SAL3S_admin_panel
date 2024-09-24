@@ -1,5 +1,4 @@
 # Smile Sales Admin Panel for product microservice (Private API)
-This is the main website of the SMILE SALES e-commerce.
 
 # .env file example
 ```shell
